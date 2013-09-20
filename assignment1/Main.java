@@ -28,26 +28,36 @@ public class Main {
         line = in.nextLine().trim();
         while(line != ""){
             lines.add(line);
-            line = in.nextLine.trim();
+            line = in.nextLine().trim();
         }
-        MTPair[] forcedAssignments = parseForcedAssignments(lines);
+        try{
+            int[][] forcedAssignments = parseForcedAssignments(lines);
+        } catch(IOException e){
+            System.out.println(e.getMessage());
+            return;
+        }
 		
         lines = new LinkedList<String>();
         line = in.nextLine().trim();
         while(line != ""){
             lines.add(line);
-            line = in.nextLine.trim();
+            line = in.nextLine().trim();
         }
-        boolean[][] forbiddenMachine = parseForbiddenMachines(lines);
+        try{
+            boolean[][] forbiddenMachine = parseForbiddenMachines(lines);
+        } catch(IOException e){
+            System.out.println(e.getMessage());
+            return;
+        }
 
         lines = new LinkedList<String>();
         line = in.nextLine().trim();
         while(line != ""){
             lines.add(line);
-            line = in.nextLine.trim();
+            line = in.nextLine().trim();
         }
 
-		String line = in.nextLine().trim();
+		line = in.nextLine().trim();
 		while(line.toCharArray()[0] == '('){
 			String[] split = line.substring(1, line.length() -1).split(",");
 			int machine = Integer.parseInt(split[0]);
@@ -58,39 +68,46 @@ public class Main {
 	}
 	
     // Return some data structure containing forced parcial assignments.
-	public static MTPair[] parseForcedAssignments(LinkedList<String> in) throws IOException{
-		MTPair[] result = new MTPair[in.length]; // 8 machines maximum, each can only appear once.
+	public static int[][] parseForcedAssignments(LinkedList<String> in) throws IOException{
+        // Initialize the result array such that each element is -1;
+        int[][] result = new int[in.size()][2];
+        for(int i = 0; i < result.length; i++){
+            result[i][0] = -1;
+            result[i][1] = -1;
+        }
+        
 		int sp = 0;
-		char machine;
-		char task;
-		MTPair constraint;
+		int machine;
+		int task;
+
 		for(String line : in){
 			String[] split = line.substring(0, line.length() - 1).split(",");
-			machine = split[0].charAt(0);
-			task = split[1].toLowerCase().charAt(0);
-			constraint = new MTPair(machine, task);
+			machine = Node.getMachineNumber(split[0].charAt(0));
+			task = Character.getNumericValue(split[1].toLowerCase().charAt(0));
 			
 			// Naive search for duplicate machines or tasks.
-			for(MTPair p : result){
-				if(p != null && (p.machine() == machine || p.task() == task)){
+            for(int i = 0; i < result.length; i++){
+                if(result[i][0] != -1 && (result[i][0] == machine || result[i][1] == task)){
 					throw new IOException("partial assignment error");
 				}
 			}
-			result[sp++] = constraint;
+            result[sp][0] = machine;
+            result[sp][1] = task;
+            sp++;
 		}
 		
 		return result;
 	}
 	
     // Return a map ((machine, task) -> boolean) containing forbidden machines.
-	public static boolean[][] parseForbiddenMachines(LinkedList<String> in){
+	public static boolean[][] parseForbiddenMachines(LinkedList<String> in) throws IOException{
 		boolean[][] result = new boolean[8][8];
 		char machine;
-		char task;
+		int task;
 		for(String line : in){
 			String[] split = line.substring(0, line.length() - 1).split(",");
 			machine = split[0].toLowerCase().charAt(0);
-			task = Integer.parseInt(split[1].charAt(0)) - 1;
+			task = Character.getNumericValue(split[1].charAt(0)) - 1;
 			
             /* Catch errors. */
             if(machine < 'a' || machine > 'h' || task < 0 || task > 7){
@@ -107,12 +124,14 @@ public class Main {
 	public static boolean[][] parseTooNearTasks(LinkedList<String> in){
 		boolean[][] result = new boolean[8][8];
         int sp = 0;
-        char machine;
-        char task;
+        int machine;
+        int task;
+        int task1;
+        int task2;
         for(String line : in){
-            String[] split = line.substring(0, line.lengh() - 1).split(",");
-            task1 = split[0].charAt(0) - 1;
-            task2 = split[1].charAt(0) - 1;
+            String[] split = line.substring(0, line.length() - 1).split(",");
+            task1 = Character.getNumericValue(split[0].charAt(0)) - 1;
+            task2 = Character.getNumericValue(split[1].charAt(0)) - 1;
             result[task1][task2] = true;
         }
 
@@ -124,22 +143,25 @@ public class Main {
         int[][] result = new int[8][8];
 
         /* Check input length. */
-        if (in.length != 8) throw new IOException("machine penalty error");
+        if (in.size() != 8) throw new IOException("machine penalty error");
 
-		for(int i = 0; i < 8; i++){
-            String[] split = in[i].split();
+        int i = 0;
+		for(String line : in){
+            String[] split = line.split(",");
             
             /* Check input length. */
             if(split.length != 8) throw new IOException("machine penalty error");
 
-            for(int j = 0; i < 8; i++){
+            for(int j = 0; j < 8; j++){
                 result[i][j] = Integer.parseInt(split[j]);
             }
+
+            i++;
         }
         return result;
 	}
 	
 	public static int[][] parseTooNearPenalties(LinkedList<String> in){
-		
+		return null;
 	}
 }

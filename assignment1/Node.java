@@ -15,13 +15,15 @@ public class Node{
         this.penalty = parent.getPenalty();
     }
 
-    public setTask(char machine, int task) throws Exception{
+    public void setTask(char machine, int task) throws Exception{
         int machineNum = getMachineNumber(machine);
         if(machineNum < 0 || machineNum > 7) throw new Exception("FAIL");
         tasks[getMachineNumber(machine)] = task;
+        penalty += penalties[machineNum][task];
     }
 
     public int getPenalty(){
+        return penalty;
     }
 
     public static int getMachineNumber(char machine){
