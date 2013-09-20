@@ -22,7 +22,7 @@ public class Main {
 		in.nextLine(); // Skip blank line.
 
         line = in.nextLine();
-        if(line != "forced partial assignment:") System.out.println("Error while parsing input file');
+        if(line != "forced partial assignment:") System.out.println("Error while parsing input file");
 
         lines = new LinkedList<String>();
         line = in.nextLine().trim();
