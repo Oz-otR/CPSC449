@@ -5,6 +5,7 @@ public class Node{
     private static long[][] tooNearPenalties;
 
     private int[] tasks = new int[8];
+    private boolean[] assigned;
 
     public Node(long[][] penalties, long[][] tooNearPenalties){
         this.penalties = penalties;
@@ -14,6 +15,7 @@ public class Node{
     public Node(Node parent){
         for(int i = 0; i < 8; i++){
             tasks[i] = parent.getTask(i);
+            if(tasks[i] != -1) assigned[tasks[i]] = true;
         }
     }
 
@@ -25,6 +27,7 @@ public class Node{
             if(tasks[i] == task) throw new Exception("task already assigned");
         }
 
+        assigned[task] = true;
         tasks[machine] = task;
     }
     
@@ -51,6 +54,23 @@ public class Node{
             if(tasks[i] != -1) count++;
         }
         return count;
+    }
+    
+    public int[] getRemainingTasks(){
+        // Count how many remaining tasks there are.
+        int count = 0;
+        for(int i = 0; i < 8; i++){
+            if(tasks[i] == -1) count++;
+        }
+
+        // Create the result array of size count.
+        int[] result = new int[count];
+
+        // Fill the result array.
+        for(int i = 0; i < 8; i++){
+            if(!assigned[i]) result[--count] = i;
+        }
+        return result;
     }
 
     public int getFreeMachine(){
