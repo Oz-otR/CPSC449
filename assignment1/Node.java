@@ -40,8 +40,8 @@ public class Node{
         for(int i = 0; i < 8; i++){
             if(tasks[i] != -1){
                 penalty += penalties[i][tasks[i]];
-                if(tasks[(i + 1) % 7] != -1){
-                    penalty += tooNearPenalties[i][(i + 1) % 7];
+                if(tasks[(i + 1) % 8] != -1){
+                    penalty += tooNearPenalties[i][(i + 1) % 8];
                 }
             }
         }

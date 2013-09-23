@@ -17,7 +17,7 @@ public class Solver{
             for(int t : n.getRemainingTasks()){
 
                 // Check if the task assignment is forbidden.
-                if(!forbidden[m][t] && !tooNear[n.getTask((m-1) % 7)][t]){
+                if(!forbidden[m][t] && !tooNear[n.getTask((m-1) % 8)][t]){
 
                     // Create the new node and assign the task.
                     Node next = new Node(n);
