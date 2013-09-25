@@ -7,9 +7,10 @@ public class Node{
     private int[] tasks = new int[8];
     private boolean[] assigned;
 
-    public Node(long[][] penalties, long[][] tooNearPenalties){
+    public Node(int[] tasks, long[][] penalties, long[][] tooNearPenalties){
         this.penalties = penalties;
         this.tooNearPenalties = tooNearPenalties;
+        this.tasks = tasks;
     }
 
     public Node(Node parent){
