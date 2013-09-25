@@ -27,29 +27,29 @@ public class Parser{
     }
 	
     // Return a map ((machine, task) -> boolean) containing forbidden machines.
-	public static boolean[][] parseForbiddenMachines(LinkedList<String> in) throws IOException{
-		boolean[][] result = new boolean[8][8];
-		char machine;
-		int task;
-		for(String line : in){
-			String[] split = line.substring(0, line.length() - 1).split(",");
-			machine = split[0].toLowerCase().charAt(0);
-			task = Character.getNumericValue(split[1].charAt(0)) - 1;
-			
+        public static boolean[][] parseForbiddenMachines(LinkedList<String> in) throws IOException{
+        boolean[][] result = new boolean[8][8];
+        char machine;
+        int task;
+        for(String line : in){
+            String[] split = line.substring(0, line.length() - 1).split(",");
+            machine = split[0].toLowerCase().charAt(0);
+            task = Character.getNumericValue(split[1].charAt(0)) - 1;
+            
             /* Catch errors. */
             if(machine < 'a' || machine > 'h' || task < 0 || task > 7){
                 throw new IOException("invalid machine/task");
             }
 
             result[Node.getMachineNumber(machine)][task] = true;
-		}
+        }
 		
-		return result;
-	}
+    return result;
+    }
 	
     // Return some data structure containing Too-Near tasks.
-	public static boolean[][] parseTooNearTasks(LinkedList<String> in){
-		boolean[][] result = new boolean[8][8];
+    public static boolean[][] parseTooNearTasks(LinkedList<String> in){
+        boolean[][] result = new boolean[8][8];
         int sp = 0;
         int machine;
         int task;
@@ -66,14 +66,14 @@ public class Parser{
 	}
 	
     // Return a 2D matrix of penalties.
-	public static int[][] parseMachinePenalties(LinkedList<String> in) throws IOException{
+    public static int[][] parseMachinePenalties(LinkedList<String> in) throws IOException{
         int[][] result = new int[8][8];
 
         /* Check input length. */
         if (in.size() != 8) throw new IOException("machine penalty error");
 
         int i = 0;
-		for(String line : in){
+        for(String line : in){
             String[] split = line.split(",");
             
             /* Check input length. */
@@ -86,9 +86,9 @@ public class Parser{
             i++;
         }
         return result;
-	}
+    }
 	
-	public static int[][] parseTooNearPenalties(LinkedList<String> in){
-		return null;
-	}
+    public static int[][] parseTooNearPenalties(LinkedList<String> in){
+        return null;
+    }
 }
