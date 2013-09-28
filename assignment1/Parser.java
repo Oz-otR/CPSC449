@@ -87,8 +87,23 @@ public class Parser{
         }
         return result;
     }
-	
+    // Returns an 8x8 matrix of pentalties, where [x][y] is the penalty for having y run on the machine next to x
     public static int[][] parseTooNearPenalties(LinkedList<String> in){
-        return null;
+        int[][] result = new int[8][8];
+        int sp = 0;
+        int machine;
+        int task;
+        int task1;
+        int task2;
+        int value;
+        for(String line : in){
+            String[] split = line.substring(0, line.length() - 1).split(",");
+            task1 = Character.getNumericValue(split[0].charAt(0)) - 1;
+            task2 = Character.getNumericValue(split[1].charAt(0)) - 1;
+            value = Character.getNumericValue(split[2].charAt(0));
+            result[task1][task2] = value;
+        }
+
+        return result;
     }
 }
