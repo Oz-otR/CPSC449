@@ -89,6 +89,6 @@ public class Parser{
 	}
 	
 	public static int[][] parseTooNearPenalties(LinkedList<String> in){
-    	return null;
+		return null;
 	}
 }
