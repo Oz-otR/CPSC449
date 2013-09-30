@@ -17,7 +17,8 @@ public class Parser{
             String[] split = line.substring(1, line.length() - 1).split(",");
             machine = Node.getMachineNumber(split[0].charAt(0));
             task = Character.getNumericValue(split[1].toLowerCase().charAt(0));
-
+            if(machine>7 || machine<0) throw new IOException("invalid machine");
+            if(task>7 || task<0) throw new IOEsception("invalid task");
             if(result[machine] != -1) throw new IOException("partial assignment error");
 
             result[machine] = task;
@@ -25,7 +26,7 @@ public class Parser{
 
         return result;
     }
-	
+    
     // Return a map ((machine, task) -> boolean) containing forbidden machines.
         public static boolean[][] parseForbiddenMachines(LinkedList<String> in) throws IOException{
         boolean[][] result = new boolean[8][8];
@@ -37,16 +38,15 @@ public class Parser{
             task = Character.getNumericValue(split[1].charAt(0)) - 1;
             
             /* Catch errors. */
-            if(machine < 'a' || machine > 'h' || task < 0 || task > 7){
-                throw new IOException("invalid machine/task");
-            }
+            if(machine < 'a' || machine > 'h' ) throw new IOException("invalid machine");    //Isn't machine supposed to be numbered?
+            if(task<0 || task>7) throw new IOException("invalid task");
 
             result[Node.getMachineNumber(machine)][task] = true;
         }
-		
+    	
     return result;
     }
-	
+    
     // Return some data structure containing Too-Near tasks.
     public static boolean[][] parseTooNearTasks(LinkedList<String> in){
         boolean[][] result = new boolean[8][8];
@@ -59,6 +59,7 @@ public class Parser{
             String[] split = line.substring(0, line.length() - 1).split(",");
             task1 = Character.getNumericValue(split[0].charAt(0)) - 1;
             task2 = Character.getNumericValue(split[1].charAt(0)) - 1;
+            if(task1>7 || task2<0 || task2>7 || task2<0) throw new IOEsception("invalid task");
             result[task1][task2] = true;
         }
 
@@ -101,6 +102,7 @@ public class Parser{
             task1 = Character.getNumericValue(split[0].charAt(0)) - 1;
             task2 = Character.getNumericValue(split[1].charAt(0)) - 1;
             value = Character.getNumericValue(split[2].charAt(0));
+            if(task1>7 || task2<0 || task2>7 || task2<0) throw new IOEsception("invalid task");
             result[task1][task2] = value;
         }
 
