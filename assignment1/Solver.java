@@ -9,7 +9,7 @@ public class Solver{
         // Check if the number of assigned tasks for n is 8.
         if(n.getTaskCount() >= 8){
             // There are no more empty slots, get the penalty value for this configuration.
-            bestNode = this;
+            bestNode = n;
         } else {
             // There is still at least one task to assign.
 
