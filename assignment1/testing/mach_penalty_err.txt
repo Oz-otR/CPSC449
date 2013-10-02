@@ -19,6 +19,6 @@ machine penalties:
 1 1 1 1 1
 
 
-too-near penalties
+too-near penalities
 (e,f,30)
 
