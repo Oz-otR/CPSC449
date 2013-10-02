@@ -1,5 +1,9 @@
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Scanner;
 import java.io.FileReader;
@@ -111,4 +115,46 @@ public class Main {
         for(; i >= 0 && Character.isWhitespace(s.charAt(i)); i--);
         return s.substring(0, i + 1);
     }
+    
+	public static LinkedList<String> ReadFromFile(String readFileName){
+		
+		LinkedList<String> linesOfFile = new LinkedList<String>();
+		Scanner fileScanner;
+		try {
+			//new File(System.getProperty("user.dir") + "/" + 
+			fileScanner = new Scanner(new File(readFileName));
+			while (fileScanner.hasNextLine()){
+			    linesOfFile.add(fileScanner.nextLine().trim());
+			}
+			fileScanner.close();
+			
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			System.out.println("File Not Found!");
+		}
+		
+		return linesOfFile;
+	}
+	
+	public static void WriteToFile(String inputStringToFile, String fileName) {
+		try {
+			File file = new File(fileName);
+	 
+			if (!file.exists()) {
+				file.createNewFile();
+			}
+ 
+			FileWriter fw = new FileWriter(file.getAbsoluteFile(),true); //false to overwrite, true to append
+			BufferedWriter buffWriter = new BufferedWriter(fw);
+			buffWriter.write(inputStringToFile);
+			buffWriter.newLine();
+			buffWriter.close();
+ 
+			System.out.println("Done writing to file.");
+	 
+			} catch (IOException e) {
+				e.printStackTrace();
+				System.out.println("Error writing to file");
+			}
+	}
 }
