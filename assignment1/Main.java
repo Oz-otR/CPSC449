@@ -5,28 +5,15 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-<<<<<<< HEAD
 import java.io.InputStreamReader;
 import java.io.FileWriter;
 import java.util.Dictionary;
-=======
->>>>>>> origin/master
 import java.util.Scanner;
 import java.io.FileReader;
 import java.io.FileNotFoundException;
 
 
 public class Main {
-<<<<<<< HEAD
-
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args){
-		FileWriter output = new FileWriter(args[2]);
-		try(output.open()) catch(IOException e{
-		Scanner in = new Scanner(new BufferedReader(new InputStreamReader(System.in)));
-=======
 	public static void main(String[] args) {
         Scanner in = null;
         try{
@@ -35,8 +22,7 @@ public class Main {
             System.out.println("file not found");
             return;
         }
-
->>>>>>> origin/master
+        
         String line;
 
         line = rtrim(skip(in));

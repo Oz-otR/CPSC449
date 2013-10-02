@@ -48,9 +48,9 @@ public class Solver{
     }
     return bestNode;
   }
-  public Node setupRoot(int [] forced, boolean[][] forbidden, boolean[][] tooNearTask,long[][] penalties, long[][] tooNearPenalties){
+  public Node setupRoot(int [] forced, boolean[][] forbidden, boolean[][] tooNearTask,long[][] penalties, long[][] tooNearPenalties) throws Exception{
       int[] taskArray;
-      const String ex = "error message"
+      final String ex = "error message";
       int prev_I;
       int next_I;
       int prevTask;
