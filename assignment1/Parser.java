@@ -28,7 +28,7 @@ public class Parser{
     }
     
     // Return a map ((machine, task) -> boolean) containing forbidden machines.
-        public static boolean[][] parseForbiddenMachines(LinkedList<String> in) throws IOException{
+    public static boolean[][] parseForbiddenMachines(LinkedList<String> in) throws IOException{
         boolean[][] result = new boolean[8][8];
         int machine;
         int task;
@@ -116,7 +116,7 @@ public class Parser{
 
         return result;
     }
-}
+
     public static int getTaskNumber(char task){
         switch(task){
             case 'a':
@@ -139,3 +139,16 @@ public class Parser{
                 return -1;
         }
     }
+    public static int getTaskNumber(String task){
+        task = task.toLowerCase();
+        if(task == "a") return 0;
+        if(task == "b") return 1;
+        if(task == "c") return 2;
+        if(task == "d") return 3;
+        if(task == "e") return 4;
+        if(task == "f") return 5;
+        if(task == "g") return 6;
+        if(task == "h") return 7;
+        return -1;
+    }
+}
