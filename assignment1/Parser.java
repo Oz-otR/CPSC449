@@ -102,8 +102,8 @@ public class Parser{
         for(String line : in){
             String[] split = line.substring(0, line.length() - 1).split(",");
             try{
-                task1 = Node.getTaskNumber(split[0]);
-                task2 = Node.getTaskNumber(split[1]);
+                task1 = getTaskNumber(split[0]);
+                task2 = getTaskNumber(split[1]);
             } catch (NumberFormatException e){
                 throw new IOException("invalid task");
             }
@@ -120,3 +120,25 @@ public class Parser{
         return result;
     }
 }
+    public static int getTaskNumber(char task){
+        switch(task){
+            case 'a':
+                return 0;
+            case 'b':
+                return 1;
+            case 'c':
+                return 2;
+            case 'd':
+                return 3;
+            case 'e':
+                return 4;
+            case 'f':
+                return 5;
+            case 'g':
+                return 6;
+            case 'h':
+                return 7;
+            default:
+                return -1;
+        }
+    }
