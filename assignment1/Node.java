@@ -80,8 +80,8 @@ public class Node{
         return result;
     }
 
-    public static int getMachineNumber(char machine){
-        switch(machine){
+    public static int getTaskNumber(char task){
+        switch(task){
             case 'a':
                 return 0;
             case 'b':
@@ -101,5 +101,18 @@ public class Node{
             default:
                 return -1;
         }
+    }
+
+    public static int getTaskNumber(String task){
+        task = task.toLowerCase();
+        if(task == "a") return 0;
+        if(task == "b") return 1;
+        if(task == "c") return 2;
+        if(task == "d") return 3;
+        if(task == "e") return 4;
+        if(task == "f") return 5;
+        if(task == "g") return 6;
+        if(task == "h") return 7;
+        return -1;
     }
 }
