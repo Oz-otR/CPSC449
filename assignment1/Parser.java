@@ -15,13 +15,8 @@ public class Parser{
 
         for(String line : in){
             String[] split = line.substring(1, line.length() - 1).split(",");
-<<<<<<< HEAD
-            machine = Character.getNumericValue(split[0].toLowerCase().charAt(0));
-            task = Node.getTaskNumber(split[1].charAt(0));
-=======
             machine = Integer.parseInt(split[0]);
-            task = Node.getTaskNumber(split[1]);
->>>>>>> origin/master
+            task = getTaskNumber(split[1]);
             if(machine>7 || machine<0) throw new IOException("invalid machine");
             if(task>7 || task<0) throw new IOException("invalid task");
             if(result[machine] != -1) throw new IOException("partial assignment error");
@@ -39,24 +34,13 @@ public class Parser{
         int task;
         for(String line : in){
             String[] split = line.substring(0, line.length() - 1).split(",");
-<<<<<<< HEAD
-            machine = Character.getNumericValue(split[0].charAt(0)) - 1;
-            task = split[1].toLowerCase().charAt(0);
-            
-            /* Catch errors. */
-            if(machine < 0 || machine > 7 ) throw new IOException("invalid machine");
-            if(task < 'a' || task > 'h') throw new IOException("invalid task");
-
-            result[machine][Node.getTaskNumber(task)] = true;
-=======
             machine = Integer.parseInt(split[0]);
-            task = Node.getTaskNumber(split[1]);
+            task = getTaskNumber(split[1]);
             
             /* Catch errors. */
             if(task<0 || task>7) throw new IOException("invalid task");
 
             result[machine][task] = true;
->>>>>>> origin/master
         }
     	
     return result;
@@ -65,24 +49,15 @@ public class Parser{
     // Return some data structure containing Too-Near tasks.
     public static boolean[][] parseTooNearTasks(LinkedList<String> in) throws IOException{
         boolean[][] result = new boolean[8][8];
-<<<<<<< HEAD
-=======
         int machine;
         int task;
->>>>>>> origin/master
         int task1;
         int task2;
         for(String line : in){
             String[] split = line.substring(0, line.length() - 1).split(",");
-<<<<<<< HEAD
-            task1 = Node.getTaskNumber(split[0].charAt(0));
-            task2 = Node.getTaskNumber(split[1].charAt(0));
-            if(task1>7 || task2<0 || task2>7 || task2<0) throw new IOException("invalid task");
-=======
-            task1 = Node.getTaskNumber(split[0]);
-            task2 = Node.getTaskNumber(split[1]);
+            task1 = getTaskNumber(split[0]);
+            task2 = getTaskNumber(split[1]);
             if(task2 < 0 || task1 < 0) throw new IOException("invalid task");
->>>>>>> origin/master
             result[task1][task2] = true;
         }
 
@@ -116,33 +91,19 @@ public class Parser{
         return result;
     }
     // Returns an 8x8 matrix of pentalties, where [x][y] is the penalty for having y run on the machine next to x
-<<<<<<< HEAD
-    public static int[][] parseTooNearPenalties(LinkedList<String> in){
-        int[][] result = new int[8][8];
-=======
     public static long[][] parseTooNearPenalties(LinkedList<String> in) throws IOException{
         long[][] result = new long[8][8];
         int sp = 0;
         int machine;
         int task;
->>>>>>> origin/master
         int task1;
         int task2;
         long value;
         for(String line : in){
             String[] split = line.substring(0, line.length() - 1).split(",");
-<<<<<<< HEAD
-            task1 = Node.getTaskNumber(split[0].charAt(0)) - 1;
-            task2 = Node.getTaskNumber(split[1].charAt(0)) - 1;
-            value = Character.getNumericValue(split[2].charAt(0));
-            if(task1>7 || task2<0 || task2>7 || task2<0) throw new IOException("invalid task");
-=======
-            try{
-                task1 = getTaskNumber(split[0]);
-                task2 = getTaskNumber(split[1]);
-            } catch (NumberFormatException e){
-                throw new IOException("invalid task");
-            }
+            task1 = getTaskNumber(split[0]);
+            task2 = getTaskNumber(split[1]);
+            
             if(task1 < 0 || task2 < 0) throw new IOException("invalid task");
             try{
                 value = Long.parseLong(split[2]);
@@ -150,7 +111,6 @@ public class Parser{
                 throw new IOException("invalid penalty");
             }
 
->>>>>>> origin/master
             result[task1][task2] = value;
         }
 
