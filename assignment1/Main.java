@@ -5,9 +5,13 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.FileWriter;
+import java.util.Dictionary;
 import java.util.Scanner;
 import java.io.FileReader;
 import java.io.FileNotFoundException;
+
 
 public class Main {
 	public static void main(String[] args) {
@@ -18,7 +22,7 @@ public class Main {
             System.out.println("file not found");
             return;
         }
-
+        
         String line;
 
         line = rtrim(skip(in));

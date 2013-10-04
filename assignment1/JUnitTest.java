@@ -96,13 +96,14 @@ public class JUnitTest {
 	
 	/////////////////////////////////////////////////////////////////////////////////
 	//Node Tests
-	@Test
+	
+	/*
 	public void GetMachineNumberTest(){
-		int testResult = Node.getMachineNumber('a');
-		int expectedResult = 0;
+		//int testResult = Node.getMachineNumber('a');
+		//int expectedResult = 0;
 		
 		assertEquals(testResult,expectedResult);
-	}
+	}*/
 	
 	@Test
 	public void GetTaskTest() throws Exception{

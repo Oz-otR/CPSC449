@@ -16,7 +16,7 @@ public class Parser{
         for(String line : in){
             String[] split = line.substring(1, line.length() - 1).split(",");
             machine = Integer.parseInt(split[0]);
-            task = Node.getTaskNumber(split[1]);
+            task = getTaskNumber(split[1]);
             if(machine>7 || machine<0) throw new IOException("invalid machine");
             if(task>7 || task<0) throw new IOException("invalid task");
             if(result[machine] != -1) throw new IOException("partial assignment error");
@@ -28,14 +28,14 @@ public class Parser{
     }
     
     // Return a map ((machine, task) -> boolean) containing forbidden machines.
-        public static boolean[][] parseForbiddenMachines(LinkedList<String> in) throws IOException{
+    public static boolean[][] parseForbiddenMachines(LinkedList<String> in) throws IOException{
         boolean[][] result = new boolean[8][8];
         int machine;
         int task;
         for(String line : in){
             String[] split = line.substring(0, line.length() - 1).split(",");
             machine = Integer.parseInt(split[0]);
-            task = Node.getTaskNumber(split[1]);
+            task = getTaskNumber(split[1]);
             
             /* Catch errors. */
             if(task<0 || task>7) throw new IOException("invalid task");
@@ -55,8 +55,8 @@ public class Parser{
         int task2;
         for(String line : in){
             String[] split = line.substring(0, line.length() - 1).split(",");
-            task1 = Node.getTaskNumber(split[0]);
-            task2 = Node.getTaskNumber(split[1]);
+            task1 = getTaskNumber(split[0]);
+            task2 = getTaskNumber(split[1]);
             if(task2 < 0 || task1 < 0) throw new IOException("invalid task");
             result[task1][task2] = true;
         }
@@ -101,12 +101,9 @@ public class Parser{
         long value;
         for(String line : in){
             String[] split = line.substring(0, line.length() - 1).split(",");
-            try{
-                task1 = Node.getTaskNumber(split[0]);
-                task2 = Node.getTaskNumber(split[1]);
-            } catch (NumberFormatException e){
-                throw new IOException("invalid task");
-            }
+            task1 = getTaskNumber(split[0]);
+            task2 = getTaskNumber(split[1]);
+            
             if(task1 < 0 || task2 < 0) throw new IOException("invalid task");
             try{
                 value = Long.parseLong(split[2]);
@@ -118,5 +115,40 @@ public class Parser{
         }
 
         return result;
+    }
+
+    public static int getTaskNumber(char task){
+        switch(task){
+            case 'a':
+                return 0;
+            case 'b':
+                return 1;
+            case 'c':
+                return 2;
+            case 'd':
+                return 3;
+            case 'e':
+                return 4;
+            case 'f':
+                return 5;
+            case 'g':
+                return 6;
+            case 'h':
+                return 7;
+            default:
+                return -1;
+        }
+    }
+    public static int getTaskNumber(String task){
+        task = task.toLowerCase();
+        if(task == "a") return 0;
+        if(task == "b") return 1;
+        if(task == "c") return 2;
+        if(task == "d") return 3;
+        if(task == "e") return 4;
+        if(task == "f") return 5;
+        if(task == "g") return 6;
+        if(task == "h") return 7;
+        return -1;
     }
 }
