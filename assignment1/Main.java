@@ -97,7 +97,7 @@ public class Main {
     /** Check if the line matches the title. */
     private static boolean matches(String line, String match){
         if(line != match){
-            String s = e.getMessage();
+            String s = "Error while parsing input file";
 			WriteToFile(s, args[1]);
             return false;
         }
