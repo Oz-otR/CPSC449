@@ -38,7 +38,7 @@ public class Solver{
           // has a smaller penalty than the current best.
           if(bestNode == null || next.getPenalty() < bestNode.getPenalty()){
             Node nextBestNode = solve(next, forbidden, tooNear);
-            long nextBest = nextBestNode.getPenalty();
+            long nextBest = nextBestNode == null ? 2**63 : nextBestNode.getPenalty();
             if(bestNode == null || nextBest < bestNode.getPenalty()){
               bestNode = nextBestNode;
             }
@@ -48,6 +48,7 @@ public class Solver{
     }
     return bestNode;
   }
+
   public Node setupRoot(int [] forced, boolean[][] forbidden, boolean[][] tooNearTask,long[][] penalties, long[][] tooNearPenalties) throws Exception{
       int[] taskArray;
       final String ex = "error message";
