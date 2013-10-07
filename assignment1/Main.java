@@ -17,9 +17,10 @@ public class Main {
 	public static void main(String[] args) {
         Scanner in = null;
         try{
-		    in = new Scanner(new BufferedReader(new FileReader(args[1])));
+		    in = new Scanner(new BufferedReader(new FileReader(args[0])));
         } catch (FileNotFoundException e){
-            System.out.println("file not found");
+            String s = "file not found";
+			WriteToFile(s, args[1]);
             return;
         }
         
@@ -36,7 +37,8 @@ public class Main {
         try{
             int[] forcedAssignments = Parser.parseForcedAssignments(getLines(in));
         } catch(IOException e){
-            System.out.println(e.getMessage());
+            String s = e.getMessage();
+			WriteToFile(s, args[1]);
             return;
         }
 		
@@ -46,7 +48,8 @@ public class Main {
         try{
             boolean[][] forbiddenMachine = Parser.parseForbiddenMachines(getLines(in));
         } catch(IOException e){
-            System.out.println(e.getMessage());
+            String s = e.getMessage();
+			WriteToFile(s, args[1]);
             return;
         }
         
@@ -56,7 +59,8 @@ public class Main {
         try{
             boolean[][] tooNear = Parser.parseTooNearTasks(getLines(in));
         } catch (IOException e){
-            System.out.println(e.getMessage());
+            String s = e.getMessage();
+			WriteToFile(s, args[1]);
             return;
         }
 
@@ -66,7 +70,8 @@ public class Main {
         try{
             long[][] machinePenalties = Parser.parseMachinePenalties(getLines(in));
         } catch (IOException e){
-            System.out.println(e.getMessage());
+            String s = e.getMessage();
+			WriteToFile(s, args[1]);
             return;
         }
 
@@ -76,7 +81,8 @@ public class Main {
         try{
             long[][] tooNearPenalties = Parser.parseTooNearPenalties(getLines(in));
         } catch (IOException e){
-            System.out.println(e.getMessage());
+            String s = e.getMessage();
+			WriteToFile(s, args[1]);
             return;
         }
     }
@@ -84,7 +90,8 @@ public class Main {
     /** Check if the line matches the title. */
     private static boolean matches(String line, String match){
         if(line != match){
-            System.out.println("Error while parsing input file");
+            String s = e.getMessage();
+			WriteToFile(s, args[1]);
             return false;
         }
         return true;
@@ -133,8 +140,8 @@ public class Main {
 			fileScanner.close();
 			
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-			System.out.println("File Not Found!");
+			String s = "File not found!";
+			WriteToFile(s, args[1]);
 		}
 		
 		return linesOfFile;
@@ -157,7 +164,6 @@ public class Main {
 			System.out.println("Done writing to file.");
 	 
 			} catch (IOException e) {
-				e.printStackTrace();
 				System.out.println("Error writing to file");
 			}
 	}
