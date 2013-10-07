@@ -1,6 +1,7 @@
 public class Solver{
-  private static Node solve(Node n, boolean[][] forbidden, boolean[][] tooNear){
-    return solve(n, null, forbidden, tooNear);
+  private static Node solve(int[] forced, boolean[][] forbidden, boolean[][] tooNear, long[][] penalties, long[][] tooNearPenalties){
+    Node n = setupRoot(forced, forbidden, tooNear, penalties, tooNearPenalties);
+    return solve(n,n,forbidden,tooNear);
   }
   
   private static Node solve(Node n, Node bestNode, boolean[][] forbidden, boolean[][] tooNear){
@@ -83,18 +84,8 @@ public class Solver{
         taskArray[tempMachine]=tempTask;
         
         //Checking for too near task
-        if(i==0){
-            prev_I=7;
-        }
-        else{
-            prev_I=i-1;
-        }
-        if(i==7){
-            next_I=0;
-        }
-        else{
-            next_I=i+1;
-        }
+        prev_I = (i - 1) % 8;
+        next_I = (i + 1) % 8;
         
         //Check for i-1 to i
         if(taskArray[prev_I] >=0 && taskArray[prev_I] < 8){
@@ -108,7 +99,7 @@ public class Solver{
         if(taskArray[next_I]!=-1){
             nextTask=taskArray[next_I];
             if(tooNearTask[tempTask][nextTask]){
-              throw new Exception("no possible solution or whatever");
+              throw new Exception("No valid solution possible!");
             }
         }
         
