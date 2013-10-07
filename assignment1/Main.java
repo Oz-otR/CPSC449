@@ -34,8 +34,9 @@ public class Main {
         line = skip(in);
 
         if(!matches(line, "forced partial assignment:")) return;
+		int[] forcedAssignments;
         try{
-            int[] forcedAssignments = Parser.parseForcedAssignments(getLines(in));
+            forcedAssignments = Parser.parseForcedAssignments(getLines(in));
         } catch(IOException e){
             String s = e.getMessage();
 			WriteToFile(s, args[1]);
@@ -45,8 +46,9 @@ public class Main {
         /* Skip all blank lines. */
         line = skip(in);
         if(!matches(line, "forbidden machine:")) return;
+		boolean[][] forbiddenMachine;
         try{
-            boolean[][] forbiddenMachine = Parser.parseForbiddenMachines(getLines(in));
+            forbiddenMachine = Parser.parseForbiddenMachines(getLines(in));
         } catch(IOException e){
             String s = e.getMessage();
 			WriteToFile(s, args[1]);
@@ -56,8 +58,9 @@ public class Main {
         /* Skip all blank lines. */
         line = skip(in);
         if(!matches(line, "too-near tasks:")) return;
+		boolean[][] tooNear;
         try{
-            boolean[][] tooNear = Parser.parseTooNearTasks(getLines(in));
+            tooNear = Parser.parseTooNearTasks(getLines(in));
         } catch (IOException e){
             String s = e.getMessage();
 			WriteToFile(s, args[1]);
@@ -67,8 +70,9 @@ public class Main {
         /* Skip all blank lines. */
         line = skip(in);
         if(!matches(line, "machine penalties")) return;
+		long[][] machinePenalties;
         try{
-            long[][] machinePenalties = Parser.parseMachinePenalties(getLines(in));
+            machinePenalties = Parser.parseMachinePenalties(getLines(in));
         } catch (IOException e){
             String s = e.getMessage();
 			WriteToFile(s, args[1]);
@@ -78,13 +82,16 @@ public class Main {
         /* Skip all blank lines. */
         line = skip(in);
         if(!matches(line, "too-near penalities")) return;
+		long[][] tooNearPenalties;
         try{
-            long[][] tooNearPenalties = Parser.parseTooNearPenalties(getLines(in));
+            tooNearPenalties = Parser.parseTooNearPenalties(getLines(in));
         } catch (IOException e){
             String s = e.getMessage();
 			WriteToFile(s, args[1]);
             return;
         }
+		
+		WriteToFile(Solver.solve(forcedAssignments, forbiddenMachine, tooNear, machinePenalties, tooNearPenalties), args[1]);
     }
 
     /** Check if the line matches the title. */
