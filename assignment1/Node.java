@@ -79,4 +79,8 @@ public class Node{
         while(tasks[result] != -1) result++;
         return result;
     }
+
+    public String toString(){
+        return "node";
+    }
 }

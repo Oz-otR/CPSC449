@@ -14,13 +14,15 @@ import java.io.FileNotFoundException;
 
 
 public class Main {
+    static String[] _args;
 	public static void main(String[] args) {
+        _args = args;
         Scanner in = null;
         try{
-		    in = new Scanner(new BufferedReader(new FileReader(args[0])));
+		    in = new Scanner(new BufferedReader(new FileReader(_args[0])));
         } catch (FileNotFoundException e){
             String s = "file not found";
-			WriteToFile(s, args[1]);
+			WriteToFile(s, _args[1]);
             return;
         }
         
@@ -39,7 +41,7 @@ public class Main {
             forcedAssignments = Parser.parseForcedAssignments(getLines(in));
         } catch(IOException e){
             String s = e.getMessage();
-			WriteToFile(s, args[1]);
+			WriteToFile(s, _args[1]);
             return;
         }
 		
@@ -51,7 +53,7 @@ public class Main {
             forbiddenMachine = Parser.parseForbiddenMachines(getLines(in));
         } catch(IOException e){
             String s = e.getMessage();
-			WriteToFile(s, args[1]);
+			WriteToFile(s, _args[1]);
             return;
         }
         
@@ -63,7 +65,7 @@ public class Main {
             tooNear = Parser.parseTooNearTasks(getLines(in));
         } catch (IOException e){
             String s = e.getMessage();
-			WriteToFile(s, args[1]);
+			WriteToFile(s, _args[1]);
             return;
         }
 
@@ -75,7 +77,7 @@ public class Main {
             machinePenalties = Parser.parseMachinePenalties(getLines(in));
         } catch (IOException e){
             String s = e.getMessage();
-			WriteToFile(s, args[1]);
+			WriteToFile(s, _args[1]);
             return;
         }
 
@@ -87,18 +89,24 @@ public class Main {
             tooNearPenalties = Parser.parseTooNearPenalties(getLines(in));
         } catch (IOException e){
             String s = e.getMessage();
-			WriteToFile(s, args[1]);
+			WriteToFile(s, _args[1]);
             return;
         }
 		
-		WriteToFile(Solver.solve(forcedAssignments, forbiddenMachine, tooNear, machinePenalties, tooNearPenalties), args[1]);
+        String result;
+        try{
+            result = Solver.solve(forcedAssignments, forbiddenMachine, tooNear, machinePenalties, tooNearPenalties).toString();
+        } catch (Exception e){
+            result = "Something went terrible wrong!" + e.getMessage();
+        }
+		WriteToFile(result, _args[1]);
     }
 
     /** Check if the line matches the title. */
     private static boolean matches(String line, String match){
         if(line != match){
             String s = "Error while parsing input file";
-			WriteToFile(s, args[1]);
+			WriteToFile(s, _args[1]);
             return false;
         }
         return true;
@@ -148,7 +156,7 @@ public class Main {
 			
 		} catch (FileNotFoundException e) {
 			String s = "File not found!";
-			WriteToFile(s, args[1]);
+			WriteToFile(s, _args[1]);
 		}
 		
 		return linesOfFile;
