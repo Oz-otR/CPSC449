@@ -1,1 +1,1 @@
-Something went terrible wrong!-1
+Partial assignment error

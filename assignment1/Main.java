@@ -35,15 +35,26 @@ public class Main {
         line = rtrim(skip(in));
         if(!matches(line, "Name:")) return;
 		String name = rtrim(in.nextLine()); // Get name.
-
+	    boolean duplicates = false;
         /* Skip all blank lines. */
         line = skip(in);
         if(!matches(line, "forced partial assignment:")) return;
 		int[] forcedAssignments;
         try{
             forcedAssignments = Parser.parseForcedAssignments(getLines(in));
-        } catch(IOException e){
+		    for (int m=0; m<8; m++){
+		    	if (forcedAssignments[m] != -1){
+			    	for (int n=0; n<8; n++){
+			    		if (n!=m && forcedAssignments[n] == forcedAssignments[m]){
+			    			duplicates=true;
+			    			throw new Exception("Partial assignment error");
+			    		}
+			    	}
+		    	}
+			}
+        } catch(Exception e){
             String s = e.getMessage();
+            if (duplicates == true)
 			WriteToFile(s, _args[1]);
             return;
         }
@@ -54,7 +65,7 @@ public class Main {
 		boolean[][] forbiddenMachine;
         try{
             forbiddenMachine = Parser.parseForbiddenMachines(getLines(in));
-        } catch(IOException e){
+        } catch(Exception e){
             String s = e.getMessage();
 			WriteToFile(s, _args[1]);
             return;
@@ -66,7 +77,7 @@ public class Main {
 		boolean[][] tooNear;
         try{
             tooNear = Parser.parseTooNearTasks(getLines(in));
-        } catch (IOException e){
+        } catch (Exception e){
             String s = e.getMessage();
 			WriteToFile(s, _args[1]);
             return;
@@ -78,7 +89,7 @@ public class Main {
 		long[][] machinePenalties;
         try{
             machinePenalties = Parser.parseMachinePenalties(getLines(in));
-        } catch (IOException e){
+        } catch (Exception e){
             String s = e.getMessage();
 			WriteToFile(s, _args[1]);
             return;
@@ -90,7 +101,7 @@ public class Main {
 		long[][] tooNearPenalties;
         try{
             tooNearPenalties = Parser.parseTooNearPenalties(getLines(in));
-        } catch (IOException e){
+        } catch (Exception e){
             String s = e.getMessage();
 			WriteToFile(s, _args[1]);
             return;

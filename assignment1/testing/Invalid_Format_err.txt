@@ -3,10 +3,10 @@ Invalid Format error
 
 forced partial assignment:
 (1,c)
-forbidden machine:    ***This line***
+forbidden machine:
 (2,d)
 
-too-near tasks
+too-near tasks:
 (c,d)
 
 machine penalties:
