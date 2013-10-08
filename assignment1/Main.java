@@ -17,6 +17,10 @@ public class Main {
     static String[] _args;
 	public static void main(String[] args) {
         _args = args;
+        if(args.length != 2){
+            System.out.println("Usage: <input file> <output file>");
+            return;
+        }
         Scanner in = null;
         try{
 		    in = new Scanner(new BufferedReader(new FileReader(_args[0])));
@@ -137,6 +141,7 @@ public class Main {
 
     /** Trim whitespace from only the right side of the string. */
     private static String rtrim(String s){
+        if (s == null) return null;
         int i = s.length() - 1;
         for(; i >= 0 && Character.isWhitespace(s.charAt(i)); i--);
         return s.substring(0, i + 1);
