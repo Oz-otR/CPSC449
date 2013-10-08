@@ -1,10 +1,10 @@
 public class Solver{
-  private static Node solve(int[] forced, boolean[][] forbidden, boolean[][] tooNear, long[][] penalties, long[][] tooNearPenalties){
+  public static Node solve(int[] forced, boolean[][] forbidden, boolean[][] tooNear, long[][] penalties, long[][] tooNearPenalties) throws Exception{
     Node n = setupRoot(forced, forbidden, tooNear, penalties, tooNearPenalties);
     return solve(n,n,forbidden,tooNear);
   }
   
-  private static Node solve(Node n, Node bestNode, boolean[][] forbidden, boolean[][] tooNear){
+  private static Node solve(Node n, Node bestNode, boolean[][] forbidden, boolean[][] tooNear) throws Exception{
     // Set the best penalty found so far to infinity.
     
     // Check if the number of assigned tasks for n is 8.
@@ -38,8 +38,8 @@ public class Solver{
           // Check if the subtree rooted at the new node
           // has a smaller penalty than the current best.
           if(bestNode == null || next.getPenalty() < bestNode.getPenalty()){
-            Node nextBestNode = solve(next, forbidden, tooNear);
-            long nextBest = nextBestNode == null ? 2**63 : nextBestNode.getPenalty();
+            Node nextBestNode = solve(next, bestNode, forbidden, tooNear);
+            long nextBest = nextBestNode == null ? Long.MAX_VALUE : nextBestNode.getPenalty();
             if(bestNode == null || nextBest < bestNode.getPenalty()){
               bestNode = nextBestNode;
             }
@@ -50,7 +50,7 @@ public class Solver{
     return bestNode;
   }
 
-  public Node setupRoot(int [] forced, boolean[][] forbidden, boolean[][] tooNearTask,long[][] penalties, long[][] tooNearPenalties) throws Exception{
+  public static Node setupRoot(int [] forced, boolean[][] forbidden, boolean[][] tooNearTask,long[][] penalties, long[][] tooNearPenalties) throws Exception{
       int[] taskArray;
       final String ex = "error message";
       int prev_I;
