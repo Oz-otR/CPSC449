@@ -17,6 +17,10 @@ public class Main {
     static String[] _args;
 	public static void main(String[] args) {
         _args = args;
+        if(args.length != 2){
+            System.out.println("Usage: <input file> <output file>");
+            return;
+        }
         Scanner in = null;
         try{
 		    in = new Scanner(new BufferedReader(new FileReader(_args[0])));
