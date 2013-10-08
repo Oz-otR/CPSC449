@@ -15,7 +15,7 @@ public class Parser{
 
         for(String line : in){
             String[] split = line.substring(1, line.length() - 1).split(",");
-            machine = Integer.parseInt(split[0]);
+            machine = Integer.parseInt(split[0])-1;
             task = getTaskNumber(split[1]);
             if(machine>7 || machine<0) throw new IOException("invalid machine");
             if(task>7 || task<0) throw new IOException("invalid task");
@@ -33,8 +33,8 @@ public class Parser{
         int machine;
         int task;
         for(String line : in){
-            String[] split = line.substring(0, line.length() - 1).split(",");
-            machine = Integer.parseInt(split[0]);
+            String[] split = line.substring(1, line.length() - 1).split(",");
+            machine = Integer.parseInt(split[0])-1 ;
             task = getTaskNumber(split[1]);
             
             /* Catch errors. */
@@ -49,12 +49,10 @@ public class Parser{
     // Return some data structure containing Too-Near tasks.
     public static boolean[][] parseTooNearTasks(LinkedList<String> in) throws IOException{
         boolean[][] result = new boolean[8][8];
-        int machine;
-        int task;
         int task1;
         int task2;
         for(String line : in){
-            String[] split = line.substring(0, line.length() - 1).split(",");
+            String[] split = line.substring(1, line.length() - 1).split(",");
             task1 = getTaskNumber(split[0]);
             task2 = getTaskNumber(split[1]);
             if(task2 < 0 || task1 < 0) throw new IOException("invalid task");
@@ -73,7 +71,7 @@ public class Parser{
 
         int i = 0;
         for(String line : in){
-            String[] split = line.split(",");
+            String[] split = line.split(" ");
             
             /* Check input length. */
             if(split.length != 8) throw new IOException("machine penalty error");
@@ -100,7 +98,7 @@ public class Parser{
         int task2;
         long value;
         for(String line : in){
-            String[] split = line.substring(0, line.length() - 1).split(",");
+            String[] split = line.substring(1, line.length() - 1).split(",");
             task1 = getTaskNumber(split[0]);
             task2 = getTaskNumber(split[1]);
             
@@ -141,14 +139,14 @@ public class Parser{
     }
     public static int getTaskNumber(String task){
         task = task.toLowerCase();
-        if(task == "a") return 0;
-        if(task == "b") return 1;
-        if(task == "c") return 2;
-        if(task == "d") return 3;
-        if(task == "e") return 4;
-        if(task == "f") return 5;
-        if(task == "g") return 6;
-        if(task == "h") return 7;
+        if(task.equals("a")) return 0;
+        if(task.equals("b")) return 1;
+        if(task.equals("c")) return 2;
+        if(task.equals("d")) return 3;
+        if(task.equals("e")) return 4;
+        if(task.equals("f")) return 5;
+        if(task.equals("g")) return 6;
+        if(task.equals("h")) return 7;
         return -1;
     }
 }

@@ -156,6 +156,28 @@ public class JUnitTest {
 		Node testNode = new Node(tasks,penalties,tooNearPenalties);
 		//testNode.setTask(0, 0);
 	}
+	
+	//////////////////////////////////////////////////////////////////////////
+	//Solver test
+	/*
+	@Test
+	public void SetupRootTest(){
+		int[] tasks = {0,1,2,3,4,5,6,7};
+		long[][] penalties = new long[8][8];
+		long[][] tooNearPenalties = new long[8][8];
+		boolean[][] forbidden = new boolean[8][8];
+		boolean[][] tooNearTask = new boolean[8][8];
+		
+		Node testNode = new Node(tasks,penalties,tooNearPenalties);
+		try {
+			assertEquals(testNode, Solver.setupRoot(tasks, forbidden, tooNearTask, penalties, tooNearPenalties));
+		} catch (Exception e) {
+			
+			e.printStackTrace();
+		}
+	}
+	*/
+	
 	/*
 	@Test
 	public void getPenaltyTest(){

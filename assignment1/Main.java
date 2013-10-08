@@ -23,10 +23,10 @@ public class Main {
         }
         Scanner in = null;
         try{
-		    in = new Scanner(new BufferedReader(new FileReader(_args[0])));
+		    in = new Scanner(new BufferedReader(new FileReader(args[0])));
         } catch (FileNotFoundException e){
             String s = "file not found";
-			WriteToFile(s, _args[1]);
+			WriteToFile(s, args[1]);
             return;
         }
         
@@ -38,7 +38,6 @@ public class Main {
 
         /* Skip all blank lines. */
         line = skip(in);
-
         if(!matches(line, "forced partial assignment:")) return;
 		int[] forcedAssignments;
         try{
@@ -75,7 +74,7 @@ public class Main {
 
         /* Skip all blank lines. */
         line = skip(in);
-        if(!matches(line, "machine penalties")) return;
+        if(!matches(line, "machine penalties:")) return;
 		long[][] machinePenalties;
         try{
             machinePenalties = Parser.parseMachinePenalties(getLines(in));
@@ -108,7 +107,7 @@ public class Main {
 
     /** Check if the line matches the title. */
     private static boolean matches(String line, String match){
-        if(line != match){
+        if(!line.equals(match)){
             String s = "Error while parsing input file";
 			WriteToFile(s, _args[1]);
             return false;
@@ -119,10 +118,13 @@ public class Main {
     /** Gets the next section of lines. */
     private static LinkedList<String> getLines(Scanner in){
         LinkedList<String> lines = new LinkedList<String>();
+        String line;
         if(in.hasNext()){
-            do{
-                lines.add(rtrim(in.nextLine()));
-            } while(in.hasNext());
+        	line = rtrim(in.nextLine());
+        	while(!line.equals("")){
+        		lines.add(line);
+        		line = rtrim(in.nextLine());
+        	}
         }
         return lines;
     }
@@ -134,7 +136,7 @@ public class Main {
         if(in.hasNext()){
             do{
                 line = in.nextLine();
-            } while (in.hasNext() && line.trim() == "");
+            } while (in.hasNext() && line.trim().equals(""));
         }
         return line;
     }
@@ -175,7 +177,7 @@ public class Main {
 				file.createNewFile();
 			}
  
-			FileWriter fw = new FileWriter(file.getAbsoluteFile(),true); //false to overwrite, true to append
+			FileWriter fw = new FileWriter(file.getAbsoluteFile(),false); //false to overwrite, true to append
 			BufferedWriter buffWriter = new BufferedWriter(fw);
 			buffWriter.write(inputStringToFile);
 			buffWriter.newLine();

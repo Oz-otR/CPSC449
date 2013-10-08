@@ -84,8 +84,8 @@ public class Solver{
         taskArray[tempMachine]=tempTask;
         
         //Checking for too near task
-        prev_I = (i - 1) % 8;
-        next_I = (i + 1) % 8;
+        if(i==0) prev_I = 7; else prev_I = i - 1;
+        if(i==7) next_I = 0; else next_I = i + 1;
         
         //Check for i-1 to i
         if(taskArray[prev_I] >=0 && taskArray[prev_I] < 8){
