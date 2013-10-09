@@ -14,8 +14,13 @@ import java.io.FileNotFoundException;
 
 
 public class Main {
+
     static String[] _args;
 	public static void main(String[] args) {
+		// Initiate input file checks
+		
+		// Check if correct arguments are being used
+		// Check if input file is valid
         _args = args;
         if(args.length != 2){
             System.out.println("Usage: <input file> <output file>");
@@ -31,13 +36,20 @@ public class Main {
         }
         
         String line;
-
+        
+        // Retrieve name of input file
         line = rtrim(skip(in));
         if(!matches(line, "Name:")) return;
 		String name = rtrim(in.nextLine()); // Get name.
-	    boolean duplicates = false;
+	    
+		boolean duplicates = false;
+		
         /* Skip all blank lines. */
         line = skip(in);
+        
+        // Test for forced partial assignments
+        // Uses parseForcedAssignments(LinkedList <String>) from Parser
+        // If forced partial assignment found, write error message to output file 
         if(!matches(line, "forced partial assignment:")) return;
 		int[] forcedAssignments;
         try{
@@ -61,6 +73,10 @@ public class Main {
 		
         /* Skip all blank lines. */
         line = skip(in);
+        
+        // Test for forbidden machines
+        // Uses parseForbiddenMachines(LinkedList<Strings>) from Parser
+        // If forbidden machine assignment found, write error message to file
         if(!matches(line, "forbidden machine:")) return;
 		boolean[][] forbiddenMachine;
         try{
@@ -73,6 +89,10 @@ public class Main {
         
         /* Skip all blank lines. */
         line = skip(in);
+        
+        // Test for too-near tasks
+        // Uses parseTooNearTasks(LinkedList<Strings>) from Parser
+        // If too-near tasks assignments are found, write error message to file
         if(!matches(line, "too-near tasks:")) return;
 		boolean[][] tooNear;
         try{
@@ -85,6 +105,10 @@ public class Main {
 
         /* Skip all blank lines. */
         line = skip(in);
+        
+        // Get machine penalties and apply penalties
+        // Uses parseMachinePenalties(LinkedList<Strings>) from Parser
+        // If error, write error to output file
         if(!matches(line, "machine penalties:")) return;
 		long[][] machinePenalties;
         try{
@@ -97,6 +121,10 @@ public class Main {
 
         /* Skip all blank lines. */
         line = skip(in);
+        
+        // Get too-near penalties and apply penalties
+        // Uses parseTooNearPenalties(LinkedList<Strings>) from Parser
+        // If error, write error to output file
         if(!matches(line, "too-near penalities")) return;
 		long[][] tooNearPenalties;
         try{

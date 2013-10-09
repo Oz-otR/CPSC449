@@ -3,7 +3,7 @@ import java.util.LinkedList;
 
 public class Parser{
 
-    // Return some data structure containing forced parcial assignments.
+    // Return some data structure containing forced partial assignments.
     public static int[] parseForcedAssignments(LinkedList<String> in) throws Exception{
         int[] result = new int[8];
         for(int i = 0; i < 8; i++){
