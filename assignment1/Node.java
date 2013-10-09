@@ -5,12 +5,15 @@ public class Node{
     private static long[][] tooNearPenalties;
 
     private int[] tasks = new int[8];
-    private boolean[] assigned;
+    private boolean[] assigned = new boolean[8];
 
     public Node(int[] tasks, long[][] penalties, long[][] tooNearPenalties){
         this.penalties = penalties;
         this.tooNearPenalties = tooNearPenalties;
         this.tasks = tasks;
+        for(int i : tasks){
+        	if(i >=0 && i < 8) assigned[i] = true;
+        }
     }
 
     public Node(Node parent){
@@ -24,10 +27,7 @@ public class Node{
         if(machine < 0 || machine > 7) throw new Exception("invalid machine");
         if(task < 0 || task > 7) throw new Exception("invalid task");
         if(tasks[machine] != -1) throw new Exception("machine already assigned");
-        for(int i = 0; i < 8; i++){
-            if(tasks[i] == task) throw new Exception("task already assigned");
-        }
-
+        if(assigned[task]) throw new Exception("task already assigned");
         assigned[task] = true;
         tasks[machine] = task;
     }
@@ -81,6 +81,11 @@ public class Node{
     }
 
     public String toString(){
-        return "node";
+        StringBuilder result = new StringBuilder();
+        for(int t : tasks){
+        	result.append(t);
+        }
+        result.append(":" + getPenalty());
+        return result.toString();
     }
 }

@@ -1,7 +1,7 @@
 public class Solver{
   public static Node solve(int[] forced, boolean[][] forbidden, boolean[][] tooNear, long[][] penalties, long[][] tooNearPenalties) throws Exception{
     Node n = setupRoot(forced, forbidden, tooNear, penalties, tooNearPenalties);
-    return solve(n,n,forbidden,tooNear);
+    return solve(n,null,forbidden,tooNear);
   }
   
   private static Node solve(Node n, Node bestNode, boolean[][] forbidden, boolean[][] tooNear) throws Exception{
@@ -77,6 +77,7 @@ public class Solver{
         }
         
         //Check if Forbidden
+        if(tempTask == -1){ i++; continue; }
         if(forbidden[tempMachine][tempTask]==true){
             throw new Exception(ex);
         }
