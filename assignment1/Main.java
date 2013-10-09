@@ -132,7 +132,7 @@ public class Main {
         String line;
         if(in.hasNext()){
         	line = rtrim(in.nextLine());
-        	while(!line.equals("")){
+        	while(!line.equals("") && in.hasNext()){
         		lines.add(line);
         		line = rtrim(in.nextLine());
         	}

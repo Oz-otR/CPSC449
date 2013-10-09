@@ -82,10 +82,13 @@ public class Node{
 
     public String toString(){
         StringBuilder result = new StringBuilder();
+        result.append("Solution ");
+        int count = 7;
         for(int t : tasks){
-        	result.append(t);
+        	result.append(Parser.getTaskLetter(t));
+        	if(count-- > 0) result.append(" ");
         }
-        result.append(":" + getPenalty());
+        result.append("; Quality: " + getPenalty());
         return result.toString();
     }
 }
