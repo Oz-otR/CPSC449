@@ -16,6 +16,8 @@ import java.io.FileNotFoundException;
 public class Main {
 
     static String[] _args;
+    
+    /** main method */
 	public static void main(String[] args) {
 		// Initiate input file checks
 		
@@ -39,7 +41,9 @@ public class Main {
         
         // Retrieve name of input file
         line = rtrim(skip(in));
-        if(!matches(line, "Name:")) return;
+        if(!matches(line, "Name:")) {
+        	return;
+        }
 		String name = rtrim(in.nextLine()); // Get name.
 	    
 		boolean duplicates = false;
@@ -66,8 +70,9 @@ public class Main {
 			}
         } catch(Exception e){
             String s = e.getMessage();
-            if (duplicates == true)
-			WriteToFile(s, _args[1]);
+            if (duplicates == true) {
+            	WriteToFile(s, _args[1]);
+            }
             return;
         }
 		
@@ -109,7 +114,9 @@ public class Main {
         // Get machine penalties and apply penalties
         // Uses parseMachinePenalties(LinkedList<Strings>) from Parser
         // If error, write error to output file
-        if(!matches(line, "machine penalties:")) return;
+        if(!matches(line, "machine penalties:")) {
+        	return;
+        }
 		long[][] machinePenalties;
         try{
             machinePenalties = Parser.parseMachinePenalties(getLines(in));
@@ -125,7 +132,9 @@ public class Main {
         // Get too-near penalties and apply penalties
         // Uses parseTooNearPenalties(LinkedList<Strings>) from Parser
         // If error, write error to output file
-        if(!matches(line, "too-near penalities")) return;
+        if(!matches(line, "too-near penalities")) {
+        	return;
+        }
 		long[][] tooNearPenalties;
         try{
             tooNearPenalties = Parser.parseTooNearPenalties(getLines(in));
@@ -180,14 +189,25 @@ public class Main {
         return line;
     }
 
-    /** Trim whitespace from only the right side of the string. */
+     /** Trim whitespace from only the right side of the string. 
+      *  Start from end of the string
+      *  Navigate to front of string until NO whitespace found
+   	  *  Return the string consisting of the remaining characters
+      */
     private static String rtrim(String s){
-        if (s == null) return null;
+    	
+        if (s == null) {
+        	return null;
+        }
         int i = s.length() - 1;
         for(; i >= 0 && Character.isWhitespace(s.charAt(i)); i--);
         return s.substring(0, i + 1);
     }
     
+    /** Method to read from file given a filename
+     *  Put lines read into a linked list of strings
+     *  Return the linked list of strings
+     */
 	public static LinkedList<String> ReadFromFile(String readFileName){
 		
 		LinkedList<String> linesOfFile = new LinkedList<String>();
@@ -208,6 +228,12 @@ public class Main {
 		return linesOfFile;
 	}
 	
+	/** Method to write to file given a filename 
+	 *  If file exists, create new file
+	 *  Write string to file and add newline
+	 *  Close the file
+	 * 	Notify user of error if unable to write to file
+	 */
 	public static void WriteToFile(String inputStringToFile, String fileName) {
 		try {
 			File file = new File(fileName);
