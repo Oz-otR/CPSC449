@@ -1,1 +1,1 @@
-Solution A G C D B F E H; Quality: 40
+invalid machine/task

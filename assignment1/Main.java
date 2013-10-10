@@ -65,9 +65,10 @@ public class Main {
 			    	}
 		    	}
 			}
+        } catch(InvalidMachineTaskException e){
+        	WriteToFile(e.getMessage(), _args[1]);
         } catch(Exception e){
-            String s = e.getMessage();
-            WriteToFile(s, _args[1]);
+            WriteToFile(e.getMessage(), _args[1]);
             return;
         }
 		
@@ -142,8 +143,10 @@ public class Main {
         String result;
         try{
             result = Solver.solve(forcedAssignments, forbiddenMachine, tooNear, machinePenalties, tooNearPenalties).toString();
+        } catch (NoValidSolutionException e){
+        	result = e.getMessage();
         } catch (Exception e){
-            result = "Something went terrible wrong!" + e.getMessage();
+            result = "Something went terrible wrong! " + e.getMessage();
         }
 		WriteToFile(result, _args[1]);
     }

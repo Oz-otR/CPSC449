@@ -53,7 +53,6 @@ public class Solver{
 
   public static Node setupRoot(int [] forced, boolean[][] forbidden, boolean[][] tooNearTask,long[][] penalties, long[][] tooNearPenalties) throws Exception{
       int[] taskArray;
-      final String ex = "error message";
       int prev_I;
       int next_I;
       int prevTask;
@@ -80,7 +79,7 @@ public class Solver{
         //Check if Forbidden
         if(tempTask == -1){ i++; continue; }
         if(forbidden[tempMachine][tempTask]==true){
-            throw new Exception(ex);
+            throw new NoValidSolutionException();
         }
         
         taskArray[tempMachine]=tempTask;
@@ -93,7 +92,7 @@ public class Solver{
         if(taskArray[prev_I] >=0 && taskArray[prev_I] < 8){
             prevTask=taskArray[prev_I];
             if(tooNearTask[prevTask][tempTask]){
-              throw new Exception(ex);
+              throw new NoValidSolutionException();
             }
         }
         
@@ -101,7 +100,7 @@ public class Solver{
         if(taskArray[next_I]!=-1){
             nextTask=taskArray[next_I];
             if(tooNearTask[tempTask][nextTask]){
-              throw new Exception("No valid solution possible!");
+              throw new NoValidSolutionException();
             }
         }
         
