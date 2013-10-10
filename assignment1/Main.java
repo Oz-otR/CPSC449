@@ -52,15 +52,17 @@ public class Main {
         // Test for forced partial assignments
         // Uses parseForcedAssignments(LinkedList <String>) from Parser
         // If forced partial assignment found, write error message to output file 
-        if(!matches(line, "forced partial assignment:")) return;
-		int[] forcedAssignments;
+        if(!matches(line, "forced partial assignment:")) {
+        	return;
+        }
+		int[] forcedAssignments = null;
         try{
             forcedAssignments = Parser.parseForcedAssignments(getLines(in));
 		    for (int m=0; m<8; m++){
 		    	if (forcedAssignments[m] != -1){
 			    	for (int n=0; n<8; n++){
 			    		if (n!=m && forcedAssignments[n] == forcedAssignments[m]){
-			    			throw new Exception("Partial assignment error");
+			    			throw new PartialAssignmentErrorException();
 			    		}
 			    	}
 		    	}
@@ -79,12 +81,14 @@ public class Main {
         // Uses parseForbiddenMachines(LinkedList<Strings>) from Parser
         // If forbidden machine assignment found, write error message to file
         if(!matches(line, "forbidden machine:")) return;
-		boolean[][] forbiddenMachine;
+		boolean[][] forbiddenMachine = null;
         try{
             forbiddenMachine = Parser.parseForbiddenMachines(getLines(in));
+        }
+        catch(InvalidMachineTaskException e){
+        	WriteToFile(e.getMessage(), _args[1]);
         } catch(Exception e){
-            String s = e.getMessage();
-			WriteToFile(s, _args[1]);
+			WriteToFile(e.getMessage(), _args[1]);
             return;
         }
         
@@ -95,12 +99,13 @@ public class Main {
         // Uses parseTooNearTasks(LinkedList<Strings>) from Parser
         // If too-near tasks assignments are found, write error message to file
         if(!matches(line, "too-near tasks:")) return;
-		boolean[][] tooNear;
+		boolean[][] tooNear = null;
         try{
             tooNear = Parser.parseTooNearTasks(getLines(in));
-        } catch (Exception e){
-            String s = e.getMessage();
-			WriteToFile(s, _args[1]);
+        } catch(InvalidMachineTaskException e){
+        	WriteToFile(e.getMessage(), _args[1]);
+        } catch(Exception e){
+        	WriteToFile(e.getMessage(), _args[1]);
             return;
         }
 
@@ -113,12 +118,19 @@ public class Main {
         if(!matches(line, "machine penalties:")) {
         	return;
         }
-		long[][] machinePenalties;
+        
+		long[][] machinePenalties = null;
         try{
             machinePenalties = Parser.parseMachinePenalties(getLines(in));
-        } catch (Exception e){
-            String s = e.getMessage();
-			WriteToFile(s, _args[1]);
+        } 
+        catch(InvalidPenaltyException e){
+        	WriteToFile(e.getMessage(), _args[1]);
+        }
+        catch (MachinePenaltyException e){
+        	WriteToFile(e.getMessage(), _args[1]);
+        }
+        catch (Exception e){
+        	WriteToFile(e.getMessage(), _args[1]);
             return;
         }
 
@@ -131,12 +143,15 @@ public class Main {
         if(!matches(line, "too-near penalities")) {
         	return;
         }
-		long[][] tooNearPenalties;
+		long[][] tooNearPenalties = null;
         try{
             tooNearPenalties = Parser.parseTooNearPenalties(getLines(in));
-        } catch (Exception e){
-            String s = e.getMessage();
-			WriteToFile(s, _args[1]);
+        } 
+        catch(InvalidPenaltyException e){
+        	WriteToFile(e.getMessage(), _args[1]);
+        }
+        catch (Exception e){
+        	WriteToFile(e.getMessage(), _args[1]);
             return;
         }
 		

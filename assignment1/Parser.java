@@ -4,7 +4,7 @@ import java.util.LinkedList;
 public class Parser{
 
     // Return some data structure containing forced partial assignments.
-    public static int[] parseForcedAssignments(LinkedList<String> in) throws Exception{
+    public static int[] parseForcedAssignments(LinkedList<String> in) throws InvalidMachineTaskException, PartialAssignmentErrorException{
         int[] result = new int[8];
         for(int i = 0; i < 8; i++){
             result[i] = -1;
@@ -26,7 +26,7 @@ public class Parser{
             
             if(machine>7 || machine<0) throw new InvalidMachineTaskException();
             if(task>7 || task<0) throw new InvalidMachineTaskException();
-            if(result[machine] != -1) throw new Exception("partial assignment error");
+            if(result[machine] != -1) throw new PartialAssignmentErrorException();
           
             result[machine] = task;
         }
@@ -35,7 +35,7 @@ public class Parser{
     }
     
     // Return a map ((machine, task) -> boolean) containing forbidden machines.
-    public static boolean[][] parseForbiddenMachines(LinkedList<String> in) throws Exception{
+    public static boolean[][] parseForbiddenMachines(LinkedList<String> in) throws InvalidMachineTaskException{
         boolean[][] result = new boolean[8][8];
         int machine;
         int task;
@@ -47,7 +47,7 @@ public class Parser{
             }
             catch (Exception e)
             {
-            	throw new Exception("Number format error");
+            	throw new InvalidMachineTaskException();
             }
             task = getTaskNumber(split[1]);
             
@@ -61,7 +61,7 @@ public class Parser{
     }
     
     // Return some data structure containing Too-Near tasks.
-    public static boolean[][] parseTooNearTasks(LinkedList<String> in) throws Exception{
+    public static boolean[][] parseTooNearTasks(LinkedList<String> in) throws InvalidMachineTaskException{
         boolean[][] result = new boolean[8][8];
         int task1;
         int task2;
@@ -77,27 +77,27 @@ public class Parser{
 	}
 	
     // Return a 2D matrix of penalties.
-    public static long[][] parseMachinePenalties(LinkedList<String> in) throws Exception{
+    public static long[][] parseMachinePenalties(LinkedList<String> in) throws InvalidPenaltyException, MachinePenaltyException{
         long[][] result = new long[8][8];
 
         /* Check input length. */
-        if (in.size() != 8) throw new Exception("machine penalty error");
+        if (in.size() != 8) throw new MachinePenaltyException();
 
         int i = 0;
         for(String line : in){
             String[] split = line.split(" ");
             
             /* Check input length. */
-            if(split.length != 8) throw new Exception("machine penalty error");
+            if(split.length != 8) throw new MachinePenaltyException();
 
             for(int j = 0; j < 8; j++){
                 try{
                     result[i][j] = Long.parseLong(split[j]);
                     if (result[i][j] < 0){
-                    	throw new Exception("invalid penalty");
+                    	throw new InvalidPenaltyException();
                     }
                 } catch (NumberFormatException e){
-                    throw new Exception("invalid penalty");
+                    throw new InvalidPenaltyException();
                 }
             }
 
@@ -106,7 +106,7 @@ public class Parser{
         return result;
     }
     // Returns an 8x8 matrix of pentalties, where [x][y] is the penalty for having y run on the machine next to x
-    public static long[][] parseTooNearPenalties(LinkedList<String> in) throws Exception{
+    public static long[][] parseTooNearPenalties(LinkedList<String> in) throws InvalidPenaltyException{
         long[][] result = new long[8][8];
         int sp = 0;
         int machine;
@@ -119,11 +119,11 @@ public class Parser{
             task1 = getTaskNumber(split[0]);
             task2 = getTaskNumber(split[1]);
             
-            if(task1 < 0 || task2 < 0) throw new Exception("invalid penalty");
+            if(task1 < 0 || task2 < 0) throw new InvalidPenaltyException();
             try{
                 value = Long.parseLong(split[2]);
             } catch (NumberFormatException e){
-                throw new Exception("invalid penalty");
+                throw new InvalidPenaltyException();
             }
 
             result[task1][task2] = value;
