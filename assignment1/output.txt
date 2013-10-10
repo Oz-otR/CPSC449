@@ -1,1 +1,1 @@
-invalid machine/task
+Error while parsing input file

@@ -16,48 +16,31 @@ import java.io.FileNotFoundException;
 public class Main {
 
     static String[] _args;
-    
     /** main method */
 	public static void main(String[] args) {
-		// Initiate input file checks
-		
-		// Check if correct arguments are being used
-		// Check if input file is valid
-        _args = args;
-        if(args.length != 2){
-            System.out.println("Usage: <input file> <output file>");
-            return;
-        }
-        Scanner in = null;
-        try{
-		    in = new Scanner(new BufferedReader(new FileReader(args[0])));
-        } catch (FileNotFoundException e){
-            String s = "file not found";
-			WriteToFile(s, args[1]);
-            return;
-        }
-        
-        String line;
-        
-        // Retrieve name of input file
-        line = rtrim(skip(in));
-        if(!matches(line, "Name:")) {
-        	return;
-        }
-		String name = rtrim(in.nextLine()); // Get name.
-	    
-        /* Skip all blank lines. */
-        line = skip(in);
-        
-        // Test for forced partial assignments
-        // Uses parseForcedAssignments(LinkedList <String>) from Parser
-        // If forced partial assignment found, write error message to output file 
-        if(!matches(line, "forced partial assignment:")) {
-        	return;
-        }
-		int[] forcedAssignments = null;
-        try{
-            forcedAssignments = Parser.parseForcedAssignments(getLines(in));
+		try{
+			// Check if correct arguments are being used
+			// Check if input file is valid
+	        _args = args;
+	        if(args.length != 2){
+	            System.out.println("Usage: <input file> <output file>");
+	            return;
+	        }
+	        Scanner in = new Scanner(new BufferedReader(new FileReader(args[0])));
+	
+	        // Retrieve name of input file
+	        String line = rtrim(in.nextLine());
+	        checkTitle(line, "Name:");
+			String name = rtrim(in.nextLine()); // Get name.
+		    
+	        /* Skip all blank lines. */
+	        line = skip(in);
+	        
+	        // Test for forced partial assignments
+	        // Uses parseForcedAssignments(LinkedList <String>) from Parser
+	        // If forced partial assignment found, write error message to output file 
+	        checkTitle(line, "forced partial assignment:");
+			int[] forcedAssignments = Parser.parseForcedAssignments(getLines(in));
 		    for (int m=0; m<8; m++){
 		    	if (forcedAssignments[m] != -1){
 			    	for (int n=0; n<8; n++){
@@ -67,113 +50,65 @@ public class Main {
 			    	}
 		    	}
 			}
-        } catch(InvalidMachineTaskException e){
-        	WriteToFile(e.getMessage(), _args[1]);
-        } catch(Exception e){
-            WriteToFile(e.getMessage(), _args[1]);
-            return;
-        }
-		
-        /* Skip all blank lines. */
-        line = skip(in);
-        
-        // Test for forbidden machines
-        // Uses parseForbiddenMachines(LinkedList<Strings>) from Parser
-        // If forbidden machine assignment found, write error message to file
-        if(!matches(line, "forbidden machine:")) return;
-		boolean[][] forbiddenMachine = null;
-        try{
-            forbiddenMachine = Parser.parseForbiddenMachines(getLines(in));
-        }
-        catch(InvalidMachineTaskException e){
-        	WriteToFile(e.getMessage(), _args[1]);
-        } catch(Exception e){
+	
+	        line = skip(in);
+	        
+	        // Test for forbidden machines
+	        // Uses parseForbiddenMachines(LinkedList<Strings>) from Parser
+	        // If forbidden machine assignment found, write error message to file
+	        checkTitle(line, "forbidden machine:");
+			boolean[][] forbiddenMachine = null;
+	        forbiddenMachine = Parser.parseForbiddenMachines(getLines(in));
+	        
+	        line = skip(in);
+	        
+	        // Test for too-near tasks
+	        // Uses parseTooNearTasks(LinkedList<Strings>) from Parser
+	        // If too-near tasks assignments are found, write error message to file
+	        checkTitle(line, "too-near tasks:");
+			boolean[][] tooNear = Parser.parseTooNearTasks(getLines(in));
+	
+	        line = skip(in);
+	        
+	        // Get machine penalties and apply penalties
+	        // Uses parseMachinePenalties(LinkedList<Strings>) from Parser
+	        // If error, write error to output file
+	        checkTitle(line, "machine penalties:");       
+			long[][] machinePenalties = Parser.parseMachinePenalties(getLines(in));
+	
+	        line = skip(in);
+	        
+	        // Get too-near penalties and apply penalties
+	        // Uses parseTooNearPenalties(LinkedList<Strings>) from Parser
+	        // If error, write error to output file
+	        checkTitle(line, "too-near penalities");
+			long[][] tooNearPenalties = Parser.parseTooNearPenalties(getLines(in));
+			
+			while(in.hasNext()){
+				if(!in.nextLine().trim().equals("")) throw new ParseException();
+			}
+			
+	        String result;
+	        result = Solver.solve(forcedAssignments, forbiddenMachine, tooNear, machinePenalties, tooNearPenalties).toString();
+	        
+	        WriteToFile(result, _args[1]);
+		} catch (Exception e){
 			WriteToFile(e.getMessage(), _args[1]);
-            return;
-        }
-        
-        /* Skip all blank lines. */
-        line = skip(in);
-        
-        // Test for too-near tasks
-        // Uses parseTooNearTasks(LinkedList<Strings>) from Parser
-        // If too-near tasks assignments are found, write error message to file
-        if(!matches(line, "too-near tasks:")) return;
-		boolean[][] tooNear = null;
-        try{
-            tooNear = Parser.parseTooNearTasks(getLines(in));
-        } catch(InvalidMachineTaskException e){
-        	WriteToFile(e.getMessage(), _args[1]);
-        } catch(Exception e){
-        	WriteToFile(e.getMessage(), _args[1]);
-            return;
-        }
-
-        /* Skip all blank lines. */
-        line = skip(in);
-        
-        // Get machine penalties and apply penalties
-        // Uses parseMachinePenalties(LinkedList<Strings>) from Parser
-        // If error, write error to output file
-        if(!matches(line, "machine penalties:")) {
-        	return;
-        }
-        
-		long[][] machinePenalties = null;
-        try{
-            machinePenalties = Parser.parseMachinePenalties(getLines(in));
-        } 
-        catch(InvalidPenaltyException e){
-        	WriteToFile(e.getMessage(), _args[1]);
-        }
-        catch (MachinePenaltyException e){
-        	WriteToFile(e.getMessage(), _args[1]);
-        }
-        catch (Exception e){
-        	WriteToFile(e.getMessage(), _args[1]);
-            return;
-        }
-
-        /* Skip all blank lines. */
-        line = skip(in);
-        
-        // Get too-near penalties and apply penalties
-        // Uses parseTooNearPenalties(LinkedList<Strings>) from Parser
-        // If error, write error to output file
-        if(!matches(line, "too-near penalities")) {
-        	return;
-        }
-		long[][] tooNearPenalties = null;
-        try{
-            tooNearPenalties = Parser.parseTooNearPenalties(getLines(in));
-        } 
-        catch(InvalidPenaltyException e){
-        	WriteToFile(e.getMessage(), _args[1]);
-        }
-        catch (Exception e){
-        	WriteToFile(e.getMessage(), _args[1]);
-            return;
-        }
-		
-        String result;
-        try{
-            result = Solver.solve(forcedAssignments, forbiddenMachine, tooNear, machinePenalties, tooNearPenalties).toString();
-        } catch (NoValidSolutionException e){
-        	result = e.getMessage();
-        } catch (Exception e){
-            result = "Something went terrible wrong! " + e.getMessage();
-        }
-		WriteToFile(result, _args[1]);
+		}
     }
 
     /** Check if the line matches the title. */
-    private static boolean matches(String line, String match){
+    private static boolean matches(String line, String match) throws ParseException{
         if(!line.equals(match)){
-            String s = "Error while parsing input file";
-			WriteToFile(s, _args[1]);
-            return false;
+        	throw new ParseException();
         }
         return true;
+    }
+    
+    private static void checkTitle(String line, String match) throws ParseException{
+    	if(!line.equals(match)){
+    		throw new ParseException();
+    	}
     }
         
     /** Gets the next section of lines. */
@@ -184,7 +119,11 @@ public class Main {
         	line = rtrim(in.nextLine());
         	while(!line.equals("")){
         		lines.add(line);
-        		line = in.hasNext() ? rtrim(in.nextLine()) : "";
+        		if(in.hasNext()){
+        			line = rtrim(in.nextLine());
+        		} else {
+        			line = "";
+        		}
         	}
         }
         return lines;
@@ -192,14 +131,18 @@ public class Main {
 
     /** Moves forward through the scanner until a non-empty line
      *  is found. */
-    private static String skip(Scanner in){
-        String line = null;
-        if(in.hasNext()){
-            do{
-                line = in.nextLine();
-            } while (in.hasNext() && line.trim().equals(""));
-        }
-        return line;
+    private static String skip(Scanner in) throws ParseException{
+    	String line = null;
+    	if(in.hasNext()){
+    		line = in.nextLine();
+    		if(line.equals("") && in.hasNext()){
+    			line = in.nextLine();
+    		}
+    	}
+    	if(line != null && !line.equals("")){
+    		return line;
+    	}
+    	throw new ParseException();
     }
 
      /** Trim whitespace from only the right side of the string. 
@@ -208,7 +151,6 @@ public class Main {
    	  *  Return the string consisting of the remaining characters
       */
     private static String rtrim(String s){
-    	
         if (s == null) {
         	return null;
         }
@@ -216,30 +158,6 @@ public class Main {
         for(; i >= 0 && Character.isWhitespace(s.charAt(i)); i--);
         return s.substring(0, i + 1);
     }
-    
-    /** Method to read from file given a filename
-     *  Put lines read into a linked list of strings
-     *  Return the linked list of strings
-     */
-	public static LinkedList<String> ReadFromFile(String readFileName){
-		
-		LinkedList<String> linesOfFile = new LinkedList<String>();
-		Scanner fileScanner;
-		try {
-			//new File(System.getProperty("user.dir") + "/" + 
-			fileScanner = new Scanner(new File(readFileName));
-			while (fileScanner.hasNextLine()){
-			    linesOfFile.add(fileScanner.nextLine().trim());
-			}
-			fileScanner.close();
-			
-		} catch (FileNotFoundException e) {
-			String s = "File not found!";
-			WriteToFile(s, _args[1]);
-		}
-		
-		return linesOfFile;
-	}
 	
 	/** Method to write to file given a filename 
 	 *  If file exists, create new file

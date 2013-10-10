@@ -2,13 +2,13 @@ Name:
 Normal
 
 forced partial assignment:
-(0,a)
-
-forbidden machine:
-(2,d)
 (1,a)
 
+forbidden machine:
+
+
 too-near tasks:
+(d,c)
 (c,d)
 
 machine penalties:
@@ -25,4 +25,4 @@ too-near penalities
 (e,f,30)
 
 
-
+I like pie

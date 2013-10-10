@@ -9,7 +9,7 @@ forced partial assignment:
 (4,e)
 (6,h)
 (7,a)
-(0,d)
+(8,d)
 (1,e)
 
 forbidden machine:

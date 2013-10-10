@@ -27,7 +27,7 @@ forbidden machine:
 (4,g)
 (4,h)
 
-too-near tasks
+too-near tasks:
 (a,c)
 
 machine penalties:
@@ -40,6 +40,6 @@ machine penalties:
 5 1 6 5 1 9 5 1
 7 5 1 1 1 9 1 6
 
-too-near penalties
+too-near penalities
 (e,f,30)
 
