@@ -2,13 +2,13 @@ Name:
 order(bcfdegha)pen(65)
 
 forced partial assignment:
-(1,c)
-(3,d)
+(2,c)
+(4,d)
 
 forbidden machine:
-(2,d)
+(3,d)
 
-too-near tasks
+too-near tasks:
 (c,d)
 
 machine penalties:
@@ -21,6 +21,6 @@ machine penalties:
 20 20 20 20 20 20 20 1
 1 20 20 20 20 20 20 20
 
-too-near penalties
+too-near penalities
 (e,f,50)
 

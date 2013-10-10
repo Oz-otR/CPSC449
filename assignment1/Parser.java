@@ -20,12 +20,12 @@ public class Parser{
             	machine = Integer.parseInt(split[0])-1;
             }
             catch (Exception e){
-            	throw new Exception("invalid machine");
+            	throw new Exception("invalid machine/task");
             }
             task = getTaskNumber(split[1]);
             
-            if(machine>7 || machine<0) throw new Exception("invalid machine");
-            if(task>7 || task<0) throw new Exception("invalid task");
+            if(machine>7 || machine<0) throw new Exception("invalid machine/task");
+            if(task>7 || task<0) throw new Exception("invalid machine/task");
             if(result[machine] != -1) throw new Exception("partial assignment error");
           
             result[machine] = task;
@@ -52,7 +52,7 @@ public class Parser{
             task = getTaskNumber(split[1]);
             
             /* Catch errors. */
-            if(task<0 || task>7) throw new Exception("invalid task");
+            if(task<0 || task>7) throw new Exception("invalid machine/task");
 
             result[machine][task] = true;
         }
@@ -69,7 +69,7 @@ public class Parser{
             String[] split = line.substring(1, line.length() - 1).split(",");
             task1 = getTaskNumber(split[0]);
             task2 = getTaskNumber(split[1]);
-            if(task2 < 0 || task1 < 0) throw new Exception("invalid task");
+            if(task2 < 0 || task1 < 0) throw new Exception("invalid machine/task");
             result[task1][task2] = true;
         }
 

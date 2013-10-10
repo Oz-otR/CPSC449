@@ -21,9 +21,10 @@ public class Solver{
       for(int t : n.getRemainingTasks()){
         
         // Check if the task assignment is forbidden.
+    	int mPrev = m - 1 > -1 ? m - 1 : 7;
         if((forbidden == null || !forbidden[m][t]) && 
-        (tooNear == null || n.getTask((m-1) % 8) == -1 ||
-        n.getTask((m-1) % 8) != -1 && !tooNear[n.getTask((m-1) % 8)][t]))
+        (tooNear == null || n.getTask(mPrev) == -1 ||
+        n.getTask(mPrev) != -1 && !tooNear[n.getTask(mPrev)][t]))
         {
           // Create the new node and assign the task.
           Node next = new Node(n);

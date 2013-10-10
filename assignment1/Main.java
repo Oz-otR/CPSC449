@@ -46,8 +46,6 @@ public class Main {
         }
 		String name = rtrim(in.nextLine()); // Get name.
 	    
-		boolean duplicates = false;
-		
         /* Skip all blank lines. */
         line = skip(in);
         
@@ -62,7 +60,6 @@ public class Main {
 		    	if (forcedAssignments[m] != -1){
 			    	for (int n=0; n<8; n++){
 			    		if (n!=m && forcedAssignments[n] == forcedAssignments[m]){
-			    			duplicates=true;
 			    			throw new Exception("Partial assignment error");
 			    		}
 			    	}
@@ -70,9 +67,7 @@ public class Main {
 			}
         } catch(Exception e){
             String s = e.getMessage();
-            if (duplicates == true) {
-            	WriteToFile(s, _args[1]);
-            }
+            WriteToFile(s, _args[1]);
             return;
         }
 		
@@ -169,9 +164,9 @@ public class Main {
         String line;
         if(in.hasNext()){
         	line = rtrim(in.nextLine());
-        	while(!line.equals("") && in.hasNext()){
+        	while(!line.equals("")){
         		lines.add(line);
-        		line = rtrim(in.nextLine());
+        		line = in.hasNext() ? rtrim(in.nextLine()) : "";
         	}
         }
         return lines;
@@ -248,6 +243,7 @@ public class Main {
 			buffWriter.newLine();
 			buffWriter.close();
  
+			System.out.println(inputStringToFile);
 			System.out.println("Done writing to file.");
 	 
 			} catch (IOException e) {

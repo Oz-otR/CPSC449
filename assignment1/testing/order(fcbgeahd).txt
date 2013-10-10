@@ -2,15 +2,15 @@ Name:
 order(fcbgeahd)pen(8)
 
 forced partial assignment:
-(1,c)
-(3,g)
+(2,c)
+(4,g)
 
 
 forbidden machine:
-(2,d)
-(3,f)
+(3,d)
+(4,f)
 
-too-near tasks
+too-near tasks:
 (c,d)
 (a,c)
 
@@ -24,7 +24,7 @@ machine penalties:
 5 1 6 5 1 9 5 1
 7 5 1 1 1 9 1 6
 
-too-near penalties
+too-near penalities
 (e,f,30)
 (g,h,56)
 (a,b,5)
