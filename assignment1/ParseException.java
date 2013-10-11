@@ -20,11 +20,4 @@ public class ParseException extends Exception {
 		super("Error while parsing input file", arg1);
 		// TODO Auto-generated constructor stub
 	}
-
-	public ParseException(String arg0, Throwable arg1, boolean arg2,
-			boolean arg3) {
-		super("Error while parsing input file", arg1, arg2, arg3);
-		// TODO Auto-generated constructor stub
-	}
-
 }

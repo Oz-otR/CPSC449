@@ -21,10 +21,4 @@ public class InvalidMachineTaskException extends Exception {
 		// TODO Auto-generated constructor stub
 	}
 
-	public InvalidMachineTaskException(String message, Throwable cause,
-			boolean enableSuppression, boolean writableStackTrace) {
-		super("invalid machine/task", cause, enableSuppression, writableStackTrace);
-		// TODO Auto-generated constructor stub
-	}
-
 }

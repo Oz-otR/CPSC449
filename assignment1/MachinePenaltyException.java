@@ -20,11 +20,4 @@ public class MachinePenaltyException extends Exception {
 		super("machine penalty error", cause);
 		// TODO Auto-generated constructor stub
 	}
-
-	public MachinePenaltyException(String message, Throwable cause,
-			boolean enableSuppression, boolean writableStackTrace) {
-		super("machine penalty error", cause, enableSuppression, writableStackTrace);
-		// TODO Auto-generated constructor stub
-	}
-
 }
