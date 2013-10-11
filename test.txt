@@ -1,18 +1,18 @@
 Name:
-machine partial Assign error
+Test File
 
 forced partial assignment:
-(1,c)
-(1,d)
+(1,H)
+(2,B)
 
 forbidden machine:
-(2,d)
+(2,D)
 
 too-near tasks:
-(c,d)
+(H,B)
 
 machine penalties:
-1 1 1 1 1 1 1 1
+1 1 1 1 1 1 1 22
 1 1 1 1 1 1 1 1
 1 1 1 1 1 1 1 1
 1 1 1 1 1 1 1 1
@@ -22,4 +22,6 @@ machine penalties:
 1 1 1 1 1 1 1 1
 
 too-near penalities
-(e,f,30)
+(E,F,30)
+
+

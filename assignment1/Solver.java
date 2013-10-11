@@ -1,9 +1,10 @@
 public class Solver{
-  private static Node solve(Node n, boolean[][] forbidden, boolean[][] tooNear){
-    return solve(n, null, forbidden, tooNear);
+  public static Node solve(int[] forced, boolean[][] forbidden, boolean[][] tooNear, long[][] penalties, long[][] tooNearPenalties) throws Exception{
+    Node n = setupRoot(forced, forbidden, tooNear, penalties, tooNearPenalties);
+    return solve(n,null,forbidden,tooNear);
   }
   
-  private static Node solve(Node n, Node bestNode, boolean[][] forbidden, boolean[][] tooNear){
+  private static Node solve(Node n, Node bestNode, boolean[][] forbidden, boolean[][] tooNear) throws Exception{
     // Set the best penalty found so far to infinity.
     
     // Check if the number of assigned tasks for n is 8.
@@ -20,9 +21,10 @@ public class Solver{
       for(int t : n.getRemainingTasks()){
         
         // Check if the task assignment is forbidden.
+    	int mPrev = m - 1 > -1 ? m - 1 : 7;
         if((forbidden == null || !forbidden[m][t]) && 
-        (tooNear == null || n.getTask((m-1) % 8) == -1 ||
-        n.getTask((m-1) % 8) != -1 && !tooNear[n.getTask((m-1) % 8)][t]))
+        (tooNear == null || n.getTask(mPrev) == -1 ||
+        n.getTask(mPrev) != -1 && !tooNear[n.getTask(mPrev)][t]))
         {
           // Create the new node and assign the task.
           Node next = new Node(n);
@@ -37,8 +39,8 @@ public class Solver{
           // Check if the subtree rooted at the new node
           // has a smaller penalty than the current best.
           if(bestNode == null || next.getPenalty() < bestNode.getPenalty()){
-            Node nextBestNode = solve(next, forbidden, tooNear);
-            long nextBest = nextBestNode.getPenalty();
+            Node nextBestNode = solve(next, bestNode, forbidden, tooNear);
+            long nextBest = nextBestNode == null ? Long.MAX_VALUE : nextBestNode.getPenalty();
             if(bestNode == null || nextBest < bestNode.getPenalty()){
               bestNode = nextBestNode;
             }
@@ -48,9 +50,9 @@ public class Solver{
     }
     return bestNode;
   }
-  public Node setupRoot(int [] forced, boolean[][] forbidden, boolean[][] tooNearTask,long[][] penalties, long[][] tooNearPenalties) throws Exception{
+
+  public static Node setupRoot(int [] forced, boolean[][] forbidden, boolean[][] tooNearTask,long[][] penalties, long[][] tooNearPenalties) throws Exception{
       int[] taskArray;
-      final String ex = "error message";
       int prev_I;
       int next_I;
       int prevTask;
@@ -75,31 +77,22 @@ public class Solver{
         }
         
         //Check if Forbidden
+        if(tempTask == -1){ i++; continue; }
         if(forbidden[tempMachine][tempTask]==true){
-            throw new Exception(ex);
+            throw new NoValidSolutionException();
         }
         
         taskArray[tempMachine]=tempTask;
         
         //Checking for too near task
-        if(i==0){
-            prev_I=7;
-        }
-        else{
-            prev_I=i-1;
-        }
-        if(i==7){
-            next_I=0;
-        }
-        else{
-            next_I=i+1;
-        }
+        if(i==0) prev_I = 7; else prev_I = i - 1;
+        if(i==7) next_I = 0; else next_I = i + 1;
         
         //Check for i-1 to i
         if(taskArray[prev_I] >=0 && taskArray[prev_I] < 8){
             prevTask=taskArray[prev_I];
             if(tooNearTask[prevTask][tempTask]){
-              throw new Exception(ex);
+              throw new NoValidSolutionException();
             }
         }
         
@@ -107,7 +100,7 @@ public class Solver{
         if(taskArray[next_I]!=-1){
             nextTask=taskArray[next_I];
             if(tooNearTask[tempTask][nextTask]){
-              throw new Exception("no possible solution or whatever");
+              throw new NoValidSolutionException();
             }
         }
         
