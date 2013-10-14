@@ -12,8 +12,8 @@ too-near tasks:
 (c,d)
 
 machine penalties:
-1 1 1 1 1 1 1 1
-1 1 1 1 1 1 1 1
+1 1 0 0 1 1 1 1
+1 1 0 0 1 1 1 1
 1 1 1 1 1 1 1 1
 1 1 1 1 1 1 1 1
 1 1 1 1 1 1 1 1
@@ -24,5 +24,3 @@ machine penalties:
 too-near penalities
 (e,f,30)
 
-
-I like pie
