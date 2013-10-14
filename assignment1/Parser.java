@@ -106,7 +106,7 @@ public class Parser{
         return result;
     }
     // Returns an 8x8 matrix of pentalties, where [x][y] is the penalty for having y run on the machine next to x
-    public static long[][] parseTooNearPenalties(LinkedList<String> in) throws InvalidPenaltyException{
+    public static long[][] parseTooNearPenalties(LinkedList<String> in) throws InvalidPenaltyException, InvalidTaskException{
         long[][] result = new long[8][8];
         int sp = 0;
         int machine;
@@ -119,7 +119,7 @@ public class Parser{
             task1 = getTaskNumber(split[0]);
             task2 = getTaskNumber(split[1]);
             
-            if(task1 < 0 || task2 < 0) throw new InvalidPenaltyException();
+            if(task1 < 0 || task2 < 0) throw new InvalidTaskException();
             try{
                 value = Long.parseLong(split[2]);
             } catch (NumberFormatException e){
