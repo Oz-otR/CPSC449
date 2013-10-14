@@ -22,9 +22,11 @@ public class Solver{
         
         // Check if the task assignment is forbidden.
     	int mPrev = m - 1 > -1 ? m - 1 : 7;
-        if((forbidden == null || !forbidden[m][t]) && 
-        (tooNear == null || n.getTask(mPrev) == -1 ||
-        n.getTask(mPrev) != -1 && !tooNear[n.getTask(mPrev)][t]))
+        int mNext = m + 1 < 8  ? m + 1 : 0;
+        boolean isForbidden = (forbidden != null && forbidden[m][t]);
+        boolean isTooNear = (tooNear != null && n.getTask(mPrev) != -1 && tooNear[n.getTask(mPrev)][t]);
+        isTooNear = isTooNear || (tooNear != null && n.getTask(mNext) != -1 && tooNear[t][n.getTask(mNext)]);
+        if(!isTooNear && !isForbidden)
         {
           // Create the new node and assign the task.
           Node next = new Node(n);
