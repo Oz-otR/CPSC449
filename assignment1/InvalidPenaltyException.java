@@ -19,11 +19,4 @@ public class InvalidPenaltyException extends Exception {
 		super("invalid penalty", cause);
 		// TODO Auto-generated constructor stub
 	}
-
-	public InvalidPenaltyException(String message, Throwable cause,
-			boolean enableSuppression, boolean writableStackTrace) {
-		super("invalid penalty", cause, enableSuppression, writableStackTrace);
-		// TODO Auto-generated constructor stub
-	}
-
 }

@@ -19,11 +19,4 @@ public class PartialAssignmentErrorException extends Exception {
 		super("partial assignment error", cause);
 		// TODO Auto-generated constructor stub
 	}
-
-	public PartialAssignmentErrorException(String message, Throwable cause,
-			boolean enableSuppression, boolean writableStackTrace) {
-		super("partial assignment error", cause, enableSuppression, writableStackTrace);
-		// TODO Auto-generated constructor stub
-	}
-
 }

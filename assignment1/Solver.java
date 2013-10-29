@@ -5,15 +5,11 @@ public class Solver{
   }
   
   private static Node solve(Node n, Node bestNode, boolean[][] forbidden, boolean[][] tooNear) throws Exception{
-    // Set the best penalty found so far to infinity.
-    
     // Check if the number of assigned tasks for n is 8.
     if(n.getTaskCount() >= 8){
       // There are no more empty slots, get the penalty value for this configuration.
       bestNode = n;
     } else {
-      // There is still at least one task to assign.
-      
       // Find a free machine.
       int m = n.getFreeMachine();
       
@@ -21,20 +17,16 @@ public class Solver{
       for(int t : n.getRemainingTasks()){
         
         // Check if the task assignment is forbidden.
-    	int mPrev = m - 1 > -1 ? m - 1 : 7;
-        if((forbidden == null || !forbidden[m][t]) && 
-        (tooNear == null || n.getTask(mPrev) == -1 ||
-        n.getTask(mPrev) != -1 && !tooNear[n.getTask(mPrev)][t]))
+      	int mPrev = m - 1 > -1 ? m - 1 : 7;
+        int mNext = m + 1 < 8  ? m + 1 : 0;
+        boolean isTooNear = n.getTask(mPrev) != -1 && tooNear[n.getTask(mPrev)][t];
+        isTooNear = isTooNear || (n.getTask(mNext) != -1 && tooNear[t][n.getTask(mNext)]);
+
+        if(!isTooNear && !forbidden[m][t])
         {
           // Create the new node and assign the task.
           Node next = new Node(n);
-          
-          try{
-            next.setTask(m, t);
-          } catch (Exception e){
-            System.out.println(e.getMessage());
-            return null; 
-          }
+          next.setTask(m, t);
           
           // Check if the subtree rooted at the new node
           // has a smaller penalty than the current best.
@@ -51,62 +43,55 @@ public class Solver{
     return bestNode;
   }
 
-  public static Node setupRoot(int [] forced, boolean[][] forbidden, boolean[][] tooNearTask,long[][] penalties, long[][] tooNearPenalties) throws Exception{
-      int[] taskArray;
-      int prev_I;
-      int next_I;
-      int prevTask;
-      int nextTask;
-      int i=0;
-      int tempMachine;
-      int tempTask;
-      boolean tooNear;
+  public static Node setupRoot(
+    int [] forced,
+    boolean[][] forbidden,
+    boolean[][] tooNearTask,
+    long[][] penalties,
+    long[][] tooNearPenalties) throws Exception
+  {
+      int[] tasks = new int[8];
       
-      taskArray=new int[8];
-      while(i<8){
-        taskArray[i]=-1;
-        i++;
+      // Initialize tasks.
+      for(int i = 0; i < 8; i++){
+        tasks[i] = -1;
       }
-      i=0;
+
+      for(int i = 0; i < 8; i++){
+        int task = forced[i];
+        if(task == -1) continue;
       
-      while(i<8){
-        tempMachine=i;
-        tempTask=-1;
-        if(forced[i]!=-1){
-            tempTask=forced[i];
+        if(tasks[i] == -1){
+          tasks[i] = task;
+        } else {
+          throw new NoValidSolutionException();
         }
-        
+
         //Check if Forbidden
-        if(tempTask == -1){ i++; continue; }
-        if(forbidden[tempMachine][tempTask]==true){
-            throw new NoValidSolutionException();
+        if(forbidden[i][task]){
+          throw new NoValidSolutionException();
         }
-        
-        taskArray[tempMachine]=tempTask;
         
         //Checking for too near task
-        if(i==0) prev_I = 7; else prev_I = i - 1;
-        if(i==7) next_I = 0; else next_I = i + 1;
+        int prev = i == 0 ? 7 : i - 1;
+        int next = i == 7 ? 0 : i + 1;
         
         //Check for i-1 to i
-        if(taskArray[prev_I] >=0 && taskArray[prev_I] < 8){
-            prevTask=taskArray[prev_I];
-            if(tooNearTask[prevTask][tempTask]){
-              throw new NoValidSolutionException();
-            }
+        if(tasks[prev] >=0 && tasks[prev] < 8){
+          int prevTask = tasks[prev];
+          if(tooNearTask[prevTask][task]){
+            throw new NoValidSolutionException();
+          }
         }
         
         //Check for i to 1+1
-        if(taskArray[next_I]!=-1){
-            nextTask=taskArray[next_I];
-            if(tooNearTask[tempTask][nextTask]){
-              throw new NoValidSolutionException();
-            }
+        if(tasks[next]!=-1){
+          int nextTask = tasks[next];
+          if(tooNearTask[task][nextTask]){
+            throw new NoValidSolutionException();
+          }
         }
-        
-        i++;
       }
-      
-      return new Node(taskArray, penalties, tooNearPenalties);
+      return new Node(tasks, penalties, tooNearPenalties);
   }
 }

@@ -88,10 +88,14 @@ public class Main {
 				if(!in.nextLine().trim().equals("")) throw new ParseException();
 			}
 			
-	        String result;
-	        result = Solver.solve(forcedAssignments, forbiddenMachine, tooNear, machinePenalties, tooNearPenalties).toString();
+	        Node result;
+	        result = Solver.solve(forcedAssignments, forbiddenMachine, tooNear, machinePenalties, tooNearPenalties);
 	        
-	        WriteToFile(result, _args[1]);
+            if(result != null){
+	            WriteToFile(result.toString(), _args[1]);
+            } else {
+                throw new NoValidSolutionException();
+            }
 		} catch (Exception e){
 			WriteToFile(e.getMessage(), _args[1]);
 		}
