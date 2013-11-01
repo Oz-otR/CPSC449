@@ -13,9 +13,9 @@ splitSpace :: (Char a) => [a] -> [a]
 
 parser :: ([[Int]] a, [[Bool]] b, (Int, Int) c) => String -> (a, a, b, b, [c], String)
 	parser input = parse input
--- output type: ([tooNearPen] (2D list of ints),[machinePen] (2D list in ints),[tooNear] (2D list of bool),[forbidden] (2D list of bool),[forced] (list of (machine-task pairs)),[optionalErrorMessage])--
-toValidNum :: Int -> Int
-toValidNum a 
+-- output type: ([tooNearPen] (2D list of ints),[machinePen] (2D list in ints),[tooNear] (2D list of bool),[forbidden] (2D list of bool),[forced] (list of (machine,task pairs (example: 1,a)),[optionalErrorMessage])--
+taskToValidNum :: Int -> Int
+taskToValidNum a 
 	|a == 'a' = 0
 	|a == 'b' = 1
 	|a == 'c' = 2
