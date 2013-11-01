@@ -42,7 +42,7 @@ parse case getHeader file of:
 	otherwise	returnVal
 -}
 
-ParseForbiddenTooNear :: ([String a], [Bool] b, Int c) => [String, b, c] -> [a, b, c]
+parseForbiddenTooNear :: ([String a], [Bool] b, Int c) => (String, b, c) -> 
 {-	read next line
 	if line==(x,y)
 		assign True, a[x[y]] and parse to next line ParseForbiddenTooNear [a,b+1]
@@ -50,9 +50,13 @@ ParseForbiddenTooNear :: ([String a], [Bool] b, Int c) => [String, b, c] -> [a, 
 		return [a,b+1]
 -}
 
-ParseForbiddenTooNear [a,b,c]
-		| 
+parseForbiddenTooNear (a,b,c)
+	|a == /n:_ = ""
+	|a == "" = ""
+	|otherwise = parseLineForbiddenTooNear (a,b,c)
 
+parseLineForbiddenTooNear :: ([String a], [Bool] b, Int c) => (String, b, c) -> (a, b, c)
+parseLineForbiddenTooNear (a,b,c)
 
 --input type? ["(a,b)","(c,d)","(e,f)","\n","Header2"...}--
 --check current x of x:xs--
