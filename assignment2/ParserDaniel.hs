@@ -12,30 +12,29 @@ splitSpace :: (Char a) => [a] -> [a]
 
 
 parser :: (String a) => String -> [a]
--- output type: [[tooNearPen] (2D list of ints),[machinePen] (2D list in ints),[tooNear] (2D list of bool),[forbidden] (2D list of bool),[forced] (list of (machine-task pairs)),[optionalErrorMessage]]--
+-- output type: ([tooNearPen] (2D list of ints),[machinePen] (2D list in ints),[tooNear] (2D list of bool),[forbidden] (2D list of bool),[forced] (list of (machine-task pairs)),[optionalErrorMessage])--
 --input type? ["(a,b)","(c,d)","(e,f)","\n","Header2"...}--
 --check current x of x:xs--
 --if null then go to next datatype--
 --otherwise [x:[currentdatatype]] ++ parser xs--
-parser input 
+parser input = parseTooNear $ parseMachinePenalty $ parseForbiddenTooNear $ ParseForbiddenAssign $ parseForced input
 
-
-
-
-parser x:xs = parseTooNear $ parseMachinePenalty $ parseForbiddenTooNear $ ParseForbiddenAssign $ parseForced x:xs
 (a,b)
 fst snd (a,b) = a
 
 
-toValidNum :: a -> Int
-toValidNumb a = case a of 	'a' -> 0
-							'b' -> 1
-							'c' -> 2
-							'd' -> 3
-							'e' -> 4
-							'f' -> 5
-							'g' -> 6
-							'h' -> 7
+toValidNum :: Int -> Int
+toValidNumb a 
+	|a == 'a' = 0
+	|a == 'b' = 1
+	|a == 'c' = 2
+	|a == 'd' = 3
+	|a == 'e' = 4
+	|a == 'f' = 5
+	|a == 'g' = 6
+	|a == 'h' = 7
+	|otherwise	= -1
+							
 							
 							
 							
