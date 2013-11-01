@@ -42,7 +42,7 @@ parse case getHeader file of:
 	otherwise	returnVal
 -}
 
-parseForbiddenTooNear :: ([String a], [Bool] b, Int c) => (String, b, c) -> 
+parseForbiddenTooNear :: ([String] a, [Bool] b, Int c) => (String, b, c) -> 
 {-	read next line
 	if line==(x,y)
 		assign True, a[x[y]] and parse to next line ParseForbiddenTooNear [a,b+1]
@@ -56,10 +56,23 @@ parseForbiddenTooNear (a,b,c)
 	|otherwise = parseLineForbiddenTooNear (a,b,c)
 
 parseLineForbiddenTooNear :: ([String a], [Bool] b, Int c) => (String, b, c) -> (a, b, c)
-parseLineForbiddenTooNear (a,b,c)
-
+parseLineForbiddenTooNear (a,b,c) = parseForbiddenTooNear (a, parseB, c)
+	where parseB = replace True x (b !! y)
+		  x = (a !! c) !! 1
+		  y = (a !! c) !! 2
 --input type? ["(a,b)","(c,d)","(e,f)","\n","Header2"...}--
 --check current x of x:xs--
 --if null then go to next datatype--
 --otherwise [x:[currentdatatype]] ++ parser xs--
 parser input = parseTooNear $ parseMachinePenalty $ parseForbiddenTooNear $ ParseForbiddenAssign $ parseForced input
+
+
+
+{- insert element 0 list = element:list
+   insert element index (x:xs) = x:(insert element (index - 1) xs)
+   
+   replace element 0 (x:xs) = element:xs
+   replace element index (x:xs) = x:(replace element (index - 1) xs)
+   
+   delete 0 x:xs = xs
+   delete index x:xs = x:(delete (index - 1) xs) -} 
