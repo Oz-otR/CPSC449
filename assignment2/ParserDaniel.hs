@@ -14,19 +14,41 @@ parser :: ([[Int]] a, [[Bool]] b, (Int, Int) c) => [String] -> (a, a, b, b, [c],
 	--parser input = parseTooNear $ parseMachinePen $ parseForbiddenTooNear $ ParseForbidden $ parseForced input - not sure about this for now, might be too complicated--
 parser input = (a, b, d, e, f, g)
 	|g \= ""		 = (_, _, _, _, _, g)
-	|x == "header 1" = parseTooNearPen(input, createBlank8by8list, c+1, error) + parser(,b,d,e,f,g)
-	|x == "header 2" = parseMachinePen(input, createBlank8by8list, c+1, error)
-	|x == "header 3" = parseForbiddenTooNear(input, createBlank8by8boolList, c+1, error)
-	|x == "header 4" = parseForbidden(input, createBlank8by8boolList, c+1, error)
-	|x == "header 5" = parseForced(input, "", c+1, error)
-	where	
+	|x == "header 1" = do
+						x = parseTooNearPen(input, createBlank8by8list, c+1, g)
+						parser(a', b, d, e, f, g1)
+	|x == "header 2" = do
+						x = parseMachinePen(input, createBlank8by8list, c+1, g)
+						parser(a, b', d, e, f, g2)
+	|x == "header 3" = do
+						x = parseForbiddenTooNear(input, createBlank8by8boolList, c+1, g)
+						parser(a, b, d', e, f, g3)
+	|x == "header 4" = do
+						x = parseForbidden(input, createBlank8by8boolList, c+1, g)
+						parser(a, b, d, e', f, g4)
+	|x == "header 5" = do
+						x = (parseForced(input, "", c+1, g)
+						parser(a, b, d, e, f', g5)
+	|otherwise		 = (a, b, d, e, f, g)
+	where input = x:xs
+		a' = second(x)
+		g1 = fourth(x)
+		b' = second(x)
+		g2 = fourth(x)
+		d' = second(x)
+		g3 = fourth(x)
+		e' = second(x)
+		g4 = fourth(x)
+		f' = second(x)
+		g5 = fourth(x)
 -- output type: ([tooNearPen] (2D list of ints),[machinePen] (2D list in ints),[tooNear] (2D list of bool),[forbidden] (2D list of bool),[forced] (list of (machine,task pairs (example: 1,a)),[optionalErrorMessage])--
-	-- parseForced input: (input string, input position, forced assignments, error message)--
-	-- parseForbidden input: (input string, input position, forced assignments, forbidden assignments, error)--
-	-- parseForbiddenTooNear input: (string, position, forced assignments, forbidden assignments, forbidden tooNears, error)--
-	-- parseMachinePen input: (string, position, forced assignments, forbidden assign, forbidden tooNears, machine Pens, error)--
-	-- parseTooNear input: (""		""				""					""				""					""		   , tooNear Pens, error)--
-	-- parseTooNear output: function output type --
+
+second :: (a, b, c, d) -> b
+	second (_, z, _, _) = z
+
+fourth :: (a, b, c, d) -> d
+	fourth (_, _, _, z) = z
+
 taskToValidNum :: Int -> Int
 taskToValidNum a 
 	|a == 'a' = 0
@@ -69,7 +91,7 @@ parseForbiddenTooNear (a,b,c,d)
 	|a == "" = (a, b, c+1,d)
 	|otherwise = parseLineForbiddenTooNear (a,b,c,d)
 
-parseLineForbiddenTooNear :: ([String a], [Bool] b) => (a, b, Int, String) -> (a, b, Int, String)
+parseLineForbiddenTooNear :: ([String] a, [Bool] b) => (a, b, Int, String) -> (a, b, Int, String)
 parseLineForbiddenTooNear (a,b,c,d) = parseForbiddenTooNear (a, parseB, c+1, d)
 	where parseB = replace True x (b !! y)
 		  x = (a !! c) !! 1
@@ -90,7 +112,7 @@ parseForbidden (a,b,c,d)
 	|a == "" = (a, b, c+1,d)
 	|otherwise = parseLineForbidden (a,b,c,d)
 
-parseLineForbidden :: ([String a], [Bool] b, Int c, String d) => (a, b, c, d) -> (a, b, c, d)
+parseLineForbidden :: ([String] a, [Bool] b, Int c, String d) => (a, b, c, d) -> (a, b, c, d)
 parseLineForbidden (a,b,c,d) = parseForbidden (a, parseB, c+1, d)
 	where parseB = replace True x (b !! y)
 		  x = (a !! c) !! 1
@@ -110,7 +132,7 @@ parseTooNearPen (a,b,c,d)
 	|a == "" = (a, b, c+1, d)
 	|otherwise = parseLineForbiddenTooNear (a,b,c,d)
 
-parseLineTooNearPen :: ([String a], [Int] b) => (a, b, Int, String) -> (a, b, Int, String)
+parseLineTooNearPen :: ([String] a, [Int] b) => (a, b, Int, String) -> (a, b, Int, String)
 parseLineTooNearPen (a,b,c,d) = parseTooNearPen (a, parseB, c+1, d)
 	where parseB = replace z x (b !! y)
 		  x = (a !! c) !! 1
