@@ -3,15 +3,50 @@ import Utils
 -------------------------------------------------------------------------------
 -- The solver ! 
 -------------------------------------------------------------------------------
-{-
-solver :: (Constraint, [(Int,Int)], [Char]) -> ([Int], Int, [Char])
 
-solver (constraint, partials, []) =
+solver :: Constraint -> [(Int, Int)] -> [Char] -> (Solution, [Char])
+solver constraint partials [] =
+  if (getError init )== []
+    then ((solve constraint (Solution [] MAX_VAL) (getAssignment init)), [])
+    else ((Solution [] 0), error)
+  where (init, error) = setup constraint partials []
+        MAX_VAL       = 99999999
 
-solver (constraint, partials, error) = ([], 0, error)
+solver constraint partials error = ((Solution [] 0), error)
 
--}
+solve :: Constraint -> Solution -> [Int] -> Solution
+solve constraint best assignments [] = 
+  if penalty < (getPenalty best)
+    then Solution assignments penalty
+    else best
+  where penalty = penalties assignments
 
+solve constraint best assignments remaining =
+  if (penalties assignments) < (getPenalty best)
+    then branch constraint best assignments (map (extract remaining) [0..max])
+    else best
+  where max = (length remaining) - 1
+
+branch :: Constraint -> Solution -> [Int] -> [(Int, [Int])] -> Solution
+branch constraint best assignments ((task, nextRemaining):[]) =
+  solve constraint best (assign assignments task) nextRemaining
+
+branch constraint best assignments ((task, nextRemaining):remaining) =
+  branch constraint (solve constraint best (assign assignments task) nextRemaining) remaining
+
+  -- Assign a task to the first empty machine ---------------------------------
+assign :: [Int] -> Int -> [Int]
+assign assignments task = replace task (emptyMachine assignments) assignments
+
+  -- Find the first empty machine ---------------------------------------------
+emptyMachine :: [Int] -> Int
+emptyMachine assignments = emptyMachineLoop assignments 0
+
+emptyMachineLoop :: [Int] -> Int -> Int
+emptyMachineLoop ((-1):xs) index = index
+emptyMachineLoop (x:[]) index = (-1)
+emptyMachineLoop (x:xs) index = emptyMachineLoop xs (index + 1)
+  
 -------------------------------------------------------------------------------
 -- Set up initial state 
 -------------------------------------------------------------------------------
