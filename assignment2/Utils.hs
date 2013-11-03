@@ -1,14 +1,15 @@
 module Utils 
 (
-Constraint,
+Constraint(Constraint),
 getTooNearC,
 getTooNearP,
 getMachineC,
 getMachineP,
-Solution,
-getSolution,
+Solution(Solution),
+getAssignment,
 getPenalty,
 remove,
+extract,
 allTrue,
 insert,
 replace,
@@ -26,7 +27,7 @@ getMachineP (Constraint _ _ _ p_machine) = p_machine
 
 data Solution = Solution [Int] Int deriving (Show)
 
-getSolution (Solution solution _) = solution
+getAssignment (Solution solution _) = solution
 getPenalty  (Solution _ penalty ) = penalty
 
 -- Removes element at index from the list -------------------------------------

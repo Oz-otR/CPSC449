@@ -6,11 +6,11 @@ import Utils
 
 solver :: Constraint -> [(Int, Int)] -> [Char] -> (Solution, [Char])
 solver constraint partials [] =
-  if (getError init )== []
-    then ((solve constraint (Solution [] MAX_VAL) (getAssignment init)), [])
+  if error == []
+    then ((solve constraint (Solution [] max) (getAssignment init)), [])
     else ((Solution [] 0), error)
   where (init, error) = setup constraint partials []
-        MAX_VAL       = 99999999
+        max           = 99999999
 
 solver constraint partials error = ((Solution [] 0), error)
 
