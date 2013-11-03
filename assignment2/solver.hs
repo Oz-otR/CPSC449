@@ -1,136 +1,108 @@
 import Data.List (foldl)
-import Utils.*
+import Utils
+-------------------------------------------------------------------------------
+-- The solver ! 
+-------------------------------------------------------------------------------
+solver :: (Constraint, [(Int,Int)], [Char]) -> ([Int], Int, [Char])
 
--- The solver ! ---------------------------------------------------------------
-solver :: ([[Int]], [[Int]], [[Bool]], [[Bool]], [(Int,Int)], [Char]) -> ([Int], Int, [Char])
+solver (constraint, partials, []) =
 
-solver (p_tooNear, p_machine, c_tooNear, c_machine, partials, []) =
-  solve (setup partials, c_tooNear, c_machine) [] 999999
-
-solver (p_tooNear, p_machine, c_tooNear, c_machine, partials, error) = ([], 0, error)
-
-
-solve :: [[Bool]] -> [[Bool]] -> [[Int]] -> [[Int]] -> ([Int],[Char]) -> ([Int], Int, [Char])
+solver (constraint, partials, error) = ([], 0, error)
 
 
-solveInterior c_tooNear c_machine p_tooNear p_machine assignments machine task best p =
-  solveArrangement
 
-solveArrangement c_tooNear c_machine p_tooNear p_machine assignments remaining best p =
-  if (valid assignments c_tooNear c_machine) && (penalties assignments p_tooNear p_machine < p)
-    then solveInterior
+-------------------------------------------------------------------------------
+-- Set up initial state 
+-------------------------------------------------------------------------------
+setup :: Constraint -> [(Int, Int)] -> ([Int],[Char])
+setup constraint partials [] =
+  setup constraint partials (blank 8 (-1))
 
-
--- Set up initial state -------------------------------------------------------
-setup :: [(Int,Int)] ->  [[Bool]] -> [[Bool]] -> [Int] -> ([Int],[Char])
-setup ((machine, task):[])    c_tooNear c_machine assignments =
-  if valid next c_tooNear c_machine
+setup constraint ((machine, task):[]) assignments =
+  if valid constraint next
     then (next, [])
-    else ([], 0, "no valid solution possible!")
-  where next = insert task machine assignments
+    else ([], "no valid solution possible!")
+  where next = replace task machine assignments
 
-setup ((machine, task):pairs) c_tooNear c_machine assignments =
-  if assignments !! machine /= -1 && valid next c_tooNear c_machine
+setup constraint ((machine, task):pairs) assignments =
+  if assignments !! machine /= -1 && valid constraint next
     then ([], "no valid solution possible!")
-    else setup pairs c_tooNear c_machine next
-  where next = insert task machine assignments
+    else setup constraint pairs next
+  where next = replace task machine assignments
 
     
--- Constraint functions -------------------------------------------------------
-valid :: [Int] -> [[Bool]] -> [[Bool]] -> Bool
-valid assignments c_tooNear c_machine = 
-  allTrue (map (validAssignments assignments c_tooNear c_machine) [0..7])
+-------------------------------------------------------------------------------
+-- Constraint functions
+-------------------------------------------------------------------------------
+valid :: Constraint -> [Int] -> Bool
+valid constraint assignments = 
+  allTrue (map (validAssignments constraint assignments) [0..7])
 
-validAssignments :: [Int] -> [[Bool]] -> [[Bool]] -> Int -> Bool
-validAssignments assignments c_tooNear c_machine machine =
-  (validMachine machine assignments c_machine)
-  && (validTooNear machine assignments c_tooNear)
+validAssignments :: Constraint -> [Int] -> Int -> Bool
+validAssignments constraint assignments machine =
+  (validMachine constraint assignments machine)
+  && (validTooNear constraint assignments machine)
 
-  -- Check against the invalid machine constraints:
-validMachine :: Int -> [Int] -> [[Bool]] -> Bool
-validMachine 7 assignments c_machine =
-  isValidMachine 7 (assignments !! 7    ) c_machine
+  -- Check against the invalid machine constraints ----------------------------
+validMachine :: Constraint -> [Int] -> machine -> Bool
+validMachine constraint assignments 7 =
+  isValidMachine constraint 7 (assignments !! 7    )
 
-validMachine index assignments c_machine =
-  isValidMachine index (assignments !! index) c_machine
-  && validMachine (succ index) assignments c_machine
+validMachine constraint assignments index =
+  isValidMachine constraint index (assignments !! index)
+  && validMachine constraint assignments (succ index) 
 
-isValidMachine :: Int -> Int -> [[Bool]] -> Bool
-isValidMachine machine (-1) c_machine = True
-isValidMachine machine task c_machine = (c_machine !! machine) !! task
+isValidMachine :: Constraint -> Int -> Int -> Bool
+isValidMachine constraint machine (-1) = True
+isValidMachine constraint machine task = ((getMachineC constraint)!! machine) !! task
 
-  -- Check against the too-near task constraints:
-validTooNear :: Int -> [Int] -> [[Bool]] -> Bool
-validTooNear 7     assignments c_tooNear = 
-  isValidTooNear (assignments !! 7    ) (assignments !! 0           ) c_tooNear
+  -- Check against the too-near task constraints ------------------------------
+validTooNear :: Constraint -> [Int] -> Int -> Bool
+validTooNear constraint assignments 7 = 
+  isValidTooNear constraint (assignments !! 7    ) (assignments !! 0           )
 
-validTooNear index assignments c_tooNear = 
-  isValidTooNear (assignments !! index) (assignments !! (succ index)) c_tooNear
-  && validTooNear (succ index) assignments c_tooNear
+validTooNear constraint assignments index = 
+  isValidTooNear constraint (assignments !! index) (assignments !! (succ index))
+  && validTooNear constraint assignments (succ index)
 
-isValidTooNear :: Int -> Int -> [[Bool]] -> Bool
-isValidTooNear (-1) task' c_tooNear = True
-isValidTooNear task (-1)  c_tooNear = True
-isValidTooNear task task' c_tooNear = (c_tooNear !! task) !! task'
+isValidTooNear :: Constraint -> Int -> Int -> Bool
+isValidTooNear constraint (-1) task' = True
+isValidTooNear constraint task (-1)  = True
+isValidTooNear constraint task task' = ((getTooNearC constraint) !! task) !! task'
 
 
--- Penalty functions ----------------------------------------------------------
-penalties :: [Int] -> [[Int]] -> [[Int]] -> Int
-penalties assignments p_tooNear p_machine = 
-  foldl (+) 0 (map (penalty assignments p_tooNear p_machine) [0..7])
+-------------------------------------------------------------------------------
+-- Penalty functions 
+-------------------------------------------------------------------------------
+penalties :: Constraint -> [Int] -> Int
+penalties constraint assignments = 
+  foldl (+) 0 (map (penalty constraint assignments) [0..7])
 
-penalty :: [Int] -> [[Int]] -> [[Int]] -> Int -> Int
-penalty assignments p_tooNear p_machine machine = 
-  (+) (tooNearPenalty assignments machine p_tooNear)
-      (machinePenalty assignments machine p_machine)
+penalty :: Constraint -> [Int] -> Int -> Int
+penalty constraint assignments machine = 
+  (+) (tooNearPenalty constraint assignments machine)
+      (machinePenalty constraint assignments machine)
 
-  -- Get the machine penalty:
-machinePenalty :: [Int] -> Int -> [[Int]] -> Int
-machinePenalty assignments machine p_machine = 
+  -- Get the machine penalty --------------------------------------------------
+machinePenalty :: Constraint -> [Int] -> Int -> Int
+machinePenalty constraint assignments machine = 
   if task >= 0
-    then (p_machine !! (succ machine)) !! (succ task)
+    then ((getMachineP constraint) !! machine) !! task
     else 0
   where task = assignments !! machine
 
-  -- Get the too-near penalty:
-tooNearPenalty :: [Int] -> Int -> [[Int]] -> Int
-tooNearPenalty assignments 7 p_tooNear = 
-  superRadFunction (assignments !! 7) (assignments !! 0) p_tooNear
+  -- Get the too-near penalty -------------------------------------------------
+tooNearPenalty :: Constraint -> [Int] -> Int -> Int
+tooNearPenalty constraint assignments 7 = 
+  superRadFunction constraint (assignments !! 7) (assignments !! 0)
 
-tooNearPenalty assignments machine p_tooNear = 
+tooNearPenalty constraint assignments machine = 
   if (length assignments > (succ machine))
-    then superRadFunction (assignments !! machine) (assignments !! (succ machine)) p_tooNear
+    then superRadFunction constraint (assignments !! machine) (assignments !! (succ machine))
     else 0
 
-superRadFunction :: Int -> Int -> [[Int]] -> Int
-superRadFunction (-1) task' p_tooNear = 0
-superRadFunction task (-1)  p_tooNear = 0
-superRadFunction task task' p_tooNear = (p_tooNear !! (succ task)) !! (succ task')
+superRadFunction :: Constraint -> Int -> Int -> Int
+superRadFunction constraint (-1) task' = 0
+superRadFunction constraint task (-1)  = 0
+superRadFunction constraint task task' = ((getTooNearP constraint) !! task) !! task'
 
-
--- Removes element at index from the list -------------------------------------
-remove (x:[]) index = x:[]
-remove (x:xs) 0     = xs
-remove (x:xs) index = x:(remove xs (index - 1))
-
--- Determines whether a whole list is true ------------------------------------
-allTrue :: [Bool] -> Bool
-allTrue (True:xs) = allTrue xs
-allTrue (False:xs) = False
-allTrue (x:[]) = x
-
--- Inserts an element at an index in a list -----------------------------------
-insert element 0 list = element:list
-insert element index (x:xs) = x:(insert element (index - 1) xs)
-
--- Replaces an element at an index in a list ----------------------------------
-replace element 0 (x:xs) = element:xs
-replace element index (x:xs) = x:(replace element (index - 1) xs)
-
-
--- Blank --
-blank2d sizeX 0     = []
-blank2d sizeX sizeY = (blank sizeX):(blank2d sizeX (sizeY - 1))
-
-blank 0 = []
-blank size = 0:(blank (size - 1))
