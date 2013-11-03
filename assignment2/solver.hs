@@ -3,18 +3,19 @@ import Utils
 -------------------------------------------------------------------------------
 -- The solver ! 
 -------------------------------------------------------------------------------
+{-
 solver :: (Constraint, [(Int,Int)], [Char]) -> ([Int], Int, [Char])
 
 solver (constraint, partials, []) =
 
 solver (constraint, partials, error) = ([], 0, error)
 
-
+-}
 
 -------------------------------------------------------------------------------
 -- Set up initial state 
 -------------------------------------------------------------------------------
-setup :: Constraint -> [(Int, Int)] -> ([Int],[Char])
+setup :: Constraint -> [(Int, Int)] -> [Int] -> ([Int],[Char])
 setup constraint partials [] =
   setup constraint partials (blank 8 (-1))
 
@@ -44,7 +45,7 @@ validAssignments constraint assignments machine =
   && (validTooNear constraint assignments machine)
 
   -- Check against the invalid machine constraints ----------------------------
-validMachine :: Constraint -> [Int] -> machine -> Bool
+validMachine :: Constraint -> [Int] -> Int -> Bool
 validMachine constraint assignments 7 =
   isValidMachine constraint 7 (assignments !! 7    )
 
