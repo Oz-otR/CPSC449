@@ -4,7 +4,7 @@ Constraint,
 getTooNearC,
 getTooNearP,
 getMachineC,
-getTooNearP,
+getMachineP,
 Solution,
 getSolution,
 getPenalty,
@@ -51,7 +51,7 @@ replace element index (x:xs) = x:(replace element (index - 1) xs)
 
 -- Blank --
 blank2d sizeX 0     init = []
-blank2d sizeX sizeY init = (blank sizeX init):(blank2d sizeX (sizeY - 1))
+blank2d sizeX sizeY init = (blank sizeX init):(blank2d sizeX (sizeY - 1) init)
 
 blank 0 init = []
-blank size init = init:(blank (size - 1))
+blank size init = init:(blank (size - 1) init)
