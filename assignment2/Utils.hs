@@ -65,3 +65,24 @@ blank2d sizeX sizeY init = (blank sizeX init):(blank2d sizeX (sizeY - 1) init)
 
 blank 0 init = []
 blank size init = init:(blank (size - 1) init)
+
+-- Translate task numbers --
+taskNumber 'A' = 0
+taskNumber 'B' = 1
+taskNumber 'C' = 2
+taskNumber 'D' = 3
+taskNumber 'E' = 4
+taskNumber 'F' = 5
+taskNumber 'G' = 6
+taskNumber '7' = 7
+taskNumber c = -1
+
+taskLetter 0 = 'A'
+taskLetter 1 = 'B'
+taskLetter 2 = 'C'
+taskLetter 3 = 'D'
+taskLetter 4 = 'E'
+taskLetter 5 = 'F'
+taskLetter 6 = 'G'
+taskLetter 7 = 'H'
+taskLetter c = ''
