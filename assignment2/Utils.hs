@@ -13,6 +13,7 @@ extract,
 allTrue,
 insert,
 replace,
+delete,
 blank2d,
 blank
 )
@@ -52,6 +53,11 @@ insert element index (x:xs) = x:(insert element (index - 1) xs)
 replace element 0 (x:xs) = element:xs
 replace element index (x:xs) = x:(replace element (index - 1) xs)
 
+-- Deletes an element equal to item in a list ---------------------------------
+delete item (x:xs)
+              | x == item = xs
+              | xs == [] = x:[]
+              | otherwise = x:(delete item xs)
 
 -- Blank --
 blank2d sizeX 0     init = []
