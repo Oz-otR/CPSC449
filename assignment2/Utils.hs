@@ -1,14 +1,15 @@
 module Utils 
 (
-Constraint,
+Constraint(Constraint),
 getTooNearC,
 getTooNearP,
 getMachineC,
 getMachineP,
-Solution,
-getSolution,
+Solution(Solution),
+getAssignment,
 getPenalty,
 remove,
+extract,
 allTrue,
 insert,
 replace,
@@ -26,13 +27,16 @@ getMachineP (Constraint _ _ _ p_machine) = p_machine
 
 data Solution = Solution [Int] Int deriving (Show)
 
-getSolution (Solution solution _) = solution
+getAssignment (Solution solution _) = solution
 getPenalty  (Solution _ penalty ) = penalty
 
 -- Removes element at index from the list -------------------------------------
-remove (x:[]) index = x:[]
 remove (x:xs) 0     = xs
+remove (x:[]) index = x:[]
 remove (x:xs) index = x:(remove xs (index - 1))
+
+-- Extracts element at index from the list ------------------------------------
+extract list element = (list !! element, remove list element)
 
 -- Determines whether a whole list is true ------------------------------------
 allTrue :: [Bool] -> Bool
