@@ -14,8 +14,12 @@ allTrue,
 insert,
 replace,
 delete,
-blank2d,
-blank
+blank2dInt,
+blankInt,
+blank2dBool,
+blankBool,
+taskLetter,
+taskNumber
 )
 where
 
@@ -60,11 +64,19 @@ delete item (x:xs)
               | otherwise = x:(delete item xs)
 
 -- Blank --
-blank2d sizeX 0     init = []
-blank2d sizeX sizeY init = (blank sizeX init):(blank2d sizeX (sizeY - 1) init)
+blank2dBool sizeX 0    init = []
+blank2dBool sizeX sizeY init = (blankBool sizeX init):(blank2dBool sizeX (sizeY - 1) init)
 
-blank 0 init = []
-blank size init = init:(blank (size - 1) init)
+blankBool :: Int -> Bool -> [Bool]
+blankBool 0 init = []
+blankBool size init = init:(blankBool (size - 1) init)
+
+blank2dInt sizeX 0     init = []
+blank2dInt sizeX sizeY init = (blankInt sizeX init):(blank2dInt sizeX (sizeY - 1) init)
+
+blankInt :: Int -> Int -> [Int]
+blankInt 0 init = []
+blankInt size init = init:(blankInt (size - 1) init)
 
 -- Translate task numbers --
 taskNumber 'A' = 0
