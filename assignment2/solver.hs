@@ -7,22 +7,22 @@ import Utils
 solver :: Constraint -> [(Int, Int)] -> [Char] -> (Solution, [Char])
 solver constraint partials [] =
   if error == []
-    then ((solve constraint (Solution [] max) (getAssignment init)), [])
+    then ((solve constraint (Solution [] max) init remaining), [])
     else ((Solution [] 0), error)
-  where (init, error) = setup constraint partials []
+  where (init, remaining, error) = setup constraint partials [] []
         max           = 99999999
 
 solver constraint partials error = ((Solution [] 0), error)
 
-solve :: Constraint -> Solution -> [Int] -> Solution
+solve :: Constraint -> Solution -> [Int] -> [Int] -> Solution
 solve constraint best assignments [] = 
   if penalty < (getPenalty best)
     then Solution assignments penalty
     else best
-  where penalty = penalties assignments
+  where penalty = penalties constraint assignments
 
 solve constraint best assignments remaining =
-  if (penalties assignments) < (getPenalty best)
+  if (penalties constraint assignments) < (getPenalty best)
     then branch constraint best assignments (map (extract remaining) [0..max])
     else best
   where max = (length remaining) - 1
@@ -32,7 +32,7 @@ branch constraint best assignments ((task, nextRemaining):[]) =
   solve constraint best (assign assignments task) nextRemaining
 
 branch constraint best assignments ((task, nextRemaining):remaining) =
-  branch constraint (solve constraint best (assign assignments task) nextRemaining) remaining
+  branch constraint (solve constraint best (assign assignments task) nextRemaining) assignments remaining
 
   -- Assign a task to the first empty machine ---------------------------------
 assign :: [Int] -> Int -> [Int]
@@ -50,23 +50,22 @@ emptyMachineLoop (x:xs) index = emptyMachineLoop xs (index + 1)
 -------------------------------------------------------------------------------
 -- Set up initial state 
 -------------------------------------------------------------------------------
-setup :: Constraint -> [(Int, Int)] -> [Int] -> ([Int],[Char])
-setup constraint partials [] =
-  setup constraint partials (blank 8 (-1))
+setup :: Constraint -> [(Int, Int)] -> [Int] -> [Int] -> ([Int],[Int],[Char])
+setup constraint partials [] [] =
+  setup constraint partials (blank 8 (-1)) [0..7]
 
-setup constraint ((machine, task):[]) assignments =
+setup constraint ((machine, task):[]) assignments remaining =
   if valid constraint next
-    then (next, [])
-    else ([], "no valid solution possible!")
+    then (next, (delete task remaining), [])
+    else ([], [0..7], "no valid solution possible!")
   where next = replace task machine assignments
 
-setup constraint ((machine, task):pairs) assignments =
+setup constraint ((machine, task):pairs) assignments remaining =
   if assignments !! machine /= -1 && valid constraint next
-    then ([], "no valid solution possible!")
-    else setup constraint pairs next
+    then ([], [0..7], "no valid solution possible!")
+    else setup constraint pairs next (delete task remaining)
   where next = replace task machine assignments
-
-    
+        
 -------------------------------------------------------------------------------
 -- Constraint functions
 -------------------------------------------------------------------------------
