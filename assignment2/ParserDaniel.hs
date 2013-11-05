@@ -58,15 +58,15 @@ thirdOfThree (_,_,z) = z
 parse :: ([String] a, [(Integer, Integer)] b) => a -> (Constraint, b, String) -> (Constraint, b, String)
 parse a (a1, b1, c1)
 	|c1 /= "" = (a1, b1, c1)
-	|fst q $ == "forced partial assignment:" = 
+	|fst q == "forced partial assignment:" = 
 						let y = parseForcedPartials(snd q, [], "") in parse firstOfThree y ((getTooNearC a1, getMachineC a1, getTooNearP a1, getMachineP a1), secondOfThree y, thirdOfThree y)
-	|fst q $ == "forbidden machine:" = 
+	|fst q == "forbidden machine:" = 
 						let y = parseForbiddenMachine(snd q, blank2dBool 8 8 False, "") in parse firstOfThree y ((getTooNearC a1, secondOfThree y, getTooNearP a1, getMachineP a1), b1, thirdOfThree y)
-	|fst q $ == "too-near tasks:" = 
+	|fst q == "too-near tasks:" = 
 						let y = parseTooNearTasks(snd q, blank2dBool 8 8 False, "") in parse firstOfThree y ((secondOfThree y, getMachineC a1, getTooNearP a1, getMachineP a1), b1, thirdOfThree y)
-	|fst q $ == "machine penalties:" = 
+	|fst q == "machine penalties:" = 
 						let y = parseMachinePenalties(snd q, blank2dInt 8 8 0, "") in parse firstOfThree y ((getTooNearC a1, getMachineC a1, getTooNearP a1, secondOfThree y), b1, thirdOfThree y)
-	|fst q $ == "too-near penalities" =
+	|fst q == "too-near penalities" =
 						let y = parseTooNearPenalties(snd q, blank2dInt 8 8 0, "") in parse firstOfThree y ((getTooNearC a1, getMachineC a1, secondOfThree y, getMachineP a1), b1, thirdOfThree y)
 	|otherwise 				= parse a (a1, b1, c1)
 	where q = extract a 0
@@ -74,21 +74,23 @@ parse a (a1, b1, c1)
 	
 parseForcedPartials :: ([String] a, [(Integer, Integer)] b) => (a, b, String) -> (a, b, String)
 	parseForcedPartials(a, b, c)
-	|fst q $ == ""		= (a,b,c)
+	|fst q == ""		= (a,b,c)
 	|otherwise			= (snd q, (read fst q :: (Integer, Integer)):b, c)
 	where q = extract a 0
 
 parseForbiddenMachine :: ([String] a, [[Bool]] b) => (a, b, String) -> (a, b, String)
 	parseForbidden (a,b,c)
 	|c /= "" = (a,b,c)
-	|head a == '/n' = (a, b, c)
 	|head a == "" = (a, b, c)
 	|otherwise = parseLineForbidden (a,b,c)
 
 parseLineForbidden :: ([String] a, [Bool] b) => (a, b, String) -> (a, b, String)
-parseLineForbidden (a,b,c) = parseForbidden (snd q, parseB, c)
+parseLineForbidden (a,b,c) 
+	| x <- [1..8] = (a,b,"invalid machine/task")
+	| y <- [1..8] = (a,b,"invalid machine/task")
+	| otherwise = parseForbidden (snd q, parseB b, c)
 	where q = extract a 0
-		  parseB = replace True x (b !! y)
+		  parseB var = replace True x (var !! y)
 		  x = fst $ read fst q :: (Integer, Char)
 		  y = taskNumber $ snd $ read fst q :: (Integer, Char)
 	
