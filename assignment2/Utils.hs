@@ -23,6 +23,18 @@ taskNumber
 )
 where
 
+{-
+Here is something I used to trace my solver, it is exciting to the ultimate max:
+
+solve constraint best assignments remaining | trace ("Best: " ++ show best ++ "; " ++ show assignments) False = undefined
+
+or:
+
+function <args> | trace (<string>) False = undefined
+
+Amazing!
+-}
+
 data Constraint = Constraint [[Bool]] [[Bool]] [[Int]] [[Int]] deriving (Show)
 
 getTooNearC (Constraint c_tooNear _ _ _) = c_tooNear
@@ -45,9 +57,9 @@ extract list element = (list !! element, remove list element)
 
 -- Determines whether a whole list is true ------------------------------------
 allTrue :: [Bool] -> Bool
+allTrue (x:[]) = x
 allTrue (True:xs) = allTrue xs
 allTrue (False:xs) = False
-allTrue (x:[]) = x
 
 -- Inserts an element at an index in a list -----------------------------------
 insert element 0 list = element:list

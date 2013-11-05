@@ -1,28 +1,49 @@
+module Solver
+(
+  solver,
+  solve,
+  branch,
+  assign,
+  setup,
+  valid,
+  validAssignments,
+  penalty
+)
+where
+
 import Data.List (foldl)
 import Utils
+import Debug.Trace
 -------------------------------------------------------------------------------
 -- The solver ! 
 -------------------------------------------------------------------------------
 
+
 solver :: (Constraint, [(Int, Int)], [Char]) -> (Solution, [Char])
 solver (constraint, partials, []) =
   if error == []
-    then ((solve constraint (Solution [] max) init remaining), [])
+    then sanitize (solve constraint (Solution [] max) init remaining)
     else ((Solution [] 0), error)
   where (init, remaining, error) = setup constraint partials [] []
         max           = 99999999
 
 solver (constraint, partials, error) = ((Solution [] 0), error)
 
+sanitize :: Solution -> (Solution, [Char])
+sanitize solution = 
+  if getAssignment solution == []
+    then ((Solution [] 0), "No valid solution possible!")
+    else (solution, [])
+
 solve :: Constraint -> Solution -> [Int] -> [Int] -> Solution
 solve constraint best assignments [] = 
-  if penalty < (getPenalty best)
+  if (valid constraint assignments) && (penalty < (getPenalty best))
     then Solution assignments penalty
     else best
   where penalty = penalties constraint assignments
 
 solve constraint best assignments remaining =
-  if (penalties constraint assignments) < (getPenalty best)
+  if valid constraint assignments && (penalties constraint assignments) < (getPenalty best)
     then branch constraint best assignments (map (extract remaining) [0..max])
     else best
   where max = (length remaining) - 1
@@ -54,16 +75,13 @@ setup :: Constraint -> [(Int, Int)] -> [Int] -> [Int] -> ([Int],[Int],[Char])
 setup constraint partials [] [] =
   setup constraint partials (blankInt 8 (-1)) [0..7]
 
-setup constraint ((machine, task):[]) assignments remaining =
-  if valid constraint next
-    then (next, (delete task remaining), [])
-    else ([], [0..7], "no valid solution possible!")
-  where next = replace task machine assignments
+setup constraint [] assignments remaining = 
+  (assignments, remaining, [])
 
 setup constraint ((machine, task):pairs) assignments remaining =
-  if assignments !! machine /= -1 && valid constraint next
-    then ([], [0..7], "no valid solution possible!")
-    else setup constraint pairs next (delete task remaining)
+  if assignments !! machine == (-1) && valid constraint next
+    then setup constraint pairs next (delete task remaining)
+    else ([], [0..7], "No valid solution possible!")
   where next = replace task machine assignments
         
 -------------------------------------------------------------------------------
