@@ -58,26 +58,22 @@ thirdOfThree (_,_,z) = z
 parse :: ([String] a, [(Integer, Integer)] b) => a -> (Constraint, b, String) -> (Constraint, b, String)
 parse a (a1, b1, c1)
 	|c1 /= "" = (a1, b1, c1)
-	|q == "forced partial assignment:" = do
-						y = parseForcedPartials(a, [], "")
-						parse firstOfThree y ((getTooNearC a1, getMachineC a1, getTooNearP a1, getMachineP a1), secondOfThree y, thirdOfThree y)
-	|q == "forbidden machine:" = do
-						y = parseForbiddenMachine(a, blank2dBool 8 8 False, "")
-						parse firstOfThree y ((getTooNearC a1, secondOfThree y, getTooNearP a1, getMachineP a1), b1, thirdOfThree y)
-	|q == "too-near tasks:" = do
-						y = parseTooNearTasks(a, blank2dBool 8 8 False, "")
-						parse firstOfThree y ((secondOfThree y, getMachineC a1, getTooNearP a1, getMachineP a1), b1, thirdOfThree y)
-	|q == "machine penalties:" = do
-						y = parseMachinePenalties(a, blank2dInt 8 8 0, "")
-						parse firstOfThree y ((getTooNearC a1, getMachineC a1, getTooNearP a1, secondOfThree y), b1, thirdOfThree y)
-	|q == "too-near penalities" = do
-						y = parseTooNearPenalties(a, blank2dInt 8 8 0, "")
-						parse firstOfThree y ((getTooNearC a1, getMachineC a1, secondOfThree y, getMachineP a1), b1, thirdOfThree y)
+	|q == "forced partial assignment:" = 
+						let y = parseForcedPartials(a, [], "") in parse firstOfThree y ((getTooNearC a1, getMachineC a1, getTooNearP a1, getMachineP a1), secondOfThree y, thirdOfThree y)
+	|q == "forbidden machine:" = 
+						let y = parseForbiddenMachine(a, blank2dBool 8 8 False, "") in parse firstOfThree y ((getTooNearC a1, secondOfThree y, getTooNearP a1, getMachineP a1), b1, thirdOfThree y)
+	|q == "too-near tasks:" = 
+						let y = parseTooNearTasks(a, blank2dBool 8 8 False, "") in parse firstOfThree y ((secondOfThree y, getMachineC a1, getTooNearP a1, getMachineP a1), b1, thirdOfThree y)
+	|q == "machine penalties:" = 
+						let y = parseMachinePenalties(a, blank2dInt 8 8 0, "") in parse firstOfThree y ((getTooNearC a1, getMachineC a1, getTooNearP a1, secondOfThree y), b1, thirdOfThree y)
+	|q == "too-near penalities" =
+						let y = parseTooNearPenalties(a, blank2dInt 8 8 0, "") in parse firstOfThree y ((getTooNearC a1, getMachineC a1, secondOfThree y, getMachineP a1), b1, thirdOfThree y)
 	|otherwise 				= parse a (a1, b1, c1)
 	where q = extract a 0
 	
 	
 	parseForcedPartials :: ([String] a, [(Int, Int)] b) => (a, b, String) -> (a, b, String)
+	
 	
 	parseForbiddenMachine :: ([String] a, [[Bool]] b) => (a, b, String) -> (a, b, String)
 	
@@ -88,7 +84,16 @@ parse a (a1, b1, c1)
 	parseTooNearPenalties :: ([String] a, [[Integer]] b) => (a, b, String) -> (a, b, String)
 	
 	
-	
+--------------------------------------------------------------------------
+--String functions to get the input we want
+--Removes first and last element of [char]
+removeBrackets xs = tail (init xs)  
+
+--Splits [char] separated by comma to elements
+splitComma xs = splitOn "," (removeBrackets xs)
+
+--Splits [char] separated by space to elements
+splitSpace xs = splitOn " " xs
 	
 	
 	
