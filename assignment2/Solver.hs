@@ -13,6 +13,7 @@ where
 
 import Data.List (foldl)
 import Utils
+import Debug.Trace
 -------------------------------------------------------------------------------
 -- The solver ! 
 -------------------------------------------------------------------------------
@@ -30,13 +31,13 @@ solver (constraint, partials, error) = ((Solution [] 0), error)
 
 solve :: Constraint -> Solution -> [Int] -> [Int] -> Solution
 solve constraint best assignments [] = 
-  if penalty < (getPenalty best)
+  if (valid constraint assignments) && (penalty < (getPenalty best))
     then Solution assignments penalty
     else best
   where penalty = penalties constraint assignments
 
 solve constraint best assignments remaining =
-  if (penalties constraint assignments) < (getPenalty best)
+  if valid constraint assignments && (penalties constraint assignments) < (getPenalty best)
     then branch constraint best assignments (map (extract remaining) [0..max])
     else best
   where max = (length remaining) - 1
