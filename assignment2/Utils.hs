@@ -45,9 +45,9 @@ extract list element = (list !! element, remove list element)
 
 -- Determines whether a whole list is true ------------------------------------
 allTrue :: [Bool] -> Bool
+allTrue (x:[]) = x
 allTrue (True:xs) = allTrue xs
 allTrue (False:xs) = False
-allTrue (x:[]) = x
 
 -- Inserts an element at an index in a list -----------------------------------
 insert element 0 list = element:list
