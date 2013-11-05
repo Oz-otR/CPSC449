@@ -1,4 +1,5 @@
 import Data.Char
+import Utils
 {-
 parseFunction :: (Char a) => [a] -> [a]
 parseFunction input
@@ -9,58 +10,97 @@ parseFunction input
 
 splitSpace :: (Char a) => [a] -> [a]
 -}
-
-parser :: ([[Int]] a, [[Bool]] b, (Int, Int) c) => [String] -> (a, a, b, b, [c], String)
+		--tuple: (Constraint, Partials, error)--
+--parser :: ([[Int]] a, [[Bool]] b, (Int, Int) c) => [String] -> (a, a, b, b, [c], String)
 	--parser input = parseTooNear $ parseMachinePen $ parseForbiddenTooNear $ ParseForbidden $ parseForced input - not sure about this for now, might be too complicated--
-parser input = (a, b, d, e, f, g)
+{-parser (x:xs) = (a, b, d, e, f, g)
 	|g \= ""		 = (_, _, _, _, _, g)
 	|x == "header 1" = do
-						x = parseTooNearPen(input, createBlank8by8list, c+1, g)
+						q = parseTooNearPen(input, blank2d 8 8 0, c+1, g)
 						parser(a', b, d, e, f, g1)
 	|x == "header 2" = do
-						x = parseMachinePen(input, createBlank8by8list, c+1, g)
+						q = parseMachinePen(input, blank2dInt 8 8 0, c+1, g)
 						parser(a, b', d, e, f, g2)
 	|x == "header 3" = do
-						x = parseForbiddenTooNear(input, createBlank8by8boolList, c+1, g)
+						q = parseForbiddenTooNear(input, blank2dBool 8 8 False, c+1, g)
 						parser(a, b, d', e, f, g3)
 	|x == "header 4" = do
-						x = parseForbidden(input, createBlank8by8boolList, c+1, g)
+						q = parseForbidden(input, blank2dBool 8 8 False, c+1, g)
 						parser(a, b, d, e', f, g4)
 	|x == "header 5" = do
-						x = (parseForced(input, "", c+1, g)
+						q = (parseForced(input, "", c+1, g)
 						parser(a, b, d, e, f', g5)
 	|otherwise		 = (a, b, d, e, f, g)
-	where input = x:xs
-		a' = second(x)
-		g1 = fourth(x)
-		b' = second(x)
-		g2 = fourth(x)
-		d' = second(x)
-		g3 = fourth(x)
-		e' = second(x)
-		g4 = fourth(x)
-		f' = second(x)
-		g5 = fourth(x)
+	where
+		a' = second(q)
+		g1 = fourth(q)
+		b' = second(q)
+		g2 = fourth(q)
+		d' = second(q)
+		g3 = fourth(q)
+		e' = second(q)
+		g4 = fourth(q)
+		f' = second(q)
+		g5 = fourth(q)
 -- output type: ([tooNearPen] (2D list of ints),[machinePen] (2D list in ints),[tooNear] (2D list of bool),[forbidden] (2D list of bool),[forced] (list of (machine,task pairs (example: 1,a)),[optionalErrorMessage])--
+-}
+firstOfThree :: (a,b,c) -> a
+firstOfThree (x,_,_) = x
 
-second :: (a, b, c, d) -> b
-	second (_, z, _, _) = z
+secondOfThree :: (a,b,c) -> b
+secondOfThree (_,y,_) = y
 
-fourth :: (a, b, c, d) -> d
-	fourth (_, _, _, z) = z
+thirdOfThree :: (a,b,c) -> c
+thirdOfThree (_,_,z) = z
 
-taskToValidNum :: Int -> Int
-taskToValidNum a 
-	|a == 'a' = 0
-	|a == 'b' = 1
-	|a == 'c' = 2
-	|a == 'd' = 3
-	|a == 'e' = 4
-	|a == 'f' = 5
-	|a == 'g' = 6
-	|a == 'h' = 7
-	|otherwise	= -1
+	
+	
+parse :: ([String] a, [(Integer, Integer)] b) => a -> (Constraint, b, String) -> (Constraint, b, String)
+parse a (a1, b1, c1)
+	|c1 /= "" = (a1, b1, c1)
+	|q == "forced partial assignment:" = 
+						let y = parseForcedPartials(a, [], "") in parse firstOfThree y ((getTooNearC a1, getMachineC a1, getTooNearP a1, getMachineP a1), secondOfThree y, thirdOfThree y)
+	|q == "forbidden machine:" = 
+						let y = parseForbiddenMachine(a, blank2dBool 8 8 False, "") in parse firstOfThree y ((getTooNearC a1, secondOfThree y, getTooNearP a1, getMachineP a1), b1, thirdOfThree y)
+	|q == "too-near tasks:" = 
+						let y = parseTooNearTasks(a, blank2dBool 8 8 False, "") in parse firstOfThree y ((secondOfThree y, getMachineC a1, getTooNearP a1, getMachineP a1), b1, thirdOfThree y)
+	|q == "machine penalties:" = 
+						let y = parseMachinePenalties(a, blank2dInt 8 8 0, "") in parse firstOfThree y ((getTooNearC a1, getMachineC a1, getTooNearP a1, secondOfThree y), b1, thirdOfThree y)
+	|q == "too-near penalities" =
+						let y = parseTooNearPenalties(a, blank2dInt 8 8 0, "") in parse firstOfThree y ((getTooNearC a1, getMachineC a1, secondOfThree y, getMachineP a1), b1, thirdOfThree y)
+	|otherwise 				= parse a (a1, b1, c1)
+	where q = extract a 0
+	
+	
+	parseForcedPartials :: ([String] a, [(Int, Int)] b) => (a, b, String) -> (a, b, String)
+	
+	
+	parseForbiddenMachine :: ([String] a, [[Bool]] b) => (a, b, String) -> (a, b, String)
+	
+	parseTooNearTasks :: ([String] a, [[Bool]] b) => (a, b, String) -> (a, b, String)
+	
+	parseMachinePenalties :: ([String] a, [[Integer]] b) => (a, b, String) -> (a, b, String)
+	
+	parseTooNearPenalties :: ([String] a, [[Integer]] b) => (a, b, String) -> (a, b, String)
+	
+	
+--------------------------------------------------------------------------
+--String functions to get the input we want
+--Removes first and last element of [char]
+removeBrackets xs = tail (init xs)  
 
+--Splits [char] separated by comma to elements
+splitComma xs = splitOn "," (removeBrackets xs)
+
+--Splits [char] separated by space to elements
+splitSpace xs = splitOn " " xs
+	
+	
+	
+	
+	
+	
+	
 {-							
 (file)
 .
@@ -76,7 +116,7 @@ parse case getHeader file of:
 								header2: (function2 file):returnVal ++ parse file
 	otherwise	returnVal
 -}
-
+{-
 parseForbiddenTooNear :: ([String] a, [Bool] b) => (a, b, Int, String) -> (a, b, Int, String)
 {-	read next line
 	if line==(x,y)
@@ -143,13 +183,4 @@ parseLineTooNearPen (a,b,c,d) = parseTooNearPen (a, parseB, c+1, d)
 
 --check current x of x:xs--
 --if null then go to next datatype--
---otherwise [x:[currentdatatype]] ++ parser xs--
-
-{- insert element 0 list = element:list
-   insert element index (x:xs) = x:(insert element (index - 1) xs)
-   
-   replace element 0 (x:xs) = element:xs
-   replace element index (x:xs) = x:(replace element (index - 1) xs)
-   
-   delete 0 x:xs = xs
-   delete index x:xs = x:(delete (index - 1) xs) -} 
+--otherwise [x:[currentdatatype]] ++ parser xs--}
