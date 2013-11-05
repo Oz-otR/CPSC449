@@ -1,8 +1,22 @@
+module Solver
+(
+  solver,
+  solve,
+  branch,
+  assign,
+  setup,
+  valid,
+  validAssignments,
+  penalty
+)
+where
+
 import Data.List (foldl)
 import Utils
 -------------------------------------------------------------------------------
 -- The solver ! 
 -------------------------------------------------------------------------------
+
 
 solver :: (Constraint, [(Int, Int)], [Char]) -> (Solution, [Char])
 solver (constraint, partials, []) =
@@ -54,16 +68,13 @@ setup :: Constraint -> [(Int, Int)] -> [Int] -> [Int] -> ([Int],[Int],[Char])
 setup constraint partials [] [] =
   setup constraint partials (blankInt 8 (-1)) [0..7]
 
-setup constraint ((machine, task):[]) assignments remaining =
-  if valid constraint next
-    then (next, (delete task remaining), [])
-    else ([], [0..7], "no valid solution possible!")
-  where next = replace task machine assignments
+setup constraint [] assignments remaining = 
+  (assignments, remaining, [])
 
 setup constraint ((machine, task):pairs) assignments remaining =
-  if assignments !! machine /= -1 && valid constraint next
-    then ([], [0..7], "no valid solution possible!")
-    else setup constraint pairs next (delete task remaining)
+  if assignments !! machine == (-1) && valid constraint next
+    then setup constraint pairs next (delete task remaining)
+    else ([], [0..7], "no valid solution possible!")
   where next = replace task machine assignments
         
 -------------------------------------------------------------------------------
