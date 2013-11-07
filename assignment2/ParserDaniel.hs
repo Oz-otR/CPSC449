@@ -2,7 +2,6 @@ module ParserDaniel (
 parser)
 where 
 import Data.Char
-import Split
 import Utils
 {-
 parseFunction :: (Char a) => [a] -> [a]
