@@ -63,7 +63,7 @@ parseLineForbidden (a,b,c)
     |head a == "" = (a,b,c)
     |(firstInteger a) `notElem` [0..7] = (a,b,"invalid machine/task")
     |(secondCharacter a) `notElem` ['A'..'H'] = (a,b,"invalid machine/task")
-    |otherwise = parseForbiddenMachine (tail a, insertBool b (firstInteger a) (taskNumber (secondCharacter a)), c)
+    |otherwise = parseForbiddenMachine (tail a, insertBool b (firstInteger a) (taskNumber (secondCharacter a) - 1), c)
     --where insertBool r s t = replace (replace True t (r !! s)) s r
 insertBool bools machine task | trace ("insertBool: " ++ (show machine) ++ ", " ++ (show task)) False = undefined
 insertBool bools machine task = replace (replace True task (bools !! machine)) machine bools
