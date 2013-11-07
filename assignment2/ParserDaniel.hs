@@ -96,7 +96,7 @@ parse a (a1, b1, c1)
 parseForcedPartials ::  ([String], [(Int, Int)], String) -> ([String], [(Int, Int)], String)
 parseForcedPartials(a, b, c)
 	|head a == []		= (a,b,c)
-	|otherwise			= parseForcedPartials(tail a, (read (head a) :: (Int, Int)):b, c)
+	|otherwise			= parseForcedPartials(tail a, ((firstInteger a),(taskNumber(secondCharacter a))):b, c)
 
 parseForbiddenMachine :: ([String], [[Bool]], String) -> ([String], [[Bool]], String)
 parseForbiddenMachine (a,b,c)
