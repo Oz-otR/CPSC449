@@ -30,40 +30,25 @@ parse ("forced partial assignment:":xs) (a1, b1, "") =
     where y = parseForcedPartials (xs, [], [])
 
 parse ("forbidden machine:":xs) (a1, b1, "") =
-    parse (firstOfThree y) (Constraint (getTooNearC a1) (secondOfThree y) (getTooNearP a1) (getMachineP a1), b1, thirdOfThree y)
-    where y = parseForbiddenMachine (xs, blank2dBool 8 8 False, [])
+    parse rem (Constraint (getTooNearC a1) con (getTooNearP a1) (getMachineP a1), b1, err)
+    where (rem, con, err) = parseForbiddenMachine (xs, blank2dBool 8 8 False, [])
 
 parse ("too-near tasks:":xs) (a1, b1, "") =
-    parse (firstOfThree y) (Constraint (secondOfThree y) (getMachineC a1) (getTooNearP a1) (getMachineP a1), b1, thirdOfThree y)
-    where y = parseTooNearTasks (xs, blank2dBool 8 8 False, []) 
+    parse rem (Constraint con (getMachineC a1) (getTooNearP a1) (getMachineP a1), b1, err)
+    where (rem, con, err) = parseTooNearTasks (xs, blank2dBool 8 8 False, []) 
 
 parse ("machine penalties:":xs) (a1, b1, "") =
-    parse (firstOfThree y) (Constraint (getTooNearC a1) (getMachineC a1) (getTooNearP a1) (secondOfThree y), b1, thirdOfThree y)
-    where y = parseMachinePenalties (xs, blank2dInt 8 8 0, [])
+    parse rem (Constraint (getTooNearC a1) (getMachineC a1) (getTooNearP a1) con, b1, err)
+    where (rem, con, err) = parseMachinePenalties (xs, blank2dInt 8 8 0, [])
 
 parse ("too-near penalities":xs) (a1, b1, "") =
-    parse (firstOfThree y) (Constraint (getTooNearC a1) (getMachineC a1) (secondOfThree y) (getMachineP a1), b1, thirdOfThree y)
-    where y = parseTooNearPenalties (xs, blank2dInt 8 8 0, [])
+    parse rem (Constraint (getTooNearC a1) (getMachineC a1) con (getMachineP a1), b1, err)
+    where (rem, con, err) = parseTooNearPenalties (xs, blank2dInt 8 8 0, [])
 
 parse [] (a1, b1, "") = (a1, b1, "")
 --parse (x:xs) (a1, b1, "") = parse xs (a1, b1, "")
 parse (x:xs) (a, b, []) = (a, b, "Error parsing input file.")
 parse (x:xs) (a1, b1, c1) = (a1, b1, c1)
-{-
-parse a (a1, b1, c1)
-	|c1 /= "" = (a1, b1, c1)
-	|head a == "forced partial assignment:" = parse firstOfThree y (a1, secondOfThree y, thirdOfThree y)
-						where y1 = parseForcedPartials (tail a, [], "")
-	|head a == "forbidden machine:" = 
-						let y = parseForbiddenMachine (tail a, blank2dBool 8 8 False, "") in parse (firstOfThree y) ((getTooNearC a1, secondOfThree y, getTooNearP a1, getMachineP a1), b1, thirdOfThree y)
-	|head a == "too-near tasks:" = 
-						let y = parseTooNearTasks (tail a, blank2dBool 8 8 False, "") in parse firstOfThree y ((secondOfThree y, getMachineC a1, getTooNearP a1, getMachineP a1), b1, thirdOfThree y)
-	|head a == "machine penalties:" = 
-						let y = parseMachinePenalties (tail a, blank2dInt 8 8 0, "") in parse firstOfThree y ((getTooNearC a1, getMachineC a1, getTooNearP a1, secondOfThree y), b1, thirdOfThree y)
-	|head a == "too-near penalities" =
-						let y = parseTooNearPenalties (tail a, blank2dInt 8 8 0, "") in parse firstOfThree y ((getTooNearC a1, getMachineC a1, secondOfThree y, getMachineP a1), b1, thirdOfThree y)
-	|otherwise 				= parse a (a1, b1, c1)
-	-}
 	
 parseForcedPartials ::  ([String], [(Int, Int)], String) -> ([String], [(Int, Int)], String)
 parseForcedPartials(a, b, c)
@@ -73,6 +58,7 @@ parseForcedPartials(a, b, c)
 parseForbiddenMachine :: ([String], [[Bool]], String) -> ([String], [[Bool]], String)
 parseForbiddenMachine (a,b,c)
     |c /= "" = (a,b,c)
+    |a == [] = (a,b,c)
     |head a == "" = (tail a, b, c)
     |otherwise = parseLineForbidden (a,b,c)
 
@@ -84,9 +70,6 @@ parseLineForbidden (a,b,c)
     |(secondCharacter a) `notElem` ['A'..'H'] = (a,b,"invalid machine/task")
     |otherwise = parseForbiddenMachine (tail a, parseB b (firstInteger a) (taskNumber (secondCharacter a)), c)
     where parseB r s t = replace (replace True t (r !! s)) s r
-	
-{-fst $ read fst q :: (Int, Char) (1,A) (B,C)	(1,'A') ('B','C')
-taskNumber $ snd $ read fst q :: (Int, Char)-}
 	
 parseTooNearTasks :: ([String], [[Bool]], String) -> ([String], [[Bool]], String)
 parseTooNearTasks (a,b,c)
