@@ -10,10 +10,9 @@ import Printer
 
 main = do
 
-	args <- getArgs
-	let readFile=args !! 0
-	handle<- openFile readFile ReadMode
-	contents <- hGetContents handle
-	printer(solver(parser(lines contents)))
-
-	
+  args <- getArgs
+  let readFile=args !! 0
+  handle<- openFile readFile ReadMode
+  contents <- hGetContents handle
+  print (solver(parser(lines contents)))
+  --printer(solver(parser(lines contents)))
