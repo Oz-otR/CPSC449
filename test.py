@@ -3,15 +3,15 @@
 import os
 from subprocess import call
 
-for filename in os.listdir("testing"):
+for filename in os.listdir("testcases"):
   if (filename[-4:] == ".txt"):
     print "---------------------------------------------------------"
     print "File " + filename + ":" #+ str(output1 == output2)
     print "----running Java-------"
-    call(["java","-cp","assignment1", "Main", "testing/" + filename, "output1.txt"])
+    call(["java","-cp","assignment1", "Main", "testcases/" + filename, "output1.txt"])
     # Run haskell program here!
     print "----running Haskell----"
-    # call(["runhaskell","assignment2/main.hs","testing/" + filename, "output2.txt"])
+    # call(["runhaskell","assignment2/main.hs","testcases/" + filename, "output2.txt"])
     output1 = open("output1.txt", 'r').read()
     output2 = "blah blah blah"
 #    output2 = open("output2.txt", 'r').read()
