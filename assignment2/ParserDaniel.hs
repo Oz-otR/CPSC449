@@ -3,6 +3,7 @@ parser)
 where 
 import Data.Char
 import Utils
+import Debug.Trace
 {-
 parseFunction :: (Char a) => [a] -> [a]
 parseFunction input
@@ -61,23 +62,34 @@ thirdOfThree (_,_,z) = z
 parser a = parse a (Constraint [] [] [] [], [], "")
 
 parse :: [String] -> (Constraint, [(Int, Int)], String) -> (Constraint, [(Int, Int)], String)
+--parse strList (c, p, str) | trace ("Parse: " ++ (strList !! 0)) False = undefined
+
+parse ("Name:":xs) (a1, b1, "") =
+	parse (tail (tail xs)) (a1, b1, "")
+
 parse ("forced partial assignment:":xs) (a1, b1, "") =
 	parse (firstOfThree y) (a1, secondOfThree y, thirdOfThree y)
 	where y = parseForcedPartials (xs, [], [])
+
 parse ("forbidden machine:":xs) (a1, b1, "") =
 	parse (firstOfThree y) (Constraint (getTooNearC a1) (secondOfThree y) (getTooNearP a1) (getMachineP a1), b1, thirdOfThree y)
 	where y = parseForbiddenMachine (xs, blank2dBool 8 8 False, [])
+
 parse ("too-near tasks:":xs) (a1, b1, "") =
 	parse (firstOfThree y) (Constraint (secondOfThree y) (getMachineC a1) (getTooNearP a1) (getMachineP a1), b1, thirdOfThree y)
 	where y = parseTooNearTasks (xs, blank2dBool 8 8 False, []) 
+
 parse ("machine penalties:":xs) (a1, b1, "") =
 	parse (firstOfThree y) (Constraint (getTooNearC a1) (getMachineC a1) (getTooNearP a1) (secondOfThree y), b1, thirdOfThree y)
 	where y = parseMachinePenalties (xs, blank2dInt 8 8 0, [])
+
 parse ("too-near penalities":xs) (a1, b1, "") =
 	parse (firstOfThree y) (Constraint (getTooNearC a1) (getMachineC a1) (secondOfThree y) (getMachineP a1), b1, thirdOfThree y)
 	where y = parseTooNearPenalties (xs, blank2dInt 8 8 0, [])
+
 parse [] (a1, b1, "") = (a1, b1, "")
-parse (x:xs) (a1, b1, "") = parse xs (a1, b1, "")
+--parse (x:xs) (a1, b1, "") = parse xs (a1, b1, "")
+parse (x:xs) (a, b, []) = (a, b, "Error parsing input file.")
 parse (x:xs) (a1, b1, c1) = (a1, b1, c1)
 {-
 parse a (a1, b1, c1)
