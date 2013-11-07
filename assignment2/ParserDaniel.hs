@@ -67,8 +67,11 @@ parseLineForbidden (a,b,c)
     |otherwise = parseForbiddenMachine (tail a, insertBool b (firstInteger a) (taskNumber (secondCharacter a)), c)
     --where insertBool r s t = replace (replace True t (r !! s)) s r
 insertBool bools machine task | trace ("insertBool: " ++ (show machine) ++ ", " ++ (show task)) False = undefined
-insertBool bools machine task = replace (replace True task (bools !! machine)) machine bools
-	
+insertBool bools machine task = replace (replace True task (findElem bools machine)) machine bools
+
+findElem (x:xs) 0       = x
+findElem (x:xs) y = findElem xs (y - 1)
+
 parseTooNearTasks :: ([String], [[Bool]], String) -> ([String], [[Bool]], String)
 parseTooNearTasks (strList,b,c) | trace ("parseTooNearTasks: " ++ (strList !! 0)) False = undefined
 parseTooNearTasks (a,b,c)
@@ -99,6 +102,7 @@ j j j j j j j j-}
 parseMachineHelper :: ([String], [[Int]], String, Int) -> ([String], [[Int]], String, Int)
 parseMachineHelper (a,b,c,d)
     |d > 8 =	(a,b,c,d)
+    |(head a) == "" = (a,b,"machine penalty error",d)
     |length (map read $ words (head a) :: [Int]) /= 8 = (a,b,"machine penalty error",d)
     |otherwise = parseMachineHelper (tail a, replace (map read $ words (head a) :: [Int]) d b, c, d+1)
 
@@ -114,7 +118,10 @@ parseTooNearPenalties (a,b,c)
     |otherwise = parseLineTooNearPenalties (a,b,c)
 
 parseLineTooNearPenalties :: ([String], [[Int]], String) -> ([String], [[Int]], String)
-parseLineTooNearPenalties (a,b,c) = parseTooNearPenalties (tail a, parseB, c)
+parseLineTooNearPenalties (a,b,c)
+    |(firstCharacter a) `notElem` ['A'..'H'] = (a,b,"invalid task")
+    |(secondCharacter a) `notElem` ['A'..'H'] = (a,b,"invalid task")
+    |otherwise = parseTooNearPenalties (tail a, parseB, c)
     where parseB = replace (replace (thirdInteger a) (taskNumber (firstCharacter a)) (b !! taskNumber (secondCharacter a))) (taskNumber (secondCharacter a)) b
 	
 --------------------------------------------------------------------------
