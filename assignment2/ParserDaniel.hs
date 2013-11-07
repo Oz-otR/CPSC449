@@ -37,9 +37,13 @@ parse ("too-near penalities":xs) (a1, b1, "") =
     parse rem (Constraint (getTooNearC a1) (getMachineC a1) con (getMachineP a1), b1, err)
     where (rem, con, err) = parseTooNearPenalties (xs, blank2dInt 8 8 0, [])
 
-parse [] (a1, b1, "") = (a1, b1, "")
 --parse (x:xs) (a1, b1, "") = parse xs (a1, b1, "")
-parse (x:xs) (a, b, []) = (a, b, "Error parsing input file.")
+parse (x:xs) (Constraint [] _ _ _, b1, "") = (Constraint [] [] [] [], b1, "Error parsing input file.")
+parse (x:xs) (Constraint _ [] _ _, b1, "") = (Constraint [] [] [] [], b1, "Error parsing input file.")
+parse (x:xs) (Constraint _ _ [] _, b1, "") = (Constraint [] [] [] [], b1, "Error parsing input file.")
+parse (x:xs) (Constraint _ _ _ [], b1, "") = (Constraint [] [] [] [], b1, "Error parsing input file.")
+parse (x:xs) (a, b, "") = (a, b, "Error parsing input file.")
+parse [] (a1, b1, "") = (a1, b1, "")
 parse (x:xs) (a1, b1, c1) = (a1, b1, c1)
 	
 parseForcedPartials ::  ([String], [(Int, Int)], String) -> ([String], [(Int, Int)], String)
@@ -102,7 +106,7 @@ j j j j j j j j-}
 parseMachineHelper :: ([String], [[Int]], String, Int) -> ([String], [[Int]], String, Int)
 parseMachineHelper (a,b,c,d)
     |d > 8 =	(a,b,c,d)
-    |(head a) == "" = (a,b,"machine penalty error",d)
+    |(head a) == "" = (a,b,"machine penalty error",d)   
     |length (map read $ words (head a) :: [Int]) /= 8 = (a,b,"machine penalty error",d)
     |otherwise = parseMachineHelper (tail a, replace (map read $ words (head a) :: [Int]) d b, c, d+1)
 
