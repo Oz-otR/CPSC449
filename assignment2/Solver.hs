@@ -22,12 +22,18 @@ import Debug.Trace
 solver :: (Constraint, [(Int, Int)], [Char]) -> (Solution, [Char])
 solver (constraint, partials, []) =
   if error == []
-    then ((solve constraint (Solution [] max) init remaining), [])
+    then sanitize (solve constraint (Solution [] max) init remaining)
     else ((Solution [] 0), error)
   where (init, remaining, error) = setup constraint partials [] []
         max           = 99999999
 
 solver (constraint, partials, error) = ((Solution [] 0), error)
+
+sanitize :: Solution -> (Solution, [Char])
+sanitize solution = 
+  if getAssignment solution == []
+    then ((Solution [] 0), "No valid solution possible!")
+    else (solution, [])
 
 solve :: Constraint -> Solution -> [Int] -> [Int] -> Solution
 solve constraint best assignments [] = 
@@ -75,7 +81,7 @@ setup constraint [] assignments remaining =
 setup constraint ((machine, task):pairs) assignments remaining =
   if assignments !! machine == (-1) && valid constraint next
     then setup constraint pairs next (delete task remaining)
-    else ([], [0..7], "no valid solution possible!")
+    else ([], [0..7], "No valid solution possible!")
   where next = replace task machine assignments
         
 -------------------------------------------------------------------------------
