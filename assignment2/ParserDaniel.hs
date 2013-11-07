@@ -37,12 +37,11 @@ parse ("too-near penalities":xs) (a1, b1, "") =
     parse rem (Constraint (getTooNearC a1) (getMachineC a1) con (getMachineP a1), b1, err)
     where (rem, con, err) = parseTooNearPenalties (xs, blank2dInt 8 8 0, [])
 
---parse (x:xs) (a1, b1, "") = parse xs (a1, b1, "")
-parse (x:xs) (Constraint [] _ _ _, b1, "") = (Constraint [] [] [] [], b1, "Error parsing input file.")
-parse (x:xs) (Constraint _ [] _ _, b1, "") = (Constraint [] [] [] [], b1, "Error parsing input file.")
-parse (x:xs) (Constraint _ _ [] _, b1, "") = (Constraint [] [] [] [], b1, "Error parsing input file.")
-parse (x:xs) (Constraint _ _ _ [], b1, "") = (Constraint [] [] [] [], b1, "Error parsing input file.")
-parse (x:xs) (a, b, "") = (a, b, "Error parsing input file.")
+parse (x:xs) (Constraint [] w y z, b1, "") = (Constraint [] w y z, b1, "Error parsing input file.")
+parse (x:xs) (Constraint w [] y z, b1, "") = (Constraint w [] y z, b1, "Error parsing input file.")
+parse (x:xs) (Constraint w y [] z, b1, "") = (Constraint w y [] z, b1, "Error parsing input file.")
+parse (x:xs) (Constraint w y z [], b1, "") = (Constraint w y z [], b1, "Error parsing input file.")
+parse (x:xs) (a1, b1, "") = (a1, b1, "Error parsing input file.")
 parse [] (a1, b1, "") = (a1, b1, "")
 parse (x:xs) (a1, b1, c1) = (a1, b1, c1)
 	
@@ -72,7 +71,7 @@ parseLineForbidden (a,b,c)
     --where insertBool r s t = replace (replace True t (r !! s)) s r
 insertBool bools machine task | trace ("insertBool: " ++ (show machine) ++ ", " ++ (show task)) False = undefined
 insertBool bools machine task = replace (replace True task (findElem bools machine)) machine bools
-
+                                                           {- (bools !! machine) -}
 findElem (x:xs) 0       = x
 findElem (x:xs) y = findElem xs (y - 1)
 
@@ -99,13 +98,13 @@ parseLineTooNearTasks (a,b,c)
 parseMachinePenalties :: ([String], [[Int]], String) -> ([String], [[Int]], String)
 parseMachinePenalties (strList,b,c) | trace ("parseMachinePenalties: " ++ (strList !! 0)) False = undefined
 parseMachinePenalties (("":xs),b,c) = (xs, b, "machine penalty error")
-parseMachinePenalties (a,b,c) = parseMachineReturn(parseMachineHelper (a,b,c,1))
+parseMachinePenalties (a,b,c) = parseMachineReturn(parseMachineHelper (a,b,c,0))
 {-machine penalties:
 i i i i i i i i
 j j j j j j j j-}
 parseMachineHelper :: ([String], [[Int]], String, Int) -> ([String], [[Int]], String, Int)
 parseMachineHelper (a,b,c,d)
-    |d > 8 =	(a,b,c,d)
+    |d > 7 =	(a,b,c,d)
     |(head a) == "" = (a,b,"machine penalty error",d)   
     |length (map read $ words (head a) :: [Int]) /= 8 = (a,b,"machine penalty error",d)
     |otherwise = parseMachineHelper (tail a, replace (map read $ words (head a) :: [Int]) d b, c, d+1)
