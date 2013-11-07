@@ -4,50 +4,8 @@ where
 import Data.Char
 import Utils
 import Debug.Trace
-{-
-parseFunction :: (Char a) => [a] -> [a]
-parseFunction input
-	|input == '\n':_= " " ++ parseFunction xs
-	|input == "" 	= ""
-	|otherwise 		= x ++ parseFunction xs
-	where 	a=[x:xs]
 
-splitSpace :: (Char a) => [a] -> [a]
--}
-		--tuple: (Constraint, Partials, error)--
---parser :: ([[Int]] a, [[Bool]] b, (Int, Int) c) => [String] -> (a, a, b, b, [c], String)
-	--parser input = parseTooNear $ parseMachinePen $ parseForbiddenTooNear $ ParseForbidden $ parseForced input - not sure about this for now, might be too complicated--
-{-parser (x:xs) = (a, b, d, e, f, g)
-	|g \= ""		 = (_, _, _, _, _, g)
-	|x == "header 1" = do
-						q = parseTooNearPen(input, blank2d 8 8 0, c+1, g)
-						parser(a', b, d, e, f, g1)
-	|x == "header 2" = do
-						q = parseMachinePen(input, blank2dInt 8 8 0, c+1, g)
-						parser(a, b', d, e, f, g2)
-	|x == "header 3" = do
-						q = parseForbiddenTooNear(input, blank2dBool 8 8 False, c+1, g)
-						parser(a, b, d', e, f, g3)
-	|x == "header 4" = do
-						q = parseForbidden(input, blank2dBool 8 8 False, c+1, g)
-						parser(a, b, d, e', f, g4)
-	|x == "header 5" = do
-						q = (parseForced(input, "", c+1, g)
-						parser(a, b, d, e, f', g5)
-	|otherwise		 = (a, b, d, e, f, g)
-	where
-		a' = second(q)
-		g1 = fourth(q)
-		b' = second(q)
-		g2 = fourth(q)
-		d' = second(q)
-		g3 = fourth(q)
-		e' = second(q)
-		g4 = fourth(q)
-		f' = second(q)
-		g5 = fourth(q)
 -- output type: ([tooNearPen] (2D list of ints),[machinePen] (2D list in ints),[tooNear] (2D list of bool),[forbidden] (2D list of bool),[forced] (list of (machine,task pairs (example: 1,a)),[optionalErrorMessage])--
--}
 firstOfThree :: (a,b,c) -> a
 firstOfThree (x,_,_) = x
 
@@ -109,13 +67,13 @@ parse a (a1, b1, c1)
 	
 parseForcedPartials ::  ([String], [(Int, Int)], String) -> ([String], [(Int, Int)], String)
 parseForcedPartials(a, b, c)
-    |head a == []		= (a,b,c)
+    |head a == []		= ((tail a),b,c)
     |otherwise			= parseForcedPartials(tail a, ((firstInteger a),(taskNumber(secondCharacter a))):b, c)
 
 parseForbiddenMachine :: ([String], [[Bool]], String) -> ([String], [[Bool]], String)
 parseForbiddenMachine (a,b,c)
     |c /= "" = (a,b,c)
-    |head a == "" = (a, b, c)
+    |head a == "" = (tail a, b, c)
     |otherwise = parseLineForbidden (a,b,c)
 
 parseLineForbidden :: ([String], [[Bool]], String) -> ([String], [[Bool]], String)
@@ -127,15 +85,16 @@ parseLineForbidden (a,b,c)
     |otherwise = parseForbiddenMachine (tail a, parseB b (firstInteger a) (taskNumber (secondCharacter a)), c)
     where parseB r s t = replace (replace True t (r !! s)) s r
 	
-	{-fst $ read fst q :: (Int, Char) (1,A) (B,C)	(1,'A') ('B','C')
-	taskNumber $ snd $ read fst q :: (Int, Char)-}
+{-fst $ read fst q :: (Int, Char) (1,A) (B,C)	(1,'A') ('B','C')
+taskNumber $ snd $ read fst q :: (Int, Char)-}
 	
 parseTooNearTasks :: ([String], [[Bool]], String) -> ([String], [[Bool]], String)
 parseTooNearTasks (a,b,c)
-    |c /= "" = (a,b,c)
-    |head a == "\n" = (a,b,c)
-    |head a == "" = (a, b, c)
+    |c /= [] = (a,b,c)
+    |head a == "\n" = (tail a,b,c)
+    |head a == "" = (tail a, b, c)
     |otherwise = parseLineTooNearTasks (a,b,c)
+
 
 parseLineTooNearTasks :: ([String], [[Bool]], String) -> ([String], [[Bool]], String)
 parseLineTooNearTasks (a,b,c) 
@@ -144,15 +103,15 @@ parseLineTooNearTasks (a,b,c)
     |(firstInteger a) `notElem` [0..7] = (a,b,"invalid machine/task")
     |(secondCharacter a) `notElem` [0..7] = (a,b,"invalid machine/task")
     |otherwise = parseTooNearTasks (tail a, parseB b (taskNumber (firstCharacter a)) (taskNumber (secondCharacter a)), c)
-    where parseB r s t = replace (replace True t (r !! s)) s r			-- (1,a) is not an (Int,Char)!
+    where parseB r s t = replace (replace True t (r !! s)) s r
 	
 	
 parseMachinePenalties :: ([String], [[Int]], String) -> ([String], [[Int]], String)
 parseMachinePenalties (("":xs),b,c) = (xs, b, c)
 parseMachinePenalties (a,b,c) = parseMachineReturn(parseMachineHelper (a,b,c,1))
-	{-machine penalties:
-	i i i i i i i i
-	j j j j j j j j-}
+{-machine penalties:
+i i i i i i i i
+j j j j j j j j-}
 parseMachineHelper :: ([String], [[Int]], String, Int) -> ([String], [[Int]], String, Int)
 parseMachineHelper (a,b,c,d)
     |d > 8 =	(a,b,c,d)
@@ -185,7 +144,6 @@ splitSpace xs = splitOn ' ' xs -- DOES NOT WORK! Ended up using (map read $ word
 
 --gets the Integer found at the first element
 firstInteger a = (read ((splitComma (head a)) !! 0) :: Int) - 1
-
 
 --gets the Integer found at the third element
 thirdInteger a = (read ((splitComma (head a)) !! 2) :: Int) - 1
