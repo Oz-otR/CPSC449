@@ -58,20 +58,21 @@ parseForbiddenMachine (a,b,c)
     |c /= "" = (a,b,c)
     |head a == "\n" = (tail a, b, c)
     |head a == "" = (tail a, b, c)
+    |head a == " " = (tail a, b, c)
     |otherwise = parseLineForbidden (a,b,c)
 
 parseLineForbidden :: ([String], [[Bool]], String) -> ([String], [[Bool]], String)
 parseLineForbidden (strList,b,c) | trace ("parseLineForbidden: " ++ (show b)) False = undefined
 parseLineForbidden (a,b,c) 
     |c /= "" = (a,b,c)
-    |head a == "" = (a,b,c)
+    |head a == "\n" = ((tail a),b,c)
+    |head a == "" = ((tail a),b,c)
     |(firstInteger a) `notElem` [0..7] = (a,b,"invalid machine/task")
     |(secondCharacter a) `notElem` ['A'..'H'] = (a,b,"invalid machine/task")
     |otherwise = parseForbiddenMachine (tail a, insertBool b (firstInteger a) (taskNumber (secondCharacter a)), c)
     --where insertBool r s t = replace (replace True t (r !! s)) s r
 insertBool bools machine task | trace ("insertBool: " ++ (show machine) ++ ", " ++ (show task)) False = undefined
-insertBool bools machine task = replace (replace True task (findElem bools machine)) machine bools
-                                                           {- (bools !! machine) -}
+insertBool bools machine task = replace (replace True task (bools !! machine)) machine bools
 findElem (x:xs) 0       = x
 findElem (x:xs) y = findElem xs (y - 1)
 
