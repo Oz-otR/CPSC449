@@ -14,5 +14,5 @@ main = do
   let readFile=args !! 0
   handle<- openFile readFile ReadMode
   contents <- hGetContents handle
-  print (lines contents)
-  printer(solver(parser(lines contents)))
+  print (solver(parser(lines contents)))
+  --printer(solver(parser(lines contents)))
