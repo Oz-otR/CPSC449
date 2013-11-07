@@ -110,8 +110,9 @@ parseForbiddenMachine (a,b,c)
 parseLineForbidden :: ([String], [[Bool]], String) -> ([String], [[Bool]], String)
 parseLineForbidden (a,b,c) 
 	|c /= "" = (a,b,c)
-	|(fst (read (head a) :: (Int, Char))) `notElem` [1..8] = (a,b,"invalid machine/task")
-	|(snd (read (head a) :: (Int, Char))) `notElem` ['A'..'H'] = (a,b,"invalid machine/task")
+	|head a == "" = (a,b,c)
+	|(firstInteger a) `notElem` [0..7] = (a,b,"invalid machine/task")
+	|(secondCharacter a) `notElem` [0..7] = (a,b,"invalid machine/task")
 	|otherwise = parseForbiddenMachine (tail a, parseB b (firstInteger a) (taskNumber (secondCharacter a)), c)
 	where parseB r s t = replace (replace True t (r !! s)) s r
 	
@@ -126,7 +127,12 @@ parseTooNearTasks (a,b,c)
 	|otherwise = parseLineTooNearTasks (a,b,c)
 
 parseLineTooNearTasks :: ([String], [[Bool]], String) -> ([String], [[Bool]], String)
-parseLineTooNearTasks (a,b,c) = parseTooNearTasks (tail a, parseB b (taskNumber (firstCharacter a)) (taskNumber (secondCharacter a)), c)
+parseLineTooNearTasks (a,b,c) 
+	|c /= "" = (a,b,c)
+	|head a == "" = (a,b,c)
+	|(firstInteger a) `notElem` [0..7] = (a,b,"invalid machine/task")
+	|(secondCharacter a) `notElem` [0..7] = (a,b,"invalid machine/task")
+	|otherwise = parseTooNearTasks (tail a, parseB b (taskNumber (firstCharacter a)) (taskNumber (secondCharacter a)), c)
 	where parseB r s t = replace (replace True t (r !! s)) s r			-- (1,a) is not an (Int,Char)!
 	
 	
@@ -140,19 +146,7 @@ parseMachineHelper :: ([String], [[Int]], String, Int) -> ([String], [[Int]], St
 parseMachineHelper (a,b,c,d)
 	|d > 8 =	(a,b,c,d)
 	|otherwise = parseMachineHelper (tail a, replace (map read $ words (head a) :: [Int]) d b, c, d+1)
-{-		replace(
-			read(				
-				splitSpace (	--[String]
-					head 		--String
-						a 		--[String]
-				)
-			) :: [Int]
-		) d b
-		"1","1","1",
-	a=	"1 1 1 1 1 1 1 1"				b={- - - - - - - - 		c=""		d=1
-		"2 2 2 2 2 2 2 2"				   - - - - - - - _}
-		"3 3 3 3 3 3 3 3"
-		-}-}
+
 parseMachineReturn :: ([String], [[Int]], String, Int) -> ([String], [[Int]], String)
 parseMachineReturn (a,b,c,d) = (a,b,c)
 	
@@ -189,3 +183,8 @@ firstCharacter a = ((splitComma (head a)) !! 0) !! 0
 
 --gets the Char found at the second element
 secondCharacter a = ((splitComma (head a)) !! 1) !! 0
+
+splitHomemade :: String -> [String]
+splitHomemade (",":xs) = splitHomemade(xs)
+splitHomemade ("") = ""
+splitHomemade (x:xs) = x:splitHomemade(xs)
