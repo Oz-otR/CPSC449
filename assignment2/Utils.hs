@@ -47,6 +47,19 @@ data Solution = Solution [Int] Int deriving (Show)
 getAssignment (Solution solution _) = solution
 getPenalty  (Solution _ penalty ) = penalty
 
+-- Split string on character. -------------------------------------------------
+splitOn [] char = []
+splitOn str char =
+  result:(splitOn remaining char)
+  where (result, remaining) = splitLeft str char
+
+splitLeft (x:xs) char
+    | x == char = ([],xs)
+    | xs == [] = ([],[])
+    | otherwise = (x:result, remaining)
+  where (result, remaining) = splitLeft xs char
+
+
 -- Removes element at index from the list -------------------------------------
 remove (x:xs) 0     = xs
 remove (x:[]) index = x:[]
