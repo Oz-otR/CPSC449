@@ -2,7 +2,6 @@ module ParserDaniel (
 parser)
 where 
 import Data.Char
-import Split
 import Utils
 {-
 parseFunction :: (Char a) => [a] -> [a]
@@ -173,13 +172,14 @@ parseLineTooNearPenalties (a,b,c) = parseTooNearPenalties (tail a, parseB, c)
 removeBrackets xs = tail (init xs)  
 
 --Splits [char] separated by comma to elements
-splitComma xs = splitOn "," (removeBrackets xs)
+splitComma xs = splitOn ',' (removeBrackets xs)
 
 --Splits [char] separated by space to elements
-splitSpace xs = splitOn " " xs -- DOES NOT WORK! Ended up using (map read $ words) instead.
+splitSpace xs = splitOn ' ' xs -- DOES NOT WORK! Ended up using (map read $ words) instead.
 
 --gets the Integer found at the first element
 firstInteger a = (read ((splitComma (head a)) !! 0) :: Int) - 1
+
 
 --gets the Integer found at the third element
 thirdInteger a = (read ((splitComma (head a)) !! 2) :: Int) - 1

@@ -8,6 +8,7 @@ getMachineP,
 Solution(Solution),
 getAssignment,
 getPenalty,
+splitOn,
 remove,
 extract,
 allTrue,
@@ -48,9 +49,9 @@ getAssignment (Solution solution _) = solution
 getPenalty  (Solution _ penalty ) = penalty
 
 -- Split string on character. -------------------------------------------------
-splitOn [] char = []
-splitOn str char =
-  result:(splitOn remaining char)
+splitOn char [] = []
+splitOn char str =
+  result:(splitOn char remaining )
   where (result, remaining) = splitLeft str char
 
 splitLeft (x:xs) char
