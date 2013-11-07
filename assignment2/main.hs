@@ -5,7 +5,7 @@ import System.Environment
 import Data.List
 
 import Solver
-import Parser
+import ParserDaniel
 import Printer
 
 main = do

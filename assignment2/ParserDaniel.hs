@@ -1,5 +1,8 @@
+module ParserDaniel (
+parser)
+where 
 import Data.Char
-import Data.List.Split
+import Split
 import Utils
 {-
 parseFunction :: (Char a) => [a] -> [a]
@@ -56,7 +59,7 @@ thirdOfThree (_,_,z) = z
 
 	
 
-	
+parser a = parse a (Constraint [] [] [] [], [], "")
 
 parse :: [String] -> (Constraint, [(Int, Int)], String) -> (Constraint, [(Int, Int)], String)
 parse ("forced partial assignment:":xs) (a1, b1, "") =
