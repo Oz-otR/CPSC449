@@ -184,3 +184,4 @@ firstCharacter a = ((splitComma (head a)) !! 0) !! 0
 --gets the Char found at the second element
 secondCharacter a = ((splitComma (head a)) !! 1) !! 0
 
+
