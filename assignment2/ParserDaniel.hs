@@ -6,14 +6,6 @@ import Utils
 import Debug.Trace
 
 -- output type: ([tooNearPen] (2D list of ints),[machinePen] (2D list in ints),[tooNear] (2D list of bool),[forbidden] (2D list of bool),[forced] (list of (machine,task pairs (example: 1,a)),[optionalErrorMessage])--
-firstOfThree :: (a,b,c) -> a
-firstOfThree (x,_,_) = x
-
-secondOfThree :: (a,b,c) -> b
-secondOfThree (_,y,_) = y
-
-thirdOfThree :: (a,b,c) -> c
-thirdOfThree (_,_,z) = z
 
 	
 
@@ -26,8 +18,8 @@ parse ("Name:":xs) (a1, b1, "") =
     parse (tail (tail xs)) (a1, b1, "")
 
 parse ("forced partial assignment:":xs) (a1, b1, "") =
-    parse (firstOfThree y) (a1, secondOfThree y, thirdOfThree y)
-    where y = parseForcedPartials (xs, [], [])
+    parse rem (a1, con, err)
+    where (rem, con, err) = parseForcedPartials (xs, [], [])
 
 parse ("forbidden machine:":xs) (a1, b1, "") =
     parse rem (Constraint (getTooNearC a1) con (getTooNearP a1) (getMachineP a1), b1, err)
@@ -51,18 +43,20 @@ parse (x:xs) (a, b, []) = (a, b, "Error parsing input file.")
 parse (x:xs) (a1, b1, c1) = (a1, b1, c1)
 	
 parseForcedPartials ::  ([String], [(Int, Int)], String) -> ([String], [(Int, Int)], String)
-parseForcedPartials(a, b, c)
+parseForcedPartials (strList,b,c) | trace ("parseForcedPartials: " ++ (strList !! 0)) False = undefined
+parseForcedPartials (a, b, c)
     |head a == []		= ((tail a),b,c)
     |otherwise			= parseForcedPartials(tail a, ((firstInteger a),(taskNumber(secondCharacter a))):b, c)
 
 parseForbiddenMachine :: ([String], [[Bool]], String) -> ([String], [[Bool]], String)
+parseForbiddenMachine (strList,b,c) | trace ("parseForbiddenMachine: " ++ (show strList)) False = undefined
 parseForbiddenMachine (a,b,c)
     |c /= "" = (a,b,c)
-    |a == [] = (a,b,c)
     |head a == "" = (tail a, b, c)
     |otherwise = parseLineForbidden (a,b,c)
 
 parseLineForbidden :: ([String], [[Bool]], String) -> ([String], [[Bool]], String)
+parseLineForbidden (strList,b,c) | trace ("parseLineForbidden: " ++ (strList !! 0)) False = undefined
 parseLineForbidden (a,b,c) 
     |c /= "" = (a,b,c)
     |head a == "" = (a,b,c)
@@ -72,6 +66,7 @@ parseLineForbidden (a,b,c)
     where parseB r s t = replace (replace True t (r !! s)) s r
 	
 parseTooNearTasks :: ([String], [[Bool]], String) -> ([String], [[Bool]], String)
+parseTooNearTasks (strList,b,c) | trace ("parseTooNearTasks: " ++ (strList !! 0)) False = undefined
 parseTooNearTasks (a,b,c)
     |c /= [] = (a,b,c)
     |head a == "\n" = (tail a,b,c)
@@ -80,6 +75,7 @@ parseTooNearTasks (a,b,c)
 
 
 parseLineTooNearTasks :: ([String], [[Bool]], String) -> ([String], [[Bool]], String)
+parseLineTooNearTasks (strList,b,c) | trace ("parseLineTooNearTasks: " ++ (strList !! 0)) False = undefined
 parseLineTooNearTasks (a,b,c) 
     |c /= "" = (a,b,c)
     |head a == "" = (a,b,c)
@@ -90,6 +86,7 @@ parseLineTooNearTasks (a,b,c)
 	
 	
 parseMachinePenalties :: ([String], [[Int]], String) -> ([String], [[Int]], String)
+parseMachinePenalties (strList,b,c) | trace ("parseMachinePenalties: " ++ (strList !! 0)) False = undefined
 parseMachinePenalties (("":xs),b,c) = (xs, b, c)
 parseMachinePenalties (a,b,c) = parseMachineReturn(parseMachineHelper (a,b,c,1))
 {-machine penalties:
@@ -105,6 +102,7 @@ parseMachineReturn (a,b,c,d) = (a,b,c)
 	
 	
 parseTooNearPenalties :: ([String], [[Int]], String) -> ([String], [[Int]], String)
+parseTooNearPenalties (strList,b,c) | trace ("parseTooNearPenalties: " ++ (strList !! 0)) False = undefined
 parseTooNearPenalties (a,b,c)
     |c /= "" = (a,b,c)
     |head a == "" = (a, b, c)
