@@ -24,7 +24,7 @@ printer (solution, []) = do
   
 printer (solution, error) = do
   args<-getArgs
-  let writeFile = args !! 0
+  let writeFile = args !! 1
   handle<-openFile writeFile WriteMode
   --hPrint handle error
   hPrint handle ("Printer: " ++ error)

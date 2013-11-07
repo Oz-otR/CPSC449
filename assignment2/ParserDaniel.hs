@@ -62,7 +62,7 @@ thirdOfThree (_,_,z) = z
 parser a = parse a (Constraint [] [] [] [], [], "")
 
 parse :: [String] -> (Constraint, [(Int, Int)], String) -> (Constraint, [(Int, Int)], String)
---parse strList (c, p, str) | trace ("Parse: " ++ (strList !! 0)) False = undefined
+parse strList (c, p, str) | trace ("Parse: " ++ (strList !! 0)) False = undefined
 
 parse ("Name:":xs) (a1, b1, "") =
 	parse (tail (tail xs)) (a1, b1, "")
