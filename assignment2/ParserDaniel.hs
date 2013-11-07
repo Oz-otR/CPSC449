@@ -81,7 +81,7 @@ parseLineForbidden (a,b,c)
     |c /= "" = (a,b,c)
     |head a == "" = (a,b,c)
     |(firstInteger a) `notElem` [0..7] = (a,b,"invalid machine/task")
-    |(secondCharacter a) `notElem` [0..7] = (a,b,"invalid machine/task")
+    |(secondCharacter a) `notElem` ['A'..'H'] = (a,b,"invalid machine/task")
     |otherwise = parseForbiddenMachine (tail a, parseB b (firstInteger a) (taskNumber (secondCharacter a)), c)
     where parseB r s t = replace (replace True t (r !! s)) s r
 	
@@ -101,7 +101,7 @@ parseLineTooNearTasks (a,b,c)
     |c /= "" = (a,b,c)
     |head a == "" = (a,b,c)
     |(firstInteger a) `notElem` [0..7] = (a,b,"invalid machine/task")
-    |(secondCharacter a) `notElem` [0..7] = (a,b,"invalid machine/task")
+    |(secondCharacter a) `notElem` ['A'..'H'] = (a,b,"invalid machine/task")
     |otherwise = parseTooNearTasks (tail a, parseB b (taskNumber (firstCharacter a)) (taskNumber (secondCharacter a)), c)
     where parseB r s t = replace (replace True t (r !! s)) s r
 	
