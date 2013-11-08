@@ -9,6 +9,7 @@ Solution(Solution),
 getAssignment,
 getPenalty,
 splitOn,
+splitLeft,
 remove,
 extract,
 allTrue,
@@ -56,7 +57,7 @@ splitOn char str =
 
 splitLeft (x:xs) char
     | x == char = ([],xs)
-    | xs == [] = ([],[])
+    | xs == [] = (x:[],[])
     | otherwise = (x:result, remaining)
   where (result, remaining) = splitLeft xs char
 
