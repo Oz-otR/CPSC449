@@ -2,21 +2,32 @@ This Haskell repository was created for Assignment 2 of CPSC449 L01, University 
 Authors: Daniel Armstrong, Nathan Harms, Nigel Weber, Winston Chan, and Danny Yu.
 Date: November 8, 2013
 
+=====FILES INCLUDED:=====
+main.hs
+Parser.hs
+Printer.hs
+Solver.hs
+Utils.hs
 
-TO RUN WITH COMMAND LINE:
-Open command line in the folder containing the unpacked repository
-'./main *arg1* *arg2*'
+
+=====TO COMPILE:=====
+Make sure all repository files have been unpacked into the same directory, and a command line is open in that directory
+ghc main.hs
+
+=====TO RUN WITH COMMAND LINE:=====
+Open command line in the folder containing the compiled file
+<path>/main *arg1* *arg2*
 	arg1: Input file: exact specifications listed below
 	arg2: Output file: consists of the solution after solving, or an error message that was encountered during the attempt
-	Make sure that if the input file and output file are not within the same folder, they are given relative filepaths.
+	Make sure that if the input file and output file are not within the same folder as the command line prompt, they are given relative filepaths.
 
-TO RUN WITH HUGS:
+=====TO RUN WITH HUGS:=====
 Open hugs within the folder containing the unpacked repository
-':l main.hs'
-':main "*arg1*" "*arg2*"'
+:l <path>main.hs
+:main "*arg1*" "*arg2*"
 
 
-Proper input file formatting:
+=====PROPER INPUT FILE FORMATTING:=====
 
 Name:
 *name*
@@ -50,3 +61,15 @@ too-near penalities
 (*task+11*,*task+12*,*p1*)
 ...
 (*task+x1*,*task+x2*,*px*)
+
+
+=====OUTPUT FILE ERRORS:=====
+"machine penalty error": The "machine penalties:" section contains either too many or too few lines of penalties, or one line does not contain the proper number of penalties.
+
+"invalid task": One or more of the tasks expressed during the "too-near penalities" section is not a valid task (member of [ABCDEFGH])
+
+"invalid penalty": One or more of the penalties expressed in "machine penalties:" and "too-near penalities" sections has not been expressed as a valid (natural) number.
+
+"invalid machine/task": One or more of the hard constraints ("forced partial assignment:", "forbidden machine:" and "too-near tasks:") has an invalid machine or task.
+
+"Error while parsing input file": A problem exists with the formatting of the file itself.
