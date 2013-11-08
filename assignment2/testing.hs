@@ -1,6 +1,6 @@
 import Utils
 import Solver
-import ParserDaniel
+import Parser
 
 testCase1 =
   ["Name:","whatever",
