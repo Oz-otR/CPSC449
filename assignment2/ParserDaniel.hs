@@ -50,7 +50,10 @@ parseForcedPartials (a, b, c)
     |pair `elem` b        = (a, b, "partial assignment error")
     |isValidTuple (head a) = parseForcedPartials(tail a, pair:b, c)
     |otherwise			      = (a, b, err_parsing)
-    where pair = ((firstInteger a), (taskNumber(secondCharacter a)))
+    where
+      first = firstInteger (head a)
+      second = secondCharacter (head a)
+      pair = (first, (taskNumber second))
 
 parseForbiddenMachine :: ([String], [[Bool]], String) -> ([String], [[Bool]], String)
 parseForbiddenMachine (strList,b,c) | trace ("parseForbiddenMachine: " ++ (show strList)) False = undefined
@@ -62,14 +65,18 @@ parseForbiddenMachine (a,b,c)
     |otherwise = parseLineForbidden (a,b,c)
 
 parseLineForbidden :: ([String], [[Bool]], String) -> ([String], [[Bool]], String)
-parseLineForbidden (strList,b,c) | trace ("parseLineForbidden: " ++ (show b)) False = undefined
-parseLineForbidden (a,b,c) 
-    |c /= "" = (a,b,c)
-    |head a == "\n" = ((tail a),b,c)
-    |head a == "" = ((tail a),b,c)
-    |(firstInteger a) `notElem` [0..7] = (a,b,err_machine_task)
-    |(secondCharacter a) `notElem` ['A'..'H'] = (a,b,err_machine_task)
-    |otherwise = parseForbiddenMachine (tail a, insertBool b (firstInteger a) (taskNumber (secondCharacter a)), c)
+parseLineForbidden (strList,b,c) | trace ("parseLineForbidden:'" ++ (strList !! 0) ++ "'") False = undefined
+parseLineForbidden (strList,table,err) 
+    |err /= ""    = (strList,table,err)
+    |word == "\n" = (rem,table,err)
+    |word == ""   = (rem,table,err)
+    |first `notElem` [0..7]      = (strList,table,err_machine_task)
+    |second `notElem` ['A'..'H'] = (strList,table,err_machine_task)
+    |otherwise = parseForbiddenMachine (rem, insertBool table first (taskNumber second), err)
+    where word   = head strList
+          rem    = tail strList
+          first  = firstInteger word
+          second = secondCharacter word
     --where insertBool r s t = replace (replace True t (r !! s)) s r
 insertBool bools machine task | trace ("insertBool: " ++ (show machine) ++ ", " ++ (show task)) False = undefined
 insertBool bools machine task = replace (replace True task (bools !! machine)) machine bools
@@ -90,9 +97,11 @@ parseLineTooNearTasks (strList,b,c) | trace ("parseLineTooNearTasks: " ++ (strLi
 parseLineTooNearTasks (a,b,c) 
     |c /= "" = (a,b,c)
     |head a == "" = (a,b,c)
-    |(firstInteger a) `notElem` [0..7] = (a,b,err_machine_task)
-    |(secondCharacter a) `notElem` ['A'..'H'] = (a,b,err_machine_task)
-    |otherwise = parseTooNearTasks (tail a, insertBool b (taskNumber (firstCharacter a)) (taskNumber (secondCharacter a)), c)
+    |first `notElem` ['A'..'H'] = (a,b,err_machine_task)
+    |second `notElem` ['A'..'H'] = (a,b,err_machine_task)
+    |otherwise = parseTooNearTasks (tail a, insertBool b (taskNumber first) (taskNumber second), c)
+    where first  = firstCharacter (head a)
+          second = secondCharacter (head a)
 	
 	
 parseMachinePenalties :: ([String], [[Int]], String) -> ([String], [[Int]], String)
@@ -122,10 +131,14 @@ parseTooNearPenalties (a,b,c)
 
 parseLineTooNearPenalties :: ([String], [[Int]], String) -> ([String], [[Int]], String)
 parseLineTooNearPenalties (a,b,c)
-    |(firstCharacter a) `notElem` ['A'..'H'] = (a,b,"invalid task")
-    |(secondCharacter a) `notElem` ['A'..'H'] = (a,b,"invalid task")
+    |first `notElem` ['A'..'H'] = (a,b,"invalid task")
+    |second `notElem` ['A'..'H'] = (a,b,"invalid task")
     |otherwise = parseTooNearPenalties (tail a, parseB, c)
-    where parseB = replace (replace (thirdInteger a) (taskNumber (firstCharacter a)) (b !! taskNumber (secondCharacter a))) (taskNumber (secondCharacter a)) b
+    where 
+      first = firstCharacter (head a)
+      second = secondCharacter (head a)
+      third = thirdInteger (head a)
+      parseB = replace (replace third (taskNumber first) (b !! taskNumber second)) (taskNumber second) b
 	
 err_machinePenalty = "machine penalty error"
 err_tooNearPenalty = "toonear penalty error"
@@ -163,13 +176,13 @@ splitComma xs = splitOn ',' (removeBrackets xs)
 splitSpace xs = splitOn ' ' xs -- DOES NOT WORK! Ended up using (map read $ words) instead.
 
 --gets the Integer found at the first element
-firstInteger a = (read ((splitComma (head a)) !! 0) :: Int) - 1
+firstInteger str = (read ((splitComma str) !! 0) :: Int) - 1
 
 --gets the Integer found at the third element
-thirdInteger a = (read ((splitComma (head a)) !! 2) :: Int) - 1
+thirdInteger a = (read ((splitComma a) !! 2) :: Int) - 1
 
 --gets the Char found at the first element
-firstCharacter a = ((splitComma (head a)) !! 0) !! 0
+firstCharacter a = ((splitComma a) !! 0) !! 0
 
 --gets the Char found at the second element
-secondCharacter a = ((splitComma (head a)) !! 1) !! 0
+secondCharacter a = ((splitComma a) !! 1) !! 0
