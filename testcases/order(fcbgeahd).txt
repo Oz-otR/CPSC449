@@ -24,7 +24,7 @@ machine penalties:
 5 1 6 5 1 9 5 1
 7 5 1 1 1 9 1 6
 
-too-near penalties
+too-near penalities
 (e,f,30)
 (g,h,56)
 (a,b,5)

@@ -21,6 +21,6 @@ machine penalties:
 20 20 20 20 20 20 20 1
 1 20 20 20 20 20 20 20
 
-too-near penalties
+too-near penalities
 (e,f,50)
 
