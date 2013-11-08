@@ -66,7 +66,7 @@ parseForcedPartials (a, b, c)
       pair = (first, (taskNumber second))
 
 parseForbiddenMachine :: ([String], [[Bool]], String) -> ([String], [[Bool]], String)
-parseForbiddenMachine (strList,b,c) | trace ("parseForbiddenMachine: " ++ (show strList)) False = undefined
+parseForbiddenMachine (strList,b,c) | trace ("parseForbiddenMachine: " ++ (strList !! 0)) False = undefined
 parseForbiddenMachine (a,b,c)
     |c /= "" = (a,b,c)
     |head a == "\n" = (tail a, b, c)
@@ -193,7 +193,7 @@ firstInteger str = (read ((splitComma str) !! 0) :: Int) - 1
 thirdInteger a = (read ((splitComma a) !! 2) :: Int) - 1
 
 --gets the Char found at the first element
-firstCharacter a = ((splitComma a) !! 0) !! 0
+firstCharacter a = toUpper $ ((splitComma a) !! 0) !! 0
 
 --gets the Char found at the second element
-secondCharacter a = ((splitComma a) !! 1) !! 0
+secondCharacter a = toUpper $ ((splitComma a) !! 1) !! 0
