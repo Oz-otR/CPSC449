@@ -113,7 +113,7 @@ taskNumber 'D' = 3
 taskNumber 'E' = 4
 taskNumber 'F' = 5
 taskNumber 'G' = 6
-taskNumber '7' = 7
+taskNumber 'H' = 7
 taskNumber c = -1
 
 taskLetter 0 = 'A'

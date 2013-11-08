@@ -57,9 +57,9 @@ parseForcedPartials ::  ([String], [(Int, Int)], String) -> ([String], [(Int, In
 parseForcedPartials (strList,b,c) | trace ("parseForcedPartials: " ++ (strList !! 0)) False = undefined
 parseForcedPartials (a, b, c)
     |head a == []		      = ((tail a),b,c)
+    |not (isValidTuple (head a)) = (a,b,err_parsing)
     |pair `elem` b        = (a, b, "partial assignment error")
-    |isValidTuple (head a) = parseForcedPartials(tail a, pair:b, c)
-    |otherwise			      = (a, b, err_parsing)
+    |otherwise = parseForcedPartials(tail a, pair:b, c)
     where
       first = firstInteger (head a)
       second = secondCharacter (head a)
