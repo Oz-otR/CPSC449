@@ -1,5 +1,15 @@
 module ParserDaniel (
-parser)
+parser,
+parse,
+parseForcedPartials,
+parseForbiddenMachine,
+parseLineForbidden,
+firstInteger,
+firstCharacter,
+thirdInteger,
+secondCharacter,
+splitComma
+)
 where 
 import Data.Char
 import Utils
@@ -78,7 +88,7 @@ parseLineForbidden (strList,table,err)
           rem    = tail strList
           first  = firstInteger word
           second = secondCharacter word
-    --where insertBool r s t = replace (replace True t (r !! s)) s r
+
 insertBool bools machine task | trace ("insertBool: " ++ (show machine) ++ ", " ++ (show task)) False = undefined
 insertBool bools machine task = replace (replace True task (bools !! machine)) machine bools
 

@@ -7,6 +7,7 @@ import Data.List
 import Solver
 import ParserDaniel
 import Printer
+import Utils
 
 main = do
 
