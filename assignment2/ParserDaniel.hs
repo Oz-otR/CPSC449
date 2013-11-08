@@ -20,7 +20,7 @@ import Debug.Trace
 parser a = parse a (Constraint [] [] [] [], [], "")
 
 parse :: [String] -> (Constraint, [(Int, Int)], String) -> (Constraint, [(Int, Int)], String)
-parse strList (c, p, str) | trace ("Parse: " ++ (strList !! 0)) False = undefined
+parse strList (c, p, str) | trace ("Parse") False = undefined
 
 parse ("Name:":xs) (a1, b1, "") =
     parse (tail (tail xs)) (a1, b1, "")
@@ -54,7 +54,7 @@ parse [] (a1, b1, "") = (a1, b1, "")
 parse (x:xs) (a1, b1, c1) = (a1, b1, c1)
 	
 parseForcedPartials ::  ([String], [(Int, Int)], String) -> ([String], [(Int, Int)], String)
-parseForcedPartials (strList,b,c) | trace ("parseForcedPartials: " ++ (strList !! 0)) False = undefined
+parseForcedPartials (strList,b,c) | trace ("parseForcedPartials:") False = undefined
 parseForcedPartials (a, b, c)
     |head a == []		      = ((tail a),b,c)
     |not (isValidTuple (head a)) = (a,b,err_parsing)
@@ -66,17 +66,20 @@ parseForcedPartials (a, b, c)
       pair = (first, (taskNumber second))
 
 parseForbiddenMachine :: ([String], [[Bool]], String) -> ([String], [[Bool]], String)
-parseForbiddenMachine (strList,b,c) | trace ("parseForbiddenMachine: " ++ (strList !! 0)) False = undefined
+parseForbiddenMachine (strList,b,c) | trace ("parseForbiddenMachine:\"" ++ c ++ "\"") False = undefined
 parseForbiddenMachine (a,b,c)
     |c /= "" = (a,b,c)
-    |head a == "\n" = (tail a, b, c)
-    |head a == "" = (tail a, b, c)
-    |head a == " " = (tail a, b, c)
-    |not (isValidTuple (head a)) = (a,b,err_parsing)
+    |a == [] = ([], b, err_parsing)
+    |word == "\n" = (rem, b, c)
+    |word == "" = (rem, b, c)
+    -- |word == " " = (rem, b, c)
+    |not (isValidTuple word) = (a,b,err_parsing)
     |otherwise = parseLineForbidden (a,b,c)
+    where word = head a
+          rem  = tail a
 
 parseLineForbidden :: ([String], [[Bool]], String) -> ([String], [[Bool]], String)
-parseLineForbidden (strList,b,c) | trace ("parseLineForbidden:'" ++ (strList !! 0) ++ "'") False = undefined
+parseLineForbidden (strList,b,c) | trace ("parseLineForbidden:") False = undefined
 parseLineForbidden (strList,table,err) 
     |err /= ""    = (strList,table,err)
     |word == "\n" = (rem,table,err)
@@ -89,11 +92,10 @@ parseLineForbidden (strList,table,err)
           first  = firstInteger word
           second = secondCharacter word
 
-insertBool bools machine task | trace ("insertBool: " ++ (show machine) ++ ", " ++ (show task)) False = undefined
 insertBool bools machine task = replace (replace True task (bools !! machine)) machine bools
 
 parseTooNearTasks :: ([String], [[Bool]], String) -> ([String], [[Bool]], String)
-parseTooNearTasks (strList,b,c) | trace ("parseTooNearTasks: " ++ (strList !! 0)) False = undefined
+parseTooNearTasks (strList,b,c) | trace ("parseTooNearTasks:") False = undefined
 parseTooNearTasks (a,b,c)
     |c /= [] = (a,b,c)
     |head a == "\n" = (tail a,b,c)
@@ -103,7 +105,7 @@ parseTooNearTasks (a,b,c)
 
 
 parseLineTooNearTasks :: ([String], [[Bool]], String) -> ([String], [[Bool]], String)
-parseLineTooNearTasks (strList,b,c) | trace ("parseLineTooNearTasks: " ++ (strList !! 0)) False = undefined
+parseLineTooNearTasks (strList,b,c) | trace ("parseLineTooNearTasks:") False = undefined
 parseLineTooNearTasks (a,b,c) 
     |c /= "" = (a,b,c)
     |head a == "" = (a,b,c)
@@ -115,7 +117,7 @@ parseLineTooNearTasks (a,b,c)
 	
 	
 parseMachinePenalties :: ([String], [[Int]], String) -> ([String], [[Int]], String)
-parseMachinePenalties (strList,b,c) | trace ("parseMachinePenalties: " ++ (strList !! 0)) False = undefined
+parseMachinePenalties (strList,b,c) | trace ("parseMachinePenalties:") False = undefined
 parseMachinePenalties (("":xs),b,c) = (xs, b, err_machinePenalty)
 parseMachinePenalties (a,b,c) = parseMachineReturn(parseMachineHelper (a,b,c,0))
 {-machine penalties:
@@ -133,7 +135,7 @@ parseMachineReturn (a,b,c,d) = (a,b,c)
 	
 	
 parseTooNearPenalties :: ([String], [[Int]], String) -> ([String], [[Int]], String)
-parseTooNearPenalties (strList,b,c) | trace ("parseTooNearPenalties: " ++ (strList !! 0)) False = undefined
+parseTooNearPenalties (strList,b,c) | trace ("parseTooNearPenalties:") False = undefined
 parseTooNearPenalties (a,b,c)
     |c /= "" = (a,b,c)
     |head a == "" = (a, b, c)
@@ -161,6 +163,7 @@ err_parsing        = "Error parsing input file."
 
 -- Check if a string matches the format "(..,..)" with no spaces.
 isValidTuple :: String -> Bool
+isValidTuple str | trace ("isValidTuple:\"" ++ str ++ "\"") False = undefined
 isValidTuple str =
   (hasBrackets rstr) && (noSpaces rstr)
   where rstr = rtrim str
