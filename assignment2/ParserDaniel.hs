@@ -8,7 +8,9 @@ firstInteger,
 firstCharacter,
 thirdInteger,
 secondCharacter,
-splitComma
+splitComma,
+parseTooNearPenalties,
+parseLineTooNearPenalties
 )
 where 
 import Data.Char
@@ -17,69 +19,103 @@ import Debug.Trace
 
 -- output type: ([tooNearPen] (2D list of ints),[machinePen] (2D list in ints),[tooNear] (2D list of bool),[forbidden] (2D list of bool),[forced] (list of (machine,task pairs (example: 1,a)),[optionalErrorMessage])--
 
-parser a = parse a (Constraint [] [] [] [], [], "")
+parser a = parse a (Constraint [] [] [] [], [(-2,-2)], "")
 
 parse :: [String] -> (Constraint, [(Int, Int)], String) -> (Constraint, [(Int, Int)], String)
-parse strList (c, p, str) | trace ("Parse") False = undefined
+parse []      (con, partials, err)
+    | partials == [(-2,-2)] || partials == [(-1,-1)] = (con, [], err_parsing)
+    | getMachineC con == [] = (con, [], err_parsing)
+    | getMachineP con == [] = (con, [], err_parsing)
+    | getTooNearC con == [] = (con, [], err_parsing)
+    | getTooNearP con == [] = (con, [], err_parsing)
+    | otherwise = (con, partials, err)
 
-parse ("Name:":xs) (a1, b1, "") =
-    parse (tail (tail xs)) (a1, b1, "")
+parse strList (con, partials, err)
+    | err     /= [] = (con, partials, err)
+    | line    == "Name:" = parseInnerName rem (con, [(-1,-1)], err)
+    | line    == "forced partial assignment:" = parseInnerPartial rem (con, partials, err) -- overwrite default
+    | line    == "forbidden machine:" = parseInnerMachineC rem (con, partials, err)
+    | line    == "too-near tasks:" = parseInnerTooNearC rem (con, partials, err)
+    | line    == "machine penalties:" = parseInnerMachineP rem (con, partials, err)
+    | line    == "too-near penalities" = parseInnerTooNearP rem (con, partials, err)
+    | line    == [] = parse rem (con, partials, err)
+    | otherwise     = (con, [], err_parsing)
+    where line = rtrim ( head strList )
+          rem  = tail strList
 
-parse ("forced partial assignment:":xs) (a1, b1, "") =
-    parse rem (a1, con, err)
-    where (rem, con, err) = parseForcedPartials (xs, [], [])
+parseInnerName strList (con, partials, err) 
+    | (length strList) < 2 = (con, [], err_parsing)
+    | otherwise            = parse (tail (tail strList)) (con, partials, err)
 
-parse ("forbidden machine:":xs) (a1, b1, "") =
-    parse rem (Constraint (getTooNearC a1) con (getTooNearP a1) (getMachineP a1), b1, err)
-    where (rem, con, err) = parseForbiddenMachine (xs, blank2dBool 8 8 False, [])
+parseInnerPartial strList (con, partials, err)
+    | partials == [(-2,-2)] = (con, [], err_parsing)
+    | err     /= [] = (con, [], err)
+    | strList == [] = (con, [], err_parsing)
+    | otherwise     = parse rem (con, partials', err')
+    where (rem, partials', err') = parseForcedPartials (strList, [], [])
+    
+parseInnerMachineC strList (con, partials, err)
+    | err     /= [] = (con, [], err)
+    | strList == [] = (con, [], err_parsing)
+    | otherwise     = parse rem (con', partials, err')
+    where (rem, bools, err') = parseForbiddenMachine (strList, blank2dBool 8 8 False, [])
+          con' = Constraint (getTooNearC con) bools (getTooNearP con) (getMachineP con)
 
-parse ("too-near tasks:":xs) (a1, b1, "") =
-    parse rem (Constraint con (getMachineC a1) (getTooNearP a1) (getMachineP a1), b1, err)
-    where (rem, con, err) = parseTooNearTasks (xs, blank2dBool 8 8 False, []) 
+parseInnerTooNearC strList (con, partials, err)
+    | err     /= [] = (con, [], err)
+    | strList == [] = (con, [], err_parsing)
+    | otherwise     = parse rem (con', partials, err')
+    where (rem, bools, err') = parseTooNearTasks (strList, blank2dBool 8 8 False, [])
+          con' = Constraint bools (getMachineC con) (getTooNearP con) (getMachineP con)
 
-parse ("machine penalties:":xs) (a1, b1, "") =
-    parse rem (Constraint (getTooNearC a1) (getMachineC a1) (getTooNearP a1) con, b1, err)
-    where (rem, con, err) = parseMachinePenalties (xs, blank2dInt 8 8 0, [])
+parseInnerMachineP strList (con, partials, err)
+    | err     /= [] = (con, [], err)
+    | strList == [] = (con, [], err_parsing)
+    | otherwise     = parse rem (con', partials, err')
+    where (rem, ints, err') = parseMachinePenalties (strList, blank2dInt 8 8 0, [])
+          con' = Constraint (getTooNearC con) (getMachineC con) (getTooNearP con) ints
 
-parse ("too-near penalities":xs) (a1, b1, "") =
-    parse rem (Constraint (getTooNearC a1) (getMachineC a1) con (getMachineP a1), b1, err)
-    where (rem, con, err) = parseTooNearPenalties (xs, blank2dInt 8 8 0, [])
+parseInnerTooNearP strList (con, partials, err)
+    | err     /= [] = (con, [], err)
+    | strList == [] = (con', partials, err) -- special since it's last
+    | otherwise     = parse rem (con', partials, err')
+    where (rem, ints, err') = parseTooNearPenalties (strList, blank2dInt 8 8 0, [])
+          con' = Constraint (getTooNearC con) (getMachineC con) ints (getMachineP con)
 
-parse (x:xs) (Constraint [] w y z, b1, "") = (Constraint [] w y z, b1, err_parsing)
-parse (x:xs) (Constraint w [] y z, b1, "") = (Constraint w [] y z, b1, err_parsing)
-parse (x:xs) (Constraint w y [] z, b1, "") = (Constraint w y [] z, b1, err_parsing)
-parse (x:xs) (Constraint w y z [], b1, "") = (Constraint w y z [], b1, err_parsing)
-parse (x:xs) (a1, b1, "") = (a1, b1, err_parsing)
-parse [] (a1, b1, "") = (a1, b1, "")
-parse (x:xs) (a1, b1, c1) = (a1, b1, c1)
-	
 parseForcedPartials ::  ([String], [(Int, Int)], String) -> ([String], [(Int, Int)], String)
-parseForcedPartials (strList,b,c) | trace ("parseForcedPartials:") False = undefined
 parseForcedPartials (a, b, c)
+    |c      /= []         = (a,b,c)
     |head a == []		      = ((tail a),b,c)
-    |not (isValidTuple (head a)) = (a,b,err_parsing)
-    |pair `elem` b        = (a, b, "partial assignment error")
+    |not (isValidTuple (head a) 2) = (a,b,err_parsing)
+    |first < 0 || first > 7 = (a,b,err_machine_task)
+    |second < 0 || second > 7 = (a,b,err_machine_task)
+    |pairIsIn pair b = (a, b, "partial assignment error")
     |otherwise = parseForcedPartials(tail a, pair:b, c)
     where
       first = firstInteger (head a)
-      second = secondCharacter (head a)
-      pair = (first, (taskNumber second))
+      second = taskNumber $ secondCharacter (head a)
+      pair = (first, second)
+
+pairIsIn (a,b) [] = False
+pairIsIn (a,b) ((a',b'):xs) 
+    | a == a' || b == b' = True
+    | xs == [] = False
+    | otherwise = pairIsIn (a,b) xs
+  
 
 parseForbiddenMachine :: ([String], [[Bool]], String) -> ([String], [[Bool]], String)
-parseForbiddenMachine (strList,b,c) | trace ("parseForbiddenMachine:\"" ++ c ++ "\"") False = undefined
 parseForbiddenMachine (a,b,c)
     |c /= "" = (a,b,c)
     |a == [] = ([], b, err_parsing)
     |word == "\n" = (rem, b, c)
     |word == "" = (rem, b, c)
     -- |word == " " = (rem, b, c)
-    |not (isValidTuple word) = (a,b,err_parsing)
+    |not (isValidTuple word 2) = (a,b,err_parsing)
     |otherwise = parseLineForbidden (a,b,c)
-    where word = head a
+    where word = rtrim $ head a
           rem  = tail a
 
 parseLineForbidden :: ([String], [[Bool]], String) -> ([String], [[Bool]], String)
-parseLineForbidden (strList,b,c) | trace ("parseLineForbidden:") False = undefined
 parseLineForbidden (strList,table,err) 
     |err /= ""    = (strList,table,err)
     |word == "\n" = (rem,table,err)
@@ -95,17 +131,15 @@ parseLineForbidden (strList,table,err)
 insertBool bools machine task = replace (replace True task (bools !! machine)) machine bools
 
 parseTooNearTasks :: ([String], [[Bool]], String) -> ([String], [[Bool]], String)
-parseTooNearTasks (strList,b,c) | trace ("parseTooNearTasks:") False = undefined
 parseTooNearTasks (a,b,c)
     |c /= [] = (a,b,c)
     |head a == "\n" = (tail a,b,c)
     |head a == "" = (tail a, b, c)
-    |not (isValidTuple (head a)) = (a,b,err_parsing)
+    |not (isValidTuple (head a) 2) = (a,b,err_parsing)
     |otherwise = parseLineTooNearTasks (a,b,c)
 
 
 parseLineTooNearTasks :: ([String], [[Bool]], String) -> ([String], [[Bool]], String)
-parseLineTooNearTasks (strList,b,c) | trace ("parseLineTooNearTasks:") False = undefined
 parseLineTooNearTasks (a,b,c) 
     |c /= "" = (a,b,c)
     |head a == "" = (a,b,c)
@@ -117,7 +151,6 @@ parseLineTooNearTasks (a,b,c)
 	
 	
 parseMachinePenalties :: ([String], [[Int]], String) -> ([String], [[Int]], String)
-parseMachinePenalties (strList,b,c) | trace ("parseMachinePenalties:") False = undefined
 parseMachinePenalties (("":xs),b,c) = (xs, b, err_machinePenalty)
 parseMachinePenalties (a,b,c) = parseMachineReturn(parseMachineHelper (a,b,c,0))
 {-machine penalties:
@@ -125,8 +158,10 @@ i i i i i i i i
 j j j j j j j j-}
 parseMachineHelper :: ([String], [[Int]], String, Int) -> ([String], [[Int]], String, Int)
 parseMachineHelper (a,b,c,d)
+    |d > 7 && (rtrim (head a)) /= [] = (a,b,err_machinePenalty,d)
     |d > 7 =	(a,b,c,d)
-    |(head a) == "" = (a,b,err_machinePenalty,d)   
+    |(rtrim (head a)) == "" = (a,b,err_machinePenalty,d)   
+    |not (areValidPenalties (head a)) = (a,b,err_penalty,d)
     |length (map read $ words (head a) :: [Int]) /= 8 = (a,b,err_machinePenalty,d)
     |otherwise = parseMachineHelper (tail a, replace (map read $ words (head a) :: [Int]) d b, c, d+1)
 
@@ -135,37 +170,47 @@ parseMachineReturn (a,b,c,d) = (a,b,c)
 	
 	
 parseTooNearPenalties :: ([String], [[Int]], String) -> ([String], [[Int]], String)
-parseTooNearPenalties (strList,b,c) | trace ("parseTooNearPenalties:") False = undefined
-parseTooNearPenalties (a,b,c)
-    |c /= "" = (a,b,c)
-    |head a == "" = (a, b, c)
-    |not (isValidTuple (head a)) = (a,b,err_parsing)
-    |otherwise = parseLineTooNearPenalties (a,b,c)
+parseTooNearPenalties (strList,ints,err)
+    |err /= ""     = (strList,ints,err)
+    |strList == [] = (strList,ints,err)
+    |word    == "" = (strList,ints,err)
+    |not (isValidTuple word 3) = (strList,ints,err_parsing)
+    |otherwise = parseLineTooNearPenalties (strList,ints,err)
+    where word = head strList
 
 parseLineTooNearPenalties :: ([String], [[Int]], String) -> ([String], [[Int]], String)
-parseLineTooNearPenalties (a,b,c)
-    |first `notElem` ['A'..'H'] = (a,b,"invalid task")
-    |second `notElem` ['A'..'H'] = (a,b,"invalid task")
-    |otherwise = parseTooNearPenalties (tail a, parseB, c)
+parseLineTooNearPenalties (strList,ints,err)
+    |task   `notElem` [0..7] = (strList,ints,err_task)
+    |task'  `notElem` [0..7] = (strList,ints,err_task)
+    |penalty < 0 = (strList, ints, err_penalty)
+    |otherwise = parseTooNearPenalties (tail strList, ints', err)
     where 
-      first = firstCharacter (head a)
-      second = secondCharacter (head a)
-      third = thirdInteger (head a)
-      parseB = replace (replace third (taskNumber first) (b !! taskNumber second)) (taskNumber second) b
+      word   = head strList
+      penalty= thirdInteger word
+      task   = taskNumber $ firstCharacter word
+      task'  = taskNumber $ secondCharacter word
+      ints'  = replace (replace penalty task' (ints !! task)) task ints
 	
 err_machinePenalty = "machine penalty error"
 err_tooNearPenalty = "toonear penalty error"
+err_task           = "invalid task"
+err_penalty        = "invalid penalty"
 err_machine_task   = "invalid machine/task"
-err_parsing        = "Error parsing input file."
+err_parsing        = "Error while parsing input file"
 
 --------------------------------------------------------------------------
 --String functions to get the input we want
 
 -- Check if a string matches the format "(..,..)" with no spaces.
-isValidTuple :: String -> Bool
-isValidTuple str | trace ("isValidTuple:\"" ++ str ++ "\"") False = undefined
-isValidTuple str =
-  (hasBrackets rstr) && (noSpaces rstr)
+areValidPenalties :: String -> Bool
+areValidPenalties [] = True
+areValidPenalties (x:xs)
+  | (isDigit x) || x == ' ' = areValidPenalties xs
+  | otherwise = False
+
+isValidTuple :: String -> Int -> Bool
+isValidTuple str len =
+  (hasBrackets rstr) && (noSpaces rstr) && length (splitComma str) == len
   where rstr = rtrim str
 
 noSpaces [] = True
@@ -193,7 +238,12 @@ splitSpace xs = splitOn ' ' xs -- DOES NOT WORK! Ended up using (map read $ word
 firstInteger str = (read ((splitComma str) !! 0) :: Int) - 1
 
 --gets the Integer found at the third element
-thirdInteger a = (read ((splitComma a) !! 2) :: Int) - 1
+thirdInteger a
+  | length split /= 3 = -1
+  | not (allTrue (map isDigit word)) = -1
+  | otherwise = read ((splitComma a) !! 2) :: Int
+  where split = splitComma a
+        word =  split !! 2
 
 --gets the Char found at the first element
 firstCharacter a = toUpper $ ((splitComma a) !! 0) !! 0

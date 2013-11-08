@@ -107,7 +107,7 @@ validMachine constraint assignments index =
 
 isValidMachine :: Constraint -> Int-> Int-> Bool
 isValidMachine constraint machine (-1) = True
-isValidMachine constraint machine task = ((getMachineC constraint)!! machine) !! task
+isValidMachine constraint machine task = not $ ((getMachineC constraint)!! machine) !! task
 
   -- Check against the too-near task constraints ------------------------------
 validTooNear :: Constraint -> [Int] -> Int-> Bool
@@ -121,7 +121,7 @@ validTooNear constraint assignments index =
 isValidTooNear :: Constraint -> Int-> Int-> Bool
 isValidTooNear constraint (-1) task' = True
 isValidTooNear constraint task (-1)  = True
-isValidTooNear constraint task task' = ((getTooNearC constraint) !! task) !! task'
+isValidTooNear constraint task task' = not $ ((getTooNearC constraint) !! task) !! task'
 
 
 -------------------------------------------------------------------------------
@@ -150,7 +150,7 @@ tooNearPenalty constraint assignments 7 =
   superRadFunction constraint (assignments !! 7) (assignments !! 0)
 
 tooNearPenalty constraint assignments machine = 
-  if (length assignments > (succ machine))
+  if machine < 7
     then superRadFunction constraint (assignments !! machine) (assignments !! (succ machine))
     else 0
 
