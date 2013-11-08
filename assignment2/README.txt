@@ -9,6 +9,7 @@ Parser.hs
 Printer.hs
 Solver.hs
 Utils.hs
+main *executable*
 
 =====TO COMPILE:=====
 Make sure all repository files have been unpacked into the same directory, and a command line is open in that directory
