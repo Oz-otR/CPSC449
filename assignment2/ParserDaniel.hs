@@ -80,8 +80,6 @@ parseLineForbidden (strList,table,err)
     --where insertBool r s t = replace (replace True t (r !! s)) s r
 insertBool bools machine task | trace ("insertBool: " ++ (show machine) ++ ", " ++ (show task)) False = undefined
 insertBool bools machine task = replace (replace True task (bools !! machine)) machine bools
-findElem (x:xs) 0       = x
-findElem (x:xs) y = findElem xs (y - 1)
 
 parseTooNearTasks :: ([String], [[Bool]], String) -> ([String], [[Bool]], String)
 parseTooNearTasks (strList,b,c) | trace ("parseTooNearTasks: " ++ (strList !! 0)) False = undefined
@@ -97,6 +95,7 @@ parseLineTooNearTasks (strList,b,c) | trace ("parseLineTooNearTasks: " ++ (strLi
 parseLineTooNearTasks (a,b,c) 
     |c /= "" = (a,b,c)
     |head a == "" = (a,b,c)
+    |isValidTuple (head a) == False = (a,b,err_parsing)
     |first `notElem` ['A'..'H'] = (a,b,err_machine_task)
     |second `notElem` ['A'..'H'] = (a,b,err_machine_task)
     |otherwise = parseTooNearTasks (tail a, insertBool b (taskNumber first) (taskNumber second), c)
@@ -127,6 +126,7 @@ parseTooNearPenalties (strList,b,c) | trace ("parseTooNearPenalties: " ++ (strLi
 parseTooNearPenalties (a,b,c)
     |c /= "" = (a,b,c)
     |head a == "" = (a, b, c)
+    |isValidTuple (head a) == False = (a,b,err_parsing)
     |otherwise = parseLineTooNearPenalties (a,b,c)
 
 parseLineTooNearPenalties :: ([String], [[Int]], String) -> ([String], [[Int]], String)
