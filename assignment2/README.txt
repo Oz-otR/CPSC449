@@ -1,4 +1,5 @@
-This Haskell repository was created for Assignment 2 of CPSC449 L01, University of Calgary.
+=====INFORMATION:=====
+This Haskell repository was created for Assignment 2 of CPSC449 L01, University of Calgary. Given an input file containing a series of constraints for a machine-task scheduling problem, it reports the solution with the fewest penalties if one exists, or returns information on a formatting error within the file.
 Authors: Daniel Armstrong, Nathan Harms, Nigel Weber, Winston Chan, and Danny Yu.
 Date: November 8, 2013
 
@@ -8,7 +9,6 @@ Parser.hs
 Printer.hs
 Solver.hs
 Utils.hs
-
 
 =====TO COMPILE:=====
 Make sure all repository files have been unpacked into the same directory, and a command line is open in that directory
@@ -28,7 +28,6 @@ Open hugs within the folder containing the unpacked repository
 
 
 =====PROPER INPUT FILE FORMATTING:=====
-
 Name:
 *name*
 
