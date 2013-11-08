@@ -35,14 +35,19 @@ getPartials3 :: [(Int,Int)]
 getPartials3 = [(3,4),(6,5)]
 getError3    = []
 
+isValidTuple :: String -> Bool
+isValidTuple str =
+  (hasBrackets rstr) && (noSpaces rstr)
+  where rstr = rtrim str
 
-splitOn [] char = []
-splitOn str char =
-  result:(splitOn remaining char)
-  where (result, remaining) = splitLeft str char
+noSpaces [] = True
+noSpaces (' ':xs) = False
+noSpaces (x:xs) = noSpaces xs
 
-splitLeft (x:xs) char
-    | x == char = ([],xs)
-    | xs == [] = ([],[])
-    | otherwise = (x:result, remaining)
-  where (result, remaining) = splitLeft xs char
+hasBrackets [] = False
+hasBrackets str = (head str) == '(' && (last str) == ')'
+
+rtrim str
+  | str == []       = []
+  | last str == ' ' = rtrim (init str)
+  | otherwise       = str

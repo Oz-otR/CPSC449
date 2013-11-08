@@ -48,7 +48,7 @@ parseForcedPartials (strList,b,c) | trace ("parseForcedPartials: " ++ (strList !
 parseForcedPartials (a, b, c)
     |head a == []		      = ((tail a),b,c)
     |pair `elem` b        = (a, b, "partial assignment error")
-    |isValidPair (head a) = parseForcedPartials(tail a, pair:b, c)
+    |isValidTuple (head a) = parseForcedPartials(tail a, pair:b, c)
     |otherwise			      = (a, b, err_parsing)
     where pair = ((firstInteger a), (taskNumber(secondCharacter a)))
 
@@ -92,8 +92,7 @@ parseLineTooNearTasks (a,b,c)
     |head a == "" = (a,b,c)
     |(firstInteger a) `notElem` [0..7] = (a,b,err_machine_task)
     |(secondCharacter a) `notElem` ['A'..'H'] = (a,b,err_machine_task)
-    |otherwise = parseTooNearTasks (tail a, parseB b (taskNumber (firstCharacter a)) (taskNumber (secondCharacter a)), c)
-    where parseB r s t = replace (replace True t (r !! s)) s r
+    |otherwise = parseTooNearTasks (tail a, insertBool b (taskNumber (firstCharacter a)) (taskNumber (secondCharacter a)), c)
 	
 	
 parseMachinePenalties :: ([String], [[Int]], String) -> ([String], [[Int]], String)
@@ -136,10 +135,24 @@ err_parsing        = "Error parsing input file."
 --------------------------------------------------------------------------
 --String functions to get the input we want
 
-isValidPair :: String -> Bool
-isValidPair str =
+-- Check if a string matches the format "(..,..)" with no spaces.
+isValidTuple :: String -> Bool
+isValidTuple str =
   (hasBrackets rstr) && (noSpaces rstr)
   where rstr = rtrim str
+
+noSpaces [] = True
+noSpaces (' ':xs) = False
+noSpaces (x:xs) = noSpaces xs
+
+hasBrackets [] = False
+hasBrackets str = (head str) == '(' && (last str) == ')'
+
+rtrim str
+  | str == []       = []
+  | last str == ' ' = rtrim (init str)
+  | otherwise       = str
+
 --Removes first and last element of [char]
 removeBrackets xs = tail (init xs)  
 
