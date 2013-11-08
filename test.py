@@ -11,9 +11,9 @@ for filename in os.listdir("testcases"):
     call(["java","-cp","assignment1", "Main", "testcases/" + filename, "output1.txt"])
     # Run haskell program here!
     print "----running Haskell----"
-    # call(["runhaskell","assignment2/main.hs","testcases/" + filename, "output2.txt"])
+    call(["./assignment2/main","testcases/" + filename, "output2.txt"])
     output1 = open("output1.txt", 'r').read()
-    output2 = "blah blah blah"
+    output2 = open("output2.txt", 'r').read()
 #    output2 = open("output2.txt", 'r').read()
     print "----RESULT-------------"
     print output1.strip()
