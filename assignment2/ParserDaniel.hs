@@ -1,244 +1,162 @@
+module ParserDaniel (
+parser)
+where 
 import Data.Char
 import Utils
-{-
-parseFunction :: (Char a) => [a] -> [a]
-parseFunction input
-	|input == '\n':_= " " ++ parseFunction xs
-	|input == "" 	= ""
-	|otherwise 		= x ++ parseFunction xs
-	where 	a=[x:xs]
+import Debug.Trace
 
-splitSpace :: (Char a) => [a] -> [a]
--}
-		--tuple: (Constraint, Partials, error)--
---parser :: ([[Int]] a, [[Bool]] b, (Int, Int) c) => [String] -> (a, a, b, b, [c], String)
-	--parser input = parseTooNear $ parseMachinePen $ parseForbiddenTooNear $ ParseForbidden $ parseForced input - not sure about this for now, might be too complicated--
-{-parser (x:xs) = (a, b, d, e, f, g)
-	|g \= ""		 = (_, _, _, _, _, g)
-	|x == "header 1" = do
-						q = parseTooNearPen(input, blank2d 8 8 0, c+1, g)
-						parser(a', b, d, e, f, g1)
-	|x == "header 2" = do
-						q = parseMachinePen(input, blank2dInt 8 8 0, c+1, g)
-						parser(a, b', d, e, f, g2)
-	|x == "header 3" = do
-						q = parseForbiddenTooNear(input, blank2dBool 8 8 False, c+1, g)
-						parser(a, b, d', e, f, g3)
-	|x == "header 4" = do
-						q = parseForbidden(input, blank2dBool 8 8 False, c+1, g)
-						parser(a, b, d, e', f, g4)
-	|x == "header 5" = do
-						q = (parseForced(input, "", c+1, g)
-						parser(a, b, d, e, f', g5)
-	|otherwise		 = (a, b, d, e, f, g)
-	where
-		a' = second(q)
-		g1 = fourth(q)
-		b' = second(q)
-		g2 = fourth(q)
-		d' = second(q)
-		g3 = fourth(q)
-		e' = second(q)
-		g4 = fourth(q)
-		f' = second(q)
-		g5 = fourth(q)
 -- output type: ([tooNearPen] (2D list of ints),[machinePen] (2D list in ints),[tooNear] (2D list of bool),[forbidden] (2D list of bool),[forced] (list of (machine,task pairs (example: 1,a)),[optionalErrorMessage])--
--}
-firstOfThree :: (a,b,c) -> a
-firstOfThree (x,_,_) = x
 
-secondOfThree :: (a,b,c) -> b
-secondOfThree (_,y,_) = y
+parser a = parse a (Constraint [] [] [] [], [], "")
 
-thirdOfThree :: (a,b,c) -> c
-thirdOfThree (_,_,z) = z
+parse :: [String] -> (Constraint, [(Int, Int)], String) -> (Constraint, [(Int, Int)], String)
+parse strList (c, p, str) | trace ("Parse: " ++ (strList !! 0)) False = undefined
 
+parse ("Name:":xs) (a1, b1, "") =
+    parse (tail (tail xs)) (a1, b1, "")
+
+parse ("forced partial assignment:":xs) (a1, b1, "") =
+    parse rem (a1, con, err)
+    where (rem, con, err) = parseForcedPartials (xs, [], [])
+
+parse ("forbidden machine:":xs) (a1, b1, "") =
+    parse rem (Constraint (getTooNearC a1) con (getTooNearP a1) (getMachineP a1), b1, err)
+    where (rem, con, err) = parseForbiddenMachine (xs, blank2dBool 8 8 False, [])
+
+parse ("too-near tasks:":xs) (a1, b1, "") =
+    parse rem (Constraint con (getMachineC a1) (getTooNearP a1) (getMachineP a1), b1, err)
+    where (rem, con, err) = parseTooNearTasks (xs, blank2dBool 8 8 False, []) 
+
+parse ("machine penalties:":xs) (a1, b1, "") =
+    parse rem (Constraint (getTooNearC a1) (getMachineC a1) (getTooNearP a1) con, b1, err)
+    where (rem, con, err) = parseMachinePenalties (xs, blank2dInt 8 8 0, [])
+
+parse ("too-near penalities":xs) (a1, b1, "") =
+    parse rem (Constraint (getTooNearC a1) (getMachineC a1) con (getMachineP a1), b1, err)
+    where (rem, con, err) = parseTooNearPenalties (xs, blank2dInt 8 8 0, [])
+
+parse (x:xs) (Constraint [] w y z, b1, "") = (Constraint [] w y z, b1, err_parsing)
+parse (x:xs) (Constraint w [] y z, b1, "") = (Constraint w [] y z, b1, err_parsing)
+parse (x:xs) (Constraint w y [] z, b1, "") = (Constraint w y [] z, b1, err_parsing)
+parse (x:xs) (Constraint w y z [], b1, "") = (Constraint w y z [], b1, err_parsing)
+parse (x:xs) (a1, b1, "") = (a1, b1, err_parsing)
+parse [] (a1, b1, "") = (a1, b1, "")
+parse (x:xs) (a1, b1, c1) = (a1, b1, c1)
 	
-	
-parse :: ([String] a, [(Integer, Integer)] b) => a -> (Constraint, b, String) -> (Constraint, b, String)
-parse a (a1, b1, c1)
-	|c1 /= "" = (a1, b1, c1)
-	|fst q == "forced partial assignment:" = 
-						let y = parseForcedPartials(snd q, [], "") in parse firstOfThree y ((getTooNearC a1, getMachineC a1, getTooNearP a1, getMachineP a1), secondOfThree y, thirdOfThree y)
-	|fst q == "forbidden machine:" = 
-						let y = parseForbiddenMachine(snd q, blank2dBool 8 8 False, "") in parse firstOfThree y ((getTooNearC a1, secondOfThree y, getTooNearP a1, getMachineP a1), b1, thirdOfThree y)
-	|fst q == "too-near tasks:" = 
-						let y = parseTooNearTasks(snd q, blank2dBool 8 8 False, "") in parse firstOfThree y ((secondOfThree y, getMachineC a1, getTooNearP a1, getMachineP a1), b1, thirdOfThree y)
-	|fst q == "machine penalties:" = 
-						let y = parseMachinePenalties(snd q, blank2dInt 8 8 0, "") in parse firstOfThree y ((getTooNearC a1, getMachineC a1, getTooNearP a1, secondOfThree y), b1, thirdOfThree y)
-	|fst q == "too-near penalities" =
-						let y = parseTooNearPenalties(snd q, blank2dInt 8 8 0, "") in parse firstOfThree y ((getTooNearC a1, getMachineC a1, secondOfThree y, getMachineP a1), b1, thirdOfThree y)
-	|otherwise 				= parse a (a1, b1, c1)
-	where q = extract a 0
-	
-	
-parseForcedPartials :: ([String] a, [(Integer, Integer)] b) => (a, b, String) -> (a, b, String)
-	parseForcedPartials(a, b, c)
-	|fst q == ""		= (a,b,c)
-	|otherwise			= (snd q, (read fst q :: (Integer, Integer)):b, c)
-	where q = extract a 0
+parseForcedPartials ::  ([String], [(Int, Int)], String) -> ([String], [(Int, Int)], String)
+parseForcedPartials (strList,b,c) | trace ("parseForcedPartials: " ++ (strList !! 0)) False = undefined
+parseForcedPartials (a, b, c)
+    |head a == []		      = ((tail a),b,c)
+    |pair `elem` b        = (a, b, "partial assignment error")
+    |isValidPair (head a) = parseForcedPartials(tail a, pair:b, c)
+    |otherwise			      = (a, b, err_parsing)
+    where pair = ((firstInteger a), (taskNumber(secondCharacter a)))
 
-parseForbiddenMachine :: ([String] a, [[Bool]] b) => (a, b, String) -> (a, b, String)
-	parseForbidden (a,b,c)
-	|c /= "" = (a,b,c)
-	|head a == "" = (a, b, c)
-	|otherwise = parseLineForbidden (a,b,c)
+parseForbiddenMachine :: ([String], [[Bool]], String) -> ([String], [[Bool]], String)
+parseForbiddenMachine (strList,b,c) | trace ("parseForbiddenMachine: " ++ (show strList)) False = undefined
+parseForbiddenMachine (a,b,c)
+    |c /= "" = (a,b,c)
+    |head a == "\n" = (tail a, b, c)
+    |head a == "" = (tail a, b, c)
+    |head a == " " = (tail a, b, c)
+    |otherwise = parseLineForbidden (a,b,c)
 
-parseLineForbidden :: ([String] a, [Bool] b) => (a, b, String) -> (a, b, String)
+parseLineForbidden :: ([String], [[Bool]], String) -> ([String], [[Bool]], String)
+parseLineForbidden (strList,b,c) | trace ("parseLineForbidden: " ++ (show b)) False = undefined
 parseLineForbidden (a,b,c) 
-	| x <- [1..8] = (a,b,"invalid machine/task")
-	| y <- [1..8] = (a,b,"invalid machine/task")
-	| otherwise = parseForbidden (snd q, parseB b, c)
-	where q = extract a 0
-		  parseB var = replace True x (var !! y)
-		  x = fst $ read fst q :: (Integer, Char)
-		  y = taskNumber $ snd $ read fst q :: (Integer, Char)
-	
-	{-fst $ read fst q :: (Integer, Char)
-	taskNumber $ snd $ read fst q :: (Integer, Char)-}
-	
-parseTooNearTasks :: ([String] a, [[Bool]] b) => (a, b, String) -> (a, b, String)
-	parseTooNearTasks (a,b,c)
-	|c /= "" = (a,b,c)
-	|head a == '/n' = (a, b, c)
-	|head a == "" = (a, b, c)
-	|otherwise = parseLineTooNearTasks (a,b,c)
+    |c /= "" = (a,b,c)
+    |head a == "\n" = ((tail a),b,c)
+    |head a == "" = ((tail a),b,c)
+    |(firstInteger a) `notElem` [0..7] = (a,b,err_machine_task)
+    |(secondCharacter a) `notElem` ['A'..'H'] = (a,b,err_machine_task)
+    |otherwise = parseForbiddenMachine (tail a, insertBool b (firstInteger a) (taskNumber (secondCharacter a)), c)
+    --where insertBool r s t = replace (replace True t (r !! s)) s r
+insertBool bools machine task | trace ("insertBool: " ++ (show machine) ++ ", " ++ (show task)) False = undefined
+insertBool bools machine task = replace (replace True task (bools !! machine)) machine bools
+findElem (x:xs) 0       = x
+findElem (x:xs) y = findElem xs (y - 1)
 
-parseLineTooNearTasks :: ([String] a, [Bool] b) => (a, b, String) -> (a, b, String)
-parseLineTooNearTasks (a,b,c) = parseTooNearTasks (snd q, parseB, c)
-	where q = extract a 0
-		  parseB = replace True x (b !! y)
-		  x = taskNumber $ fst $ read fst q :: (Char, Char)
-		  y = taskNumber $ snd $ read fst q :: (Char, Char)
-	
-	
-parseMachinePenalties :: ([String] a, [[Integer]] b) => (a, b, String) -> (a, b, String)
-	parseMachinePenalties (a,b,c)
-	|c /= "" = (a,b,c)
-	|head a == '/n' = (a, b, c)
-	|head a == "" = (a, b, c)
-	|otherwise = parseLineMachinePenalties (a,b,c)
+parseTooNearTasks :: ([String], [[Bool]], String) -> ([String], [[Bool]], String)
+parseTooNearTasks (strList,b,c) | trace ("parseTooNearTasks: " ++ (strList !! 0)) False = undefined
+parseTooNearTasks (a,b,c)
+    |c /= [] = (a,b,c)
+    |head a == "\n" = (tail a,b,c)
+    |head a == "" = (tail a, b, c)
+    |otherwise = parseLineTooNearTasks (a,b,c)
 
-parseLineMachinePenalties :: ([String] a, [Bool] b) => (a, b, String) -> (a, b, String)
-parseLineMachinePenalties (a,b,c) = parseMachinePenalties (snd q, parseB, c)
-	where q = extract a 0
-		  parseB = replace fst q x (b !! y)
-		  x = fst $ read fst q :: (Integer, Char)
-		  y = taskNumber $ snd $ read fst q :: (Integer, Char)
-		  
-	
-parseTooNearPenalties :: ([String] a, [[Integer]] b) => (a, b, String) -> (a, b, String)
-	parseTooNearPenalties (a,b,c)
-	|c /= "" = (a,b,c)
-	|head a == '/n' = (a, b, c)
-	|head a == "" = (a, b, c)
-	|otherwise = parseLineTooNearPenalties (a,b,c)
 
-parseLineTooNearPenalties :: ([String] a, [Bool] b) => (a, b, String) -> (a, b, String)
-parseLineTooNearPenalties (a,b,c) = parseTooNearPenalties (snd q, parseB, c)
-	where q = extract a 0
-		  parseB = replace z x (b !! y)
-		  x = taskNumber $ firstOfThree $ read fst q :: (Char, Char, Integer)
-		  y = taskNumber $ secondOfThree $ read fst q :: (Char, Char, Integer)
-		  z = thirdOfThree $ read fst q :: (Char, Char, Integer)
+parseLineTooNearTasks :: ([String], [[Bool]], String) -> ([String], [[Bool]], String)
+parseLineTooNearTasks (strList,b,c) | trace ("parseLineTooNearTasks: " ++ (strList !! 0)) False = undefined
+parseLineTooNearTasks (a,b,c) 
+    |c /= "" = (a,b,c)
+    |head a == "" = (a,b,c)
+    |(firstInteger a) `notElem` [0..7] = (a,b,err_machine_task)
+    |(secondCharacter a) `notElem` ['A'..'H'] = (a,b,err_machine_task)
+    |otherwise = parseTooNearTasks (tail a, parseB b (taskNumber (firstCharacter a)) (taskNumber (secondCharacter a)), c)
+    where parseB r s t = replace (replace True t (r !! s)) s r
 	
+	
+parseMachinePenalties :: ([String], [[Int]], String) -> ([String], [[Int]], String)
+parseMachinePenalties (strList,b,c) | trace ("parseMachinePenalties: " ++ (strList !! 0)) False = undefined
+parseMachinePenalties (("":xs),b,c) = (xs, b, err_machinePenalty)
+parseMachinePenalties (a,b,c) = parseMachineReturn(parseMachineHelper (a,b,c,0))
+{-machine penalties:
+i i i i i i i i
+j j j j j j j j-}
+parseMachineHelper :: ([String], [[Int]], String, Int) -> ([String], [[Int]], String, Int)
+parseMachineHelper (a,b,c,d)
+    |d > 7 =	(a,b,c,d)
+    |(head a) == "" = (a,b,err_machinePenalty,d)   
+    |length (map read $ words (head a) :: [Int]) /= 8 = (a,b,err_machinePenalty,d)
+    |otherwise = parseMachineHelper (tail a, replace (map read $ words (head a) :: [Int]) d b, c, d+1)
+
+parseMachineReturn :: ([String], [[Int]], String, Int) -> ([String], [[Int]], String)
+parseMachineReturn (a,b,c,d) = (a,b,c)
+	
+	
+parseTooNearPenalties :: ([String], [[Int]], String) -> ([String], [[Int]], String)
+parseTooNearPenalties (strList,b,c) | trace ("parseTooNearPenalties: " ++ (strList !! 0)) False = undefined
+parseTooNearPenalties (a,b,c)
+    |c /= "" = (a,b,c)
+    |head a == "" = (a, b, c)
+    |otherwise = parseLineTooNearPenalties (a,b,c)
+
+parseLineTooNearPenalties :: ([String], [[Int]], String) -> ([String], [[Int]], String)
+parseLineTooNearPenalties (a,b,c)
+    |(firstCharacter a) `notElem` ['A'..'H'] = (a,b,"invalid task")
+    |(secondCharacter a) `notElem` ['A'..'H'] = (a,b,"invalid task")
+    |otherwise = parseTooNearPenalties (tail a, parseB, c)
+    where parseB = replace (replace (thirdInteger a) (taskNumber (firstCharacter a)) (b !! taskNumber (secondCharacter a))) (taskNumber (secondCharacter a)) b
+	
+err_machinePenalty = "machine penalty error"
+err_tooNearPenalty = "toonear penalty error"
+err_machine_task   = "invalid machine/task"
+err_parsing        = "Error parsing input file."
+
 --------------------------------------------------------------------------
 --String functions to get the input we want
+
+isValidPair :: String -> Bool
+isValidPair str =
+  (hasBrackets rstr) && (noSpaces rstr)
+  where rstr = rtrim str
 --Removes first and last element of [char]
 removeBrackets xs = tail (init xs)  
 
 --Splits [char] separated by comma to elements
-splitComma xs = splitOn "," (removeBrackets xs)
+splitComma xs = splitOn ',' (removeBrackets xs)
 
 --Splits [char] separated by space to elements
-splitSpace xs = splitOn " " xs
-	
-	
-	
-	
-	
-	
-	
-{-							
-(file)
-.
-.
-.
-.
-.
--}
-{-
-parse (file)
-parse case getHeader file of:
-								header1: (function1 file):returnVal ++ parse file --when nextLine == "", return everything so far--
-								header2: (function2 file):returnVal ++ parse file
-	otherwise	returnVal
--}
-{-
-parseForbiddenTooNear :: ([String] a, [Bool] b) => (a, b, Int, String) -> (a, b, Int, String)
-{-	read next line
-	if line==(x,y)
-		assign True, a[x[y]] and parse to next line ParseForbiddenTooNear [a,b+1]
-	if line == "" or '\n':_
-		return [a,b+1]
--}
+splitSpace xs = splitOn ' ' xs -- DOES NOT WORK! Ended up using (map read $ words) instead.
 
-parseForbiddenTooNear (a,b,c,d)
-	|d \= "" = (a,b,c,d)
-	|a == /n:_ = (a, b, c+1,d)
-	|a == "" = (a, b, c+1,d)
-	|otherwise = parseLineForbiddenTooNear (a,b,c,d)
+--gets the Integer found at the first element
+firstInteger a = (read ((splitComma (head a)) !! 0) :: Int) - 1
 
-parseLineForbiddenTooNear :: ([String] a, [Bool] b) => (a, b, Int, String) -> (a, b, Int, String)
-parseLineForbiddenTooNear (a,b,c,d) = parseForbiddenTooNear (a, parseB, c+1, d)
-	where parseB = replace True x (b !! y)
-		  x = (a !! c) !! 1
-		  y = (a !! c) !! 2
+--gets the Integer found at the third element
+thirdInteger a = (read ((splitComma (head a)) !! 2) :: Int) - 1
 
+--gets the Char found at the first element
+firstCharacter a = ((splitComma (head a)) !! 0) !! 0
 
-parseForbidden :: ([String] a, [Bool] b) => (a, b, Int, String) -> (a, b, Int, String)
-{-	read next line
-	if line==(x,y)
-		assign True, a[x[y]] and parse to next line ParseForbidden [a,b+1]
-	if line == "" or '\n':_
-		return [a,b+1]
--}
-
-parseForbidden (a,b,c,d)
-	|d /= "" = (a,b,c,d)
-	|a == /n:_ = (a, b, c+1,d)
-	|a == "" = (a, b, c+1,d)
-	|otherwise = parseLineForbidden (a,b,c,d)
-
-parseLineForbidden :: ([String] a, [Bool] b, Int c, String d) => (a, b, c, d) -> (a, b, c, d)
-parseLineForbidden (a,b,c,d) = parseForbidden (a, parseB, c+1, d)
-	where parseB = replace True x (b !! y)
-		  x = (a !! c) !! 1
-		  y = (a !! c) !! 2
--- --
-parseTooNearPen:: ([String] a, [Int] b) => (a, b, Int, String) -> (a, b, Int, String)
-{-	read next line
-	if line==(x,y)
-		assign True, a[x[y]] and parse to next line ParseForbiddenTooNear [a,b+1]
-	if line == "" or '\n':_
-		return [a,b+1]
--}
-
-parseTooNearPen (a,b,c,d)
-	|d \= "" = (a,b,c,d)
-	|a == /n:_ = (a, b, c+1, d)
-	|a == "" = (a, b, c+1, d)
-	|otherwise = parseLineForbiddenTooNear (a,b,c,d)
-
-parseLineTooNearPen :: ([String] a, [Int] b) => (a, b, Int, String) -> (a, b, Int, String)
-parseLineTooNearPen (a,b,c,d) = parseTooNearPen (a, parseB, c+1, d)
-	where parseB = replace z x (b !! y)
-		  x = (a !! c) !! 1
-		  y = (a !! c) !! 2
-		  z = (a !! c) !! 3
-
-
-
---check current x of x:xs--
---if null then go to next datatype--
---otherwise [x:[currentdatatype]] ++ parser xs--}
+--gets the Char found at the second element
+secondCharacter a = ((splitComma (head a)) !! 1) !! 0

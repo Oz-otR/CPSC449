@@ -34,3 +34,15 @@ getMachineP3 = replace [0..7] 5 (blank2dInt  8 8 1)
 getPartials3 :: [(Int,Int)]
 getPartials3 = [(3,4),(6,5)]
 getError3    = []
+
+
+splitOn [] char = []
+splitOn str char =
+  result:(splitOn remaining char)
+  where (result, remaining) = splitLeft str char
+
+splitLeft (x:xs) char
+    | x == char = ([],xs)
+    | xs == [] = ([],[])
+    | otherwise = (x:result, remaining)
+  where (result, remaining) = splitLeft xs char

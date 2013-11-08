@@ -8,6 +8,7 @@ getMachineP,
 Solution(Solution),
 getAssignment,
 getPenalty,
+splitOn,
 remove,
 extract,
 allTrue,
@@ -46,6 +47,19 @@ data Solution = Solution [Int] Int deriving (Show)
 
 getAssignment (Solution solution _) = solution
 getPenalty  (Solution _ penalty ) = penalty
+
+-- Split string on character. -------------------------------------------------
+splitOn char [] = []
+splitOn char str =
+  result:(splitOn char remaining )
+  where (result, remaining) = splitLeft str char
+
+splitLeft (x:xs) char
+    | x == char = ([],xs)
+    | xs == [] = ([],[])
+    | otherwise = (x:result, remaining)
+  where (result, remaining) = splitLeft xs char
+
 
 -- Removes element at index from the list -------------------------------------
 remove (x:xs) 0     = xs
