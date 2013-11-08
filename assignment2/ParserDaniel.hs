@@ -98,6 +98,7 @@ parseTooNearTasks (a,b,c)
     |c /= [] = (a,b,c)
     |head a == "\n" = (tail a,b,c)
     |head a == "" = (tail a, b, c)
+    |not (isValidTuple (head a)) = (a,b,err_parsing)
     |otherwise = parseLineTooNearTasks (a,b,c)
 
 
@@ -106,7 +107,6 @@ parseLineTooNearTasks (strList,b,c) | trace ("parseLineTooNearTasks: " ++ (strLi
 parseLineTooNearTasks (a,b,c) 
     |c /= "" = (a,b,c)
     |head a == "" = (a,b,c)
-    |not (isValidTuple (head a)) = (a,b,err_parsing)
     |first `notElem` ['A'..'H'] = (a,b,err_machine_task)
     |second `notElem` ['A'..'H'] = (a,b,err_machine_task)
     |otherwise = parseTooNearTasks (tail a, insertBool b (taskNumber first) (taskNumber second), c)
