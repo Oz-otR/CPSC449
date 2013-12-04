@@ -94,7 +94,7 @@ parseForbiddenMachine(_) :-
 
 parseForbiddenMachine_(I) :-
   error(nil),
-  paTuple(I, M, T),!,
+  fmTuple(I, M, T),!,
   assertz(forbiddenMachine(M,T)), !.
 
 fmTuple(Word, M, T) :-
@@ -130,11 +130,11 @@ parseTooNearTask(_) :-
 
 parseTooNearTask_(I) :-
   error(nil),
-  paTuple(I, M, T),!,
+  tnTuple(I, M, T),!,
   assertz(tooNear(M,T)), !.
 
 tnTuple(Word, M, T) :-
-  fmTuple_(Word, M, T).
+  tnTuple_(Word, M, T).
 tnTuple(_, 0, 0) :-
   error(nil),
   retract(error(nil)),
@@ -194,62 +194,43 @@ parseWord(Line, M, T, R) :-
   penaltyNumber(Word, P, []),!,
   assertz(machinePenalty(M, T, P)),!.
 
-getWord([], [], []).
-getWord([10|I], [], I).
-getWord([32|I], [], I).
-getWord([C|I], [C|O], R) :-
-  getWord(I, O, R).
-
-getTrimmedLine(I, O, R):-
-  getLine(I, Line, R),!,
-  rtrim(Line, O).
-
-getLine([],[],[]).
-getLine([10|I], [], I).
-getLine([C|I], [C|Next], R) :-
-  getLine(I, Next, R).
-
-rtrim([],[]).
-rtrim([10], []).
-rtrim([32], []).
-rtrim([10|T], []) :-
-  rtrim(T, []).
-rtrim([32|T], []) :-
-  rtrim(T, []).
-rtrim([H|T], [H|O]) :-
-  rtrim(T, O).
-
 %------------------------------------------------------------------------------
 % Too near penalties.
 %------------------------------------------------------------------------------
-parseTooNearPenalties([], []) :-
-  error(nil).
 parseTooNearPenalties(I, R) :-
-  error(nil),
-  line_end(I, R).
+  getTrimmedLine(I, [], R).
 parseTooNearPenalties(I, R) :-
-  error(nil),
-  parseTooNearPenalty(I, R1),
-  line_end(R1, R2),
-  parseTooNearPenalties(R2, R).
+  getTrimmedLine(I, Line, R1),!,
+  parseTooNearPenalty(Line),!,
+  parseTooNearPenalties(R1, R).
 
-parseTooNearPenalty(I, R) :-
-  parseTooNearPenalty_(I, R).
-parseTooNearPenalty(_, []) :-
+parseTooNearPenalty(I) :-
+  parseTooNearPenalty_(I),!.
+parseTooNearPenalty(_) :-
   error(nil),
   retract(error(nil)),
-  asserta(error(invalidTooNear)).
+  asserta(error(invalidTooNearTask)).
 
-parseTooNearPenalty_(I, R) :-
-  removePrefix("(", I, R1),!,
-  taskNumber(R1, T1, R2),!,
+parseTooNearPenalty_(I) :-
+  error(nil),
+  tnpTuple(I, M, T, P),!,
+  assertz(tooNearPenalty(M,T,P)), !.
+
+tnpTuple(Word, M, T, P) :-
+  tnpTuple_(Word, M, T, P).
+tnpTuple(_, 0, 0) :-
+  error(nil),
+  retract(error(nil)),
+  asserta(error(parseErr)).
+  
+tnpTuple_(Word, M, T, P) :-
+  removePrefix("(", Word, R1),!,
+  taskNumber(R1, M, R2),!,
   removePrefix(",", R2, R3),!,
-  taskNumber(R3, T2, R4),!,
+  taskNumber(R3, T, R4),!,
   removePrefix(",", R4, R5),!,
   penaltyNumber(R5, P, R6),!,
-  removePrefix(")", R6, R),!,
-  assertz(tooNearPenalty(T1,T2,P)), !.
-
+  removePrefix(")", R6, []),!.
 
 /*
 Takes input string I and returns the first found Task
@@ -285,6 +266,31 @@ penaltyNumber(_, _, []) :-
   error(nil),
   retract(error(nil)),
   asserta(error(invalidPenalty)).
+
+getWord([], [], []).
+getWord([10|I], [], I).
+getWord([32|I], [], I).
+getWord([C|I], [C|O], R) :-
+  getWord(I, O, R).
+
+getTrimmedLine(I, O, R):-
+  getLine(I, Line, R),!,
+  rtrim(Line, O).
+
+getLine([],[],[]).
+getLine([10|I], [], I).
+getLine([C|I], [C|Next], R) :-
+  getLine(I, Next, R).
+
+rtrim([],[]).
+rtrim([10], []).
+rtrim([32], []).
+rtrim([10|T], []) :-
+  rtrim(T, []).
+rtrim([32|T], []) :-
+  rtrim(T, []).
+rtrim([H|T], [H|O]) :-
+  rtrim(T, O).
 
 machineNumber([],_, _) :-
   error(nil),
