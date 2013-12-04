@@ -36,14 +36,24 @@ solver(Best_list,Value) :-
 	setup_forced_partial(     returns:CurrentList,Error)
 	check_too_near_task(Error)
 	error =:= 0,
-	main_solve(CurrentList,FinalList,BestValue)
+	main_solver(CurrentList,FinalList,BestValue)
 	Best_list is FinalList,
 	Value is BestValue;
 	
 	Best_list is error_list(X),
 	Value is best_value_err(Y).
 
+% Danny's random doodling
+%
 main_solver(CurrentList,Final,Value) :-
+	main_solver(CurrentList, Final, Value).
+	
+check_partial(CurrentList) :- something.
+check_forbiddenMachine(CurrentList) :- something.
+check_tooNear(CurrentList) :- something.
+check_penality(CurrentList, Penalty) :- something.
+	
+%	
 	
 	
 
