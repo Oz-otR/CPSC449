@@ -78,61 +78,74 @@ paTuple_(Word, M, T) :-
 %------------------------------------------------------------------------------
 % Forbidden machines.
 %------------------------------------------------------------------------------
-parseForbiddenMachines([], []) :-
-  error(nil).
 parseForbiddenMachines(I, R) :-
-  error(nil),
-  line_end(I, R).
+  getTrimmedLine(I, [], R).
 parseForbiddenMachines(I, R) :-
-  error(nil),
-  parseForbiddenMachine(I, R1),
-  line_end(R1, R2),
+  getTrimmedLine(I, Line, R1),!,
+  parseForbiddenMachine(Line),!,
   parseForbiddenMachines(R1, R).
 
-parseForbiddenMachine(I, R) :-
-  parseForbiddenMachine_(I, R, Err),!.
-parseForbiddenMachine(_, []) :-
+parseForbiddenMachine(I) :-
+  parseForbiddenMachine_(I),!.
+parseForbiddenMachine(_) :-
   error(nil),
   retract(error(nil)),
   asserta(error(invalidForbiddenMachine)).
 
-parseForbiddenMachine_(I, R) :-
-  removePrefix("(", I, R1),!,
-  machineNumber(R1, NUM1, R2),!,
+parseForbiddenMachine_(I) :-
+  error(nil),
+  paTuple(I, M, T),!,
+  assertz(forbiddenMachine(M,T)), !.
+
+fmTuple(Word, M, T) :-
+  fmTuple_(Word, M, T).
+fmTuple(_, 0, 0) :-
+  error(nil),
+  retract(error(nil)),
+  asserta(error(parseErr)).
+  
+fmTuple_(Word, M, T) :-
+  removePrefix("(", Word, R1),!,
+  machineNumber(R1, M, R2),!,
   removePrefix(",", R2, R3),!,
-  taskNumber(R3, NUM2, R4),!,
-  removePrefix(")", R4, R),!,
-  assertz(forbiddenMachine(NUM1,NUM2)), !.
+  taskNumber(R3, T, R4),!,
+  removePrefix(")", R4, []),!.
 
 %------------------------------------------------------------------------------
 % Too-near tasks.
 %------------------------------------------------------------------------------
-parseTooNearTasks([], []) :-
-  error(nil).
 parseTooNearTasks(I, R) :-
-  error(nil),
-  line_end(I, R).
+  getTrimmedLine(I, [], R).
 parseTooNearTasks(I, R) :-
-  error(nil),
-  parseTooNearTask(I, R1),
-  line_end(R1, R2),
-  parseTooNearTasks(R2, R).
+  getTrimmedLine(I, Line, R1),!,
+  parseTooNearTask(Line),!,
+  parseTooNearTasks(R1, R).
 
-parseTooNearTask(I, R) :-
-  parseTooNearTask_(I, R),!.
-parseTooNearTask(_, []) :-
+parseTooNearTask(I) :-
+  parseTooNearTask_(I),!.
+parseTooNearTask(_) :-
   error(nil),
   retract(error(nil)),
   asserta(error(invalidTooNearTask)).
 
-parseTooNearTask_(I, R) :-
-  removePrefix("(", I, R1),!,
-  taskNumber(R1, NUM1, R2),!,
-  removePrefix(",", R2, R3),!,
-  taskNumber(R3, NUM2, R4),!,
-  removePrefix(")", R4, R),!,
-  assertz(tooNearTask(NUM1,NUM2)), !.
+parseTooNearTask_(I) :-
+  error(nil),
+  paTuple(I, M, T),!,
+  assertz(tooNear(M,T)), !.
 
+tnTuple(Word, M, T) :-
+  fmTuple_(Word, M, T).
+tnTuple(_, 0, 0) :-
+  error(nil),
+  retract(error(nil)),
+  asserta(error(parseErr)).
+  
+tnTuple_(Word, M, T) :-
+  removePrefix("(", Word, R1),!,
+  taskNumber(R1, M, R2),!,
+  removePrefix(",", R2, R3),!,
+  taskNumber(R3, T, R4),!,
+  removePrefix(")", R4, []),!.
 %------------------------------------------------------------------------------
 % Machine penalties.
 %------------------------------------------------------------------------------
