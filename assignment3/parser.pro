@@ -1,41 +1,84 @@
-:- dynamic(error/1).
+:- dynamic(error/1, partialAssignment/2).
+
 error(nil).
 testPA("(1,A)\n(2,B)  \n(3,C)\n(4,D)\n").
 testMP("1 2 3 4 5 6 7 8\n1 2 3 4 5 6 7 8\n1 2 3 4 5 6 7 8\n1 2 3 4 5 6 7 8\n1 2 3 4 5 6 7 8\n1 2 3 4 5 6 7 8\n1 2 3 4 5 6 7 8 \n\n").
+testFM("(1,A)  \n(2,D)  \n  ").
+testInput("Name: Whatever").
 test :-
   retract(error(X)),
   asserta(error(nil)),
-  retractall(partialAssignment(X,Y)),
-  testPA(L),!,
-  parsePartialAssignments(L, R).
+  retractall(forbiddenMachine(X,Y)),
+  testFM(L),!,
+  parseForbiddenMachines(L, R).
 
 parse(X) :-
   asserta(error(nil)),
   titleHeader(X, R1),!,
   fpaHeader(R1, R2),!,
-  parsePartialAssignments(R2, R3),!,
-  mpHeader(R2, R3).
+  fmHeader(R2,R3),!,
+  tntHeader(R3, R4),!,
+  mpHeader(R5, R6), !,
+  tnpHeader(R6, R7).
+parse(X) :-
+  error(nil),
+  retract(error(nil)),
+  asserta(error(parseErr)).
+parse(X).
 
-titleHeader([], []).
+titleHeader([], []) :-
+  error(nil),
+  retract(error(nil)),
+  asserta(error(parseErr)).
 titleHeader(X, R) :- 
   removePrefix("Name:", X, Q),
-  line_end(Q, R).
-titleHeader(_,[]).
-titleHeader(_,[],_).
+  line_end(Q, R1),
+  getTrimmedLine(R1, _, R).
 
-fpaHeader([], []).
+fpaHeader([], []) :-
+  error(nil),
+  retract(error(nil)),
+  asserta(error(parseErr)).
 fpaHeader(X, R) :-
   removePrefix("forced partial assignment:", X, Q),
-  line_end(Q, R).
-fpaHeader(_,[]).
-fpaHeader(_,[],_).
+  line_end(Q, R1),
+  parsePartialAssignments(R1, R).
 
-mpHeader([], []).
+fmHeader([], []) :-
+  error(nil),
+  retract(error(nil)),
+  asserta(error(parseErr)).
+fmHeader(X, R) :-
+  removePrefix("forbidden machine:", X, Q),
+  line_end(Q, L),
+  parseForbiddenMachines(L, R).
+
+tntHeader([], []) :-
+  error(nil),
+  retract(error(nil)),
+  asserta(error(parseErr)).
+tntHeader(X, R) :-
+  removePrefix("too-near tasks:", X, Q),
+  line_end(Q, L),
+  parseTooNearTasks(L, R).
+
+mpHeader([], []) :-
+  error(nil),
+  retract(error(nil)),
+  asserta(error(parseErr)).
 mpHeader(X, R) :-
   removePrefix("machine penalties:", X, Q),
-  line_end(Q, R).
-mpHeader(_,[]).
-mpHeader(_,[],_).
+  line_end(Q, L),
+  parseMachinePenalties(L, R).
+
+tnpHeader([], []) :-
+  error(nil),
+  retract(error(nil)),
+  asserta(error(parseErr)).
+tnpHeader(X, R) :-
+  removePrefix("too-near penalities", X, Q),
+  line_end(Q, L),
+  parseTooNearPenalties(L, R).
 
 %------------------------------------------------------------------------------
 % Forced partial assignments.
@@ -70,9 +113,11 @@ paTuple(_, 0, 0) :-
   
 paTuple_(Word, M, T) :-
   removePrefix("(", Word, R1),!,
+  notSpace(R1),!,
   machineNumber(R1, M, R2),!,
   removePrefix(",", R2, R3),!,
-  taskNumber(R3, T, R4),!,
+  notSpace(R3),!,
+  taskNumberConstraint(R3, T, R4),!,
   removePrefix(")", R4, []),!.
 
 %------------------------------------------------------------------------------
@@ -106,9 +151,11 @@ fmTuple(_, 0, 0) :-
   
 fmTuple_(Word, M, T) :-
   removePrefix("(", Word, R1),!,
+  notSpace(R1),!,
   machineNumber(R1, M, R2),!,
   removePrefix(",", R2, R3),!,
-  taskNumber(R3, T, R4),!,
+  notSpace(R3),!,
+  taskNumberConstraint(R3, T, R4),!,
   removePrefix(")", R4, []),!.
 
 %------------------------------------------------------------------------------
@@ -142,9 +189,11 @@ tnTuple(_, 0, 0) :-
   
 tnTuple_(Word, M, T) :-
   removePrefix("(", Word, R1),!,
-  taskNumber(R1, M, R2),!,
+  notSpace(R1),!,
+  taskNumberConstraint(R1, M, R2),!,
   removePrefix(",", R2, R3),!,
-  taskNumber(R3, T, R4),!,
+  notSpace(R3),!,
+  taskNumberConstraint(R3, T, R4),!,
   removePrefix(")", R4, []),!.
 %------------------------------------------------------------------------------
 % Machine penalties.
@@ -225,10 +274,13 @@ tnpTuple(_, 0, 0) :-
   
 tnpTuple_(Word, M, T, P) :-
   removePrefix("(", Word, R1),!,
-  taskNumber(R1, M, R2),!,
+  notSpace(R1),!,
+  taskNumberPenalty(R1, M, R2),!,
   removePrefix(",", R2, R3),!,
-  taskNumber(R3, T, R4),!,
+  notSpace(R3),!,
+  taskNumberPenalty(R3, T, R4),!,
   removePrefix(",", R4, R5),!,
+  notSpace(R5),!,
   penaltyNumber(R5, P, R6),!,
   removePrefix(")", R6, []),!.
 
@@ -237,15 +289,28 @@ Takes input string I and returns the first found Task
 number in O, with the unprocessed input in R. Error codes
 are in the final variable.
 */
-taskNumber([65|T], 1, T) :- error(nil).
-taskNumber([66|T], 2, T) :- error(nil).
-taskNumber([67|T], 3, T) :- error(nil).
-taskNumber([68|T], 4, T) :- error(nil).
-taskNumber([69|T], 5, T) :- error(nil).
-taskNumber([70|T], 6, T) :- error(nil).
-taskNumber([71|T], 7, T) :- error(nil).
-taskNumber([72|T], 8, T) :- error(nil).
-taskNumber(_, _, []) :-
+taskNumberConstraint([65|T], 1, T) :- error(nil).
+taskNumberConstraint([66|T], 2, T) :- error(nil).
+taskNumberConstraint([67|T], 3, T) :- error(nil).
+taskNumberConstraint([68|T], 4, T) :- error(nil).
+taskNumberConstraint([69|T], 5, T) :- error(nil).
+taskNumberConstraint([70|T], 6, T) :- error(nil).
+taskNumberConstraint([71|T], 7, T) :- error(nil).
+taskNumberConstraint([72|T], 8, T) :- error(nil).
+taskNumberConstraint(_, _, []) :-
+  error(nil),
+  retract(error(nil)),
+  asserta(error(invalidMachineTask)).
+
+taskNumberPenalty([65|T], 1, T) :- error(nil).
+taskNumberPenalty([66|T], 2, T) :- error(nil).
+taskNumberPenalty([67|T], 3, T) :- error(nil).
+taskNumberPenalty([68|T], 4, T) :- error(nil).
+taskNumberPenalty([69|T], 5, T) :- error(nil).
+taskNumberPenalty([70|T], 6, T) :- error(nil).
+taskNumberPenalty([71|T], 7, T) :- error(nil).
+taskNumberPenalty([72|T], 8, T) :- error(nil).
+taskNumberPenalty(_, _, []) :-
   error(nil),
   retract(error(nil)),
   asserta(error(invalidTask)).
@@ -266,6 +331,10 @@ penaltyNumber(_, _, []) :-
   error(nil),
   retract(error(nil)),
   asserta(error(invalidPenalty)).
+
+notSpace(I) :- \+ isSpace(I).
+isSpace([10|I]).
+isSpace([32|I]).
 
 getWord([], [], []).
 getWord([10|I], [], I).
@@ -304,7 +373,7 @@ machineNumber(I, O, R) :-
 machineNumber(_, _, []) :-
   error(nil),
   retract(error(nil)),
-  asserta(error(invalidMachine)).
+  asserta(error(invalidMachineTask)).
 
 number([H|T], O, R) :-
   error(nil),
