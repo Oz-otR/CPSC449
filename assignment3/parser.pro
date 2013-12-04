@@ -1,13 +1,13 @@
 :- dynamic(error/1).
 error(nil).
-testPA("(1,A)\n(2,B)  \n").
+testPA("(1,A)\n(2,B)  \n(3,C)\n(4,D)\n").
 testMP("1 2 3 4 5 6 7 8\n1 2 3 4 5 6 7 8\n1 2 3 4 5 6 7 8\n1 2 3 4 5 6 7 8\n1 2 3 4 5 6 7 8\n1 2 3 4 5 6 7 8\n1 2 3 4 5 6 7 8 \n\n").
 test :-
   retract(error(X)),
   asserta(error(nil)),
-  retractall(machinePenalty(M,T,P)),
-  testMP(L),!,
-  parseMachinePenalties(L, R).
+  retractall(partialAssignment(X,Y)),
+  testPA(L),!,
+  parsePartialAssignments(L, R).
 
 parse(X) :-
   asserta(error(nil)),
@@ -40,91 +40,112 @@ mpHeader(_,[],_).
 %------------------------------------------------------------------------------
 % Forced partial assignments.
 %------------------------------------------------------------------------------
-parsePartialAssignments([],[]) :-
-  error(nil).
 parsePartialAssignments(I, R) :-
-  error(nil),
-  line_end(I, R).
+  getTrimmedLine(I, [], R).
 parsePartialAssignments(I, R) :-
-  error(nil),
-  parsePartialAssignment(I, R1),!,
-  line_end(R1, R2),!,
-  parsePartialAssignments(R2, R).
+  getTrimmedLine(I, Line, R1),!,
+  parsePartialAssignment(Line),!,
+  parsePartialAssignments(R1, R).
 
-parsePartialAssignment(I, R) :-
-  parsePartialAssignment_(I, R),!.
-parsePartialAssignment(_, []) :-
+parsePartialAssignment(I) :-
+  parsePartialAssignment_(I),!.
+parsePartialAssignment(_) :-
   error(nil),
   retract(error(nil)),
   asserta(error(invalidPartialAssignment)).
 
-parsePartialAssignment_(I, R) :-
+parsePartialAssignment_(I) :-
   error(nil),
-  removePrefix("(", I, R1),!,
-  machineNumber(R1, NUM1, R2),!,
+  paTuple(I, M, T),!,
+  \+ partialAssignment(M,X),!,
+  \+ partialAssignment(Y,T),!,
+  assertz(partialAssignment(M,T)), !.
+
+paTuple(Word, M, T) :-
+  paTuple_(Word, M, T).
+paTuple(_, 0, 0) :-
+  error(nil),
+  retract(error(nil)),
+  asserta(error(parseErr)).
+  
+paTuple_(Word, M, T) :-
+  removePrefix("(", Word, R1),!,
+  machineNumber(R1, M, R2),!,
   removePrefix(",", R2, R3),!,
-  taskNumber(R3, NUM2, R4),!,
-  removePrefix(")", R4, R),!,
-  assertz(partialAssignment(NUM1,NUM2)), !.
+  taskNumber(R3, T, R4),!,
+  removePrefix(")", R4, []),!.
 
 %------------------------------------------------------------------------------
 % Forbidden machines.
 %------------------------------------------------------------------------------
-parseForbiddenMachines([], []) :-
-  error(nil).
 parseForbiddenMachines(I, R) :-
-  error(nil),
-  line_end(I, R).
+  getTrimmedLine(I, [], R).
 parseForbiddenMachines(I, R) :-
-  error(nil),
-  parseForbiddenMachine(I, R1),
-  line_end(R1, R2),
+  getTrimmedLine(I, Line, R1),!,
+  parseForbiddenMachine(Line),!,
   parseForbiddenMachines(R1, R).
 
-parseForbiddenMachine(I, R) :-
-  parseForbiddenMachine_(I, R, Err),!.
-parseForbiddenMachine(_, []) :-
+parseForbiddenMachine(I) :-
+  parseForbiddenMachine_(I),!.
+parseForbiddenMachine(_) :-
   error(nil),
   retract(error(nil)),
   asserta(error(invalidForbiddenMachine)).
 
-parseForbiddenMachine_(I, R) :-
-  removePrefix("(", I, R1),!,
-  machineNumber(R1, NUM1, R2),!,
+parseForbiddenMachine_(I) :-
+  error(nil),
+  fmTuple(I, M, T),!,
+  assertz(forbiddenMachine(M,T)), !.
+
+fmTuple(Word, M, T) :-
+  fmTuple_(Word, M, T).
+fmTuple(_, 0, 0) :-
+  error(nil),
+  retract(error(nil)),
+  asserta(error(parseErr)).
+  
+fmTuple_(Word, M, T) :-
+  removePrefix("(", Word, R1),!,
+  machineNumber(R1, M, R2),!,
   removePrefix(",", R2, R3),!,
-  taskNumber(R3, NUM2, R4),!,
-  removePrefix(")", R4, R),!,
-  assertz(forbiddenMachine(NUM1,NUM2)), !.
+  taskNumber(R3, T, R4),!,
+  removePrefix(")", R4, []),!.
 
 %------------------------------------------------------------------------------
 % Too-near tasks.
 %------------------------------------------------------------------------------
-parseTooNearTasks([], []) :-
-  error(nil).
 parseTooNearTasks(I, R) :-
-  error(nil),
-  line_end(I, R).
+  getTrimmedLine(I, [], R).
 parseTooNearTasks(I, R) :-
-  error(nil),
-  parseTooNearTask(I, R1),
-  line_end(R1, R2),
-  parseTooNearTasks(R2, R).
+  getTrimmedLine(I, Line, R1),!,
+  parseTooNearTask(Line),!,
+  parseTooNearTasks(R1, R).
 
-parseTooNearTask(I, R) :-
-  parseTooNearTask_(I, R),!.
-parseTooNearTask(_, []) :-
+parseTooNearTask(I) :-
+  parseTooNearTask_(I),!.
+parseTooNearTask(_) :-
   error(nil),
   retract(error(nil)),
   asserta(error(invalidTooNearTask)).
 
-parseTooNearTask_(I, R) :-
-  removePrefix("(", I, R1),!,
-  taskNumber(R1, NUM1, R2),!,
-  removePrefix(",", R2, R3),!,
-  taskNumber(R3, NUM2, R4),!,
-  removePrefix(")", R4, R),!,
-  assertz(tooNearTask(NUM1,NUM2)), !.
+parseTooNearTask_(I) :-
+  error(nil),
+  tnTuple(I, M, T),!,
+  assertz(tooNear(M,T)), !.
 
+tnTuple(Word, M, T) :-
+  tnTuple_(Word, M, T).
+tnTuple(_, 0, 0) :-
+  error(nil),
+  retract(error(nil)),
+  asserta(error(parseErr)).
+  
+tnTuple_(Word, M, T) :-
+  removePrefix("(", Word, R1),!,
+  taskNumber(R1, M, R2),!,
+  removePrefix(",", R2, R3),!,
+  taskNumber(R3, T, R4),!,
+  removePrefix(")", R4, []),!.
 %------------------------------------------------------------------------------
 % Machine penalties.
 %------------------------------------------------------------------------------
@@ -173,62 +194,43 @@ parseWord(Line, M, T, R) :-
   penaltyNumber(Word, P, []),!,
   assertz(machinePenalty(M, T, P)),!.
 
-getWord([], [], []).
-getWord([10|I], [], I).
-getWord([32|I], [], I).
-getWord([C|I], [C|O], R) :-
-  getWord(I, O, R).
-
-getTrimmedLine(I, O, R):-
-  getLine(I, Line, R),!,
-  rtrim(Line, O).
-
-getLine([],[],[]).
-getLine([10|I], [], I).
-getLine([C|I], [C|Next], R) :-
-  getLine(I, Next, R).
-
-rtrim([],[]).
-rtrim([10], []).
-rtrim([32], []).
-rtrim([10|T], []) :-
-  rtrim(T, []).
-rtrim([32|T], []) :-
-  rtrim(T, []).
-rtrim([H|T], [H|O]) :-
-  rtrim(T, O).
-
 %------------------------------------------------------------------------------
 % Too near penalties.
 %------------------------------------------------------------------------------
-parseTooNearPenalties([], []) :-
-  error(nil).
 parseTooNearPenalties(I, R) :-
-  error(nil),
-  line_end(I, R).
+  getTrimmedLine(I, [], R).
 parseTooNearPenalties(I, R) :-
-  error(nil),
-  parseTooNearPenalty(I, R1),
-  line_end(R1, R2),
-  parseTooNearPenalties(R2, R).
+  getTrimmedLine(I, Line, R1),!,
+  parseTooNearPenalty(Line),!,
+  parseTooNearPenalties(R1, R).
 
-parseTooNearPenalty(I, R) :-
-  parseTooNearPenalty_(I, R).
-parseTooNearPenalty(_, []) :-
+parseTooNearPenalty(I) :-
+  parseTooNearPenalty_(I),!.
+parseTooNearPenalty(_) :-
   error(nil),
   retract(error(nil)),
-  asserta(error(invalidTooNear)).
+  asserta(error(invalidTooNearTask)).
 
-parseTooNearPenalty_(I, R) :-
-  removePrefix("(", I, R1),!,
-  taskNumber(R1, T1, R2),!,
+parseTooNearPenalty_(I) :-
+  error(nil),
+  tnpTuple(I, M, T, P),!,
+  assertz(tooNearPenalty(M,T,P)), !.
+
+tnpTuple(Word, M, T, P) :-
+  tnpTuple_(Word, M, T, P).
+tnpTuple(_, 0, 0) :-
+  error(nil),
+  retract(error(nil)),
+  asserta(error(parseErr)).
+  
+tnpTuple_(Word, M, T, P) :-
+  removePrefix("(", Word, R1),!,
+  taskNumber(R1, M, R2),!,
   removePrefix(",", R2, R3),!,
-  taskNumber(R3, T2, R4),!,
+  taskNumber(R3, T, R4),!,
   removePrefix(",", R4, R5),!,
   penaltyNumber(R5, P, R6),!,
-  removePrefix(")", R6, R),!,
-  assertz(tooNearPenalty(T1,T2,P)), !.
-
+  removePrefix(")", R6, []),!.
 
 /*
 Takes input string I and returns the first found Task
@@ -264,6 +266,31 @@ penaltyNumber(_, _, []) :-
   error(nil),
   retract(error(nil)),
   asserta(error(invalidPenalty)).
+
+getWord([], [], []).
+getWord([10|I], [], I).
+getWord([32|I], [], I).
+getWord([C|I], [C|O], R) :-
+  getWord(I, O, R).
+
+getTrimmedLine(I, O, R):-
+  getLine(I, Line, R),!,
+  rtrim(Line, O).
+
+getLine([],[],[]).
+getLine([10|I], [], I).
+getLine([C|I], [C|Next], R) :-
+  getLine(I, Next, R).
+
+rtrim([],[]).
+rtrim([10], []).
+rtrim([32], []).
+rtrim([10|T], []) :-
+  rtrim(T, []).
+rtrim([32|T], []) :-
+  rtrim(T, []).
+rtrim([H|T], [H|O]) :-
+  rtrim(T, O).
 
 machineNumber([],_, _) :-
   error(nil),
