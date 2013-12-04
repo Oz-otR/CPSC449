@@ -49,7 +49,9 @@ main_solver(CurrentList,Final,Value) :-
 
 setup_forced_partial(Blank,    ,ReturnedList,Error) :-
 	
-	get_assignment(X,Task,Position),
+	
+	partialAssignment(Mach,Task),
+	check_for_forbidden(Mach,Task)
 	replace_at_position(Blank,Task,Position,NewList,Error),
 	setup_forced_partial(NewList,      ReturnedList,Error),
 	
@@ -67,6 +69,14 @@ replace_at_position([H|T],Task,Position,[H|Rest],Error) :-
 	Error is 0,
 	replace_at_position(T,Task,NextPosition,Rest);
 	Error is 9.
+	
+	
+check_for_forbidden(Mach,Task) :-
+	forbiddenMachine(Mach,Task),
+	error(nil),
+	retract(error(nil)),
+	asserta(error(forbidden)).
+	
 	
 	
 	
