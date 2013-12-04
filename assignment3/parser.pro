@@ -1,11 +1,12 @@
 :- dynamic(error/1).
 error(nil).
-correctMP("1.1 2 3 4 5 6 7 8\n1 2 3 4 5 6 7 8\n1 2 3 4 5 6 7 8\n1 2 3 4 5 6 7 8\n1 2 3 4 5 6 7 8\n1 2 3 4 5 6 7 8\n1 2 3 4 5 6 7 8\n1 2 3 4 5 6 7 8 \n   ").
+testPA("(1,A)\n(2,B)  \n").
+testMP("1 2 3 4 5 6 7 8\n1 2 3 4 5 6 7 8\n1 2 3 4 5 6 7 8\n1 2 3 4 5 6 7 8\n1 2 3 4 5 6 7 8\n1 2 3 4 5 6 7 8\n1 2 3 4 5 6 7 8 \n\n").
 test :-
   retract(error(X)),
   asserta(error(nil)),
   retractall(machinePenalty(M,T,P)),
-  correctMP(L),!,
+  testMP(L),!,
   parseMachinePenalties(L, R).
 
 parse(X) :-
@@ -155,20 +156,17 @@ parseMachinePenalty_([], _, _) :-
   asserta(error(invalidMachinePenalty)).
 parseMachinePenalty_(I, _, _):-
   removePrefix(" ", I, _),!,
-  error(nil),
-  retract(error(nil)),
+  error(nil),!,
+  retract(error(nil)),!,
   asserta(error(parseErr)).
-parseMachinePenalty_([H|T], 8, Row) :-
+parseMachinePenalty_(I, 8, Row) :-
   error(nil),!,
-  penaltyNumber([H|T], P, []),!,
-  assertz(machinePenalty(Row, 8, P)).
-parseMachinePenalty_([H|T], Num, Row):-
+  parseWord(I, Row, 8, []).
+parseMachinePenalty_(I, Num, Row):-
   error(nil),!,
-  penaltyNumber([H|T], P, R1),!,
-  assertz(machinePenalty(Row, Num, P)),!,
-  removePrefix(" ", R1, R2),!,
+  parseWord(I, Row, Num, R),!,
   Next is Num + 1,!,
-  parseMachinePenalty_(R2, Next, Row).
+  parseMachinePenalty_(R, Next, Row).
 
 parseWord(Line, M, T, R) :-
   getWord(Line, Word, R),!,
@@ -182,7 +180,7 @@ getWord([C|I], [C|O], R) :-
   getWord(I, O, R).
 
 getTrimmedLine(I, O, R):-
-  getLine(I, Line, R),
+  getLine(I, Line, R),!,
   rtrim(Line, O).
 
 getLine([],[],[]).
