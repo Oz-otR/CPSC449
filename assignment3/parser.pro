@@ -1,13 +1,13 @@
 :- dynamic(error/1).
 error(nil).
-testPA("(1,A)\n(2,B)  \n").
+testPA("(1,A)\n(2,B)  \n(3,C)\n(4,D)\n").
 testMP("1 2 3 4 5 6 7 8\n1 2 3 4 5 6 7 8\n1 2 3 4 5 6 7 8\n1 2 3 4 5 6 7 8\n1 2 3 4 5 6 7 8\n1 2 3 4 5 6 7 8\n1 2 3 4 5 6 7 8 \n\n").
 test :-
   retract(error(X)),
   asserta(error(nil)),
-  retractall(machinePenalty(M,T,P)),
-  testMP(L),!,
-  parseMachinePenalties(L, R).
+  retractall(partialAssignment(X,Y)),
+  testPA(L),!,
+  parsePartialAssignments(L, R).
 
 parse(X) :-
   asserta(error(nil)),
@@ -40,32 +40,40 @@ mpHeader(_,[],_).
 %------------------------------------------------------------------------------
 % Forced partial assignments.
 %------------------------------------------------------------------------------
-parsePartialAssignments([],[]) :-
-  error(nil).
 parsePartialAssignments(I, R) :-
-  error(nil),
-  line_end(I, R).
+  getTrimmedLine(I, [], R).
 parsePartialAssignments(I, R) :-
-  error(nil),
-  parsePartialAssignment(I, R1),!,
-  line_end(R1, R2),!,
-  parsePartialAssignments(R2, R).
+  getTrimmedLine(I, Line, R1),!,
+  parsePartialAssignment(Line),!,
+  parsePartialAssignments(R1, R).
 
-parsePartialAssignment(I, R) :-
-  parsePartialAssignment_(I, R),!.
-parsePartialAssignment(_, []) :-
+parsePartialAssignment(I) :-
+  parsePartialAssignment_(I),!.
+parsePartialAssignment(_) :-
   error(nil),
   retract(error(nil)),
   asserta(error(invalidPartialAssignment)).
 
-parsePartialAssignment_(I, R) :-
+parsePartialAssignment_(I) :-
   error(nil),
-  removePrefix("(", I, R1),!,
-  machineNumber(R1, NUM1, R2),!,
+  paTuple(I, M, T),!,
+  \+ partialAssignment(M,X),!,
+  \+ partialAssignment(Y,T),!,
+  assertz(partialAssignment(M,T)), !.
+
+paTuple(Word, M, T) :-
+  paTuple_(Word, M, T).
+paTuple(_, 0, 0) :-
+  error(nil),
+  retract(error(nil)),
+  asserta(error(parseErr)).
+  
+paTuple_(Word, M, T) :-
+  removePrefix("(", Word, R1),!,
+  machineNumber(R1, M, R2),!,
   removePrefix(",", R2, R3),!,
-  taskNumber(R3, NUM2, R4),!,
-  removePrefix(")", R4, R),!,
-  assertz(partialAssignment(NUM1,NUM2)), !.
+  taskNumber(R3, T, R4),!,
+  removePrefix(")", R4, []),!.
 
 %------------------------------------------------------------------------------
 % Forbidden machines.
