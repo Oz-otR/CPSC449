@@ -1,7 +1,7 @@
 /*program reads in file and outputs it as a list of characters which is stored in the database.
 */
 
-:-dynamic(contents/1).
+:-dynamic(contents/1, error/1).
 :-use_module(parser).
 :-use_module(solver).
 
@@ -38,9 +38,6 @@ read_file(_,Y):-
     read_file(Z,W),
     Y = [Z|W].
     
-removeLast([_|[]],[]).
-removeLast([H|T],[H|Q]) :- removeLast(T,Q).
-
 parseerrors(nil, _).
 parseerrors(invalidPartialAssignment, X):-
   write_file(X,"partial assignment error"),
