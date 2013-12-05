@@ -9,33 +9,16 @@ Order:
   Too-near penalties
 */
 
-error(nil).
-testPA("(1,A)\n(2,B)  \n(3,C)\n(4,D)\n").
-testFM("(1,A)  \n(2,D)  \n  ").
-testTNT("(A,B)\n\n").
-testMP("1 2 3 4 5 6 7 8\n1 2 3 4 5 6 7 8\n1 2 3 4 5 6 7 8\n1 2 3 4 5 6 7 8\n1 2 3 4 5 6 7 8\n1 2 3 4 5 6 7 8\n1 2 3 4 5 6 7 8 \n\n").
-testTNP("(A,C,100)\n(C,D,100)  \n \n").
-testInput("Name:\nWhatever\n\nforced partial assignment:\n(1,A)\n\nforbidden machine:\n(1,B)\n\ntoo-near tasks:\n(A,B)\n\nmachine penalties:\n1 2 3 4 5 6 7 8\n1 2 3 4 5 6 7 8\n1 2 3 4 5 6 7 8\n1 2 3 4 5 6 7 8\n1 2 3 4 5 6 7 8\n1 2 3 4 5 6 7 8\n1 2 3 4 5 6 7 8\n1 2 3 4 5 6 7 8\n\ntoo-near penalities\n(A,B,99)\n\n\n").
-test :-
-  retractall(error(X)),!,
-  asserta(error(nil)),!,
-  retractall(partialAssignment(A,B)),!,
-  retractall(forbiddenMachine(X,Y)),!,
-  retractall(tooNear(C,D)),!,
-  retractall(machinePenalty(E,F,G)),!,
-  retractall(tooNearPenalty(H,I,J)),!,
-  testInput(Input),!,
-  parse(Input).
-
-parse(X) :-
-  parse_(X).
-parse(X) :-
+parse :-
+  parse_.
+parse :-
   error(nil),
   retract(error(nil)),
   asserta(error(parseErr)).
-parse(X).
+parse.
 
-parse_(X) :-
+parse_ :-
+  contents(X),!,
   titleHeader(X, R1),!,
   fpaHeader(R1, R2),!,
   fmHeader(R2,R3),!,
