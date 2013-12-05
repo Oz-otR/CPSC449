@@ -528,7 +528,7 @@ machineNumber([],_, _) :-
 machineNumber(I, O, R) :- 
   error(nil),
   number(I, O, R),
-  O < 8,
+  O < 9,
   O > 0.
 machineNumber(_, _, []) :-
   error(nil),
