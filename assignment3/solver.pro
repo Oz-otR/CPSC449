@@ -46,12 +46,20 @@ solver(Best_list,Value) :-
 % Danny's random doodling
 %
 main_solver(CurrentList,Final,Value) :-
+	check_forbiddenMachine(CurrentList),
+	check_tooNear(CurrentList),
+	check_penality(CurrentList),
 	main_solver(CurrentList, Final, Value).
+
+check_forbiddenMachine([H|T]) :-
+	isNotForbidden(H),
+	check_forbiddenMachine(T).
 	
-check_partial(CurrentList) :- something.
-check_forbiddenMachine(CurrentList) :- something.
+isNotForbidden(Machine) :- something.
 check_tooNear(CurrentList) :- something.
-check_penality(CurrentList, Penalty) :- something.
+check_penality(CurrentList, Penality) :- something.
+	
+
 	
 %	
 	
