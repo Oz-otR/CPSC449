@@ -14,7 +14,8 @@ inputoutput(X,Y):-
   read_file(3,X1),       /*Y1 is the holder of character int code list*/
   seen,
   removeLast(X1, Y1),
-  assert(contents(Y1)),
+  append(Y1,"\n\n\n", Y2),
+  asserta(contents(Y2)),
   /*%Y = Y2,
   write_file('writetry.txt',Y).*/
   parse,
@@ -25,7 +26,7 @@ inputoutput(X,Y):-
   error(Z),
   !,
   parseerrors(Z,Y),
-  retract(error(_)).
+  retract(error(_)),
   solutionformat(Out),
   write_file(Y,Out),!.
   
@@ -61,12 +62,10 @@ parseerrors(parseErr, X):-
 parseerrors(noValidSolution, X):-
   write_file(X,"No valid solution possible!"),
   fail.
-
-parse:-
-  asserta(error(nil)).
   
 solve:-
-  asserta(error(nil)).
+  asserta(error(nil)),
+  asserta(solver_solution([a,b,d,c,f,g,e,h,99])).
   
 solutionformat(FinalOutput):-
   Output1 = "Solution ",
