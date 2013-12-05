@@ -7,9 +7,20 @@ task_position_pen(f,6,5).
 task_position_pen(g,2,6).
 task_position_pen(h,3,7).
 
+% Task letters
 
+taskLetter(a).
+taskLetter(b).
+taskLetter(c).
+taskLetter(d).
+taskLetter(e).
+taskLetter(f).
+taskLetter(g).
+taskLetter(h).
 
+% Task list
 
+defaultTaskList([a,b,c,d,e,f,g,h]).
 
 task_letter_value(a,0).
 task_letter_value(b,1).
@@ -32,6 +43,18 @@ error([0]).
 %
 %
 
+
+
+getRemainingTasks([H|T],ListOfRemaining, N) :- 
+	taskLetter(H),
+	removeElement(H,ListOfRemaining, List),
+	getRemainingTasks(T,ListOfRemaining, N+1),
+	remainingTasks = Result.
+	
+getRemainingTasks([_|T], ListOfRemaining, 8, remainingTasks) :- 
+	taskLetter(H),
+	removeElement(H, ListOfRemaining, remainingTasks),
+	
 solver(Best_list,Value) :-
 	setup_forced_partial(     returns:CurrentList,Error)
 	check_too_near_task(Error)
@@ -43,11 +66,12 @@ solver(Best_list,Value) :-
 	Best_list is error_list(X),
 	Value is best_value_err(Y).
 
+
 % Danny's random doodling
 %
 main_solver(CurrentList,Final,Value) :-
-	check_forbiddenMachine(CurrentList),
-	check_tooNear(CurrentList),
+	check_forbidden(CurrentList),
+	check_tooNearPenalty(CurrentList),
 	check_penality(CurrentList),
 	main_solver(CurrentList, Final, Value).
 
@@ -55,14 +79,18 @@ check_forbiddenMachine([H|T]) :-
 	isNotForbidden(H),
 	check_forbiddenMachine(T).
 	
-isNotForbidden(Machine) :- something.
+isNotForbidden(Machine) :- 
 check_tooNear(CurrentList) :- something.
 check_penality(CurrentList, Penality) :- something.
 	
+	
+	
+% Danny end doodle	
 
-	
-%	
-	
+removeElement(X, [X|XS], XS).
+removeElement(X, [Y|XS], [Y|YS]) :-
+	removeElement(X, XS, YS).
+
 	
 
 setup_forced_partial(Blank,    ,ReturnedList,Error) :-
