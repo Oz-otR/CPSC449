@@ -2,7 +2,8 @@
 */
 
 :-dynamic(contents/1).
-
+:-use_module(parser).
+:-use_module(solver).
 
 :- initialization(commandline).
 commandline :- argument_value(1, X), argument_value(2, Y), write(X), write(Y), write('\n'), inputoutput(X,Y).
