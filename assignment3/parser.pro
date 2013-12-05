@@ -1,4 +1,19 @@
-:- dynamic(error/1, partialAssignment/2, forbiddenMachine/2, tooNear/2, machinePenalty/2, tooNearPenalty/2).
+:- module(parser,
+  [parse/1,
+   error/1,
+   partialAssignment/2,
+   forbiddenMachine/2,
+   tooNear/2,
+   machinePenalty/2,
+   tooNearPenalty/2]).
+
+:- dynamic(
+  error/1,
+  partialAssignment/2,
+  forbiddenMachine/2,
+  tooNear/2,
+  machinePenalty/2,
+  tooNearPenalty/2).
 
 /*
 Order:
@@ -9,33 +24,16 @@ Order:
   Too-near penalties
 */
 
-error(nil).
-testPA("(1,A)\n(2,B)  \n(3,C)\n(4,D)\n").
-testFM("(1,A)  \n(2,D)  \n  ").
-testTNT("(A,B)\n\n").
-testMP("1 2 3 4 5 6 7 8\n1 2 3 4 5 6 7 8\n1 2 3 4 5 6 7 8\n1 2 3 4 5 6 7 8\n1 2 3 4 5 6 7 8\n1 2 3 4 5 6 7 8\n1 2 3 4 5 6 7 8 \n\n").
-testTNP("(A,C,100)\n(C,D,100)  \n \n").
-testInput("Name:\nWhatever\n\nforced partial assignment:\n(1,A)\n\nforbidden machine:\n(1,B)\n\ntoo-near tasks:\n(A,B)\n\nmachine penalties:\n1 2 3 4 5 6 7 8\n1 2 3 4 5 6 7 8\n1 2 3 4 5 6 7 8\n1 2 3 4 5 6 7 8\n1 2 3 4 5 6 7 8\n1 2 3 4 5 6 7 8\n1 2 3 4 5 6 7 8\n1 2 3 4 5 6 7 8\n\ntoo-near penalities\n(A,B,99)\n\n\n").
-test :-
-  retractall(error(X)),!,
-  asserta(error(nil)),!,
-  retractall(partialAssignment(A,B)),!,
-  retractall(forbiddenMachine(X,Y)),!,
-  retractall(tooNear(C,D)),!,
-  retractall(machinePenalty(E,F,G)),!,
-  retractall(tooNearPenalty(H,I,J)),!,
-  testInput(Input),!,
-  parse(Input).
-
-parse(X) :-
-  parse_(X).
-parse(X) :-
+parse :-
+  parse_.
+parse :-
   error(nil),
   retract(error(nil)),
   asserta(error(parseErr)).
-parse(X).
+parse.
 
-parse_(X) :-
+parse_ :-
+  contents(X),!,
   titleHeader(X, R1),!,
   fpaHeader(R1, R2),!,
   fmHeader(R2,R3),!,
@@ -364,10 +362,12 @@ penaltyNumber(_, _, []) :-
   asserta(error(invalidPenalty)).
 
 notSpace(I) :- \+ isSpace(I).
+isSpace([9|I]).
 isSpace([10|I]).
 isSpace([32|I]).
 
 getWord([], [], []).
+getWord([9|I], [], I).
 getWord([10|I], [], I).
 getWord([32|I], [], I).
 getWord([C|I], [C|O], R) :-
@@ -385,12 +385,16 @@ getLine([C|I], [C|Next], R) :-
   getLine(I, Next, R).
 
 rtrim([],[]).
+rtrim([9], []).
 rtrim([10], []).
 rtrim([32], []).
+rtrim([9|T], []) :-
+  rtrim(T, []).
 rtrim([10|T], []) :-
   rtrim(T, []).
 rtrim([32|T], []) :-
   rtrim(T, []).
+
 rtrim([H|T], [H|O]) :-
   rtrim(T, O).
 
