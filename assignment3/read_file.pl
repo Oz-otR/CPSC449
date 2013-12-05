@@ -2,6 +2,10 @@
 */
 
 :-dynamic(contents/1).
+
+
+:- initialization(commandline).
+commandline :- argument_value(1, X), argument_value(2, Y), write(X), write(Y), write('\n'), inputoutput(X,Y).
     
 /*    X is the file name, Y is the output*/
 inputoutput(X,Y):-
@@ -17,7 +21,6 @@ inputoutput(X,Y):-
   error(Z),
   !,
   parseerrors(Z,Y), %check for errors, include output filename.
-  retract(error(_)).
   solve,
   error(Z),
   !,
@@ -37,23 +40,26 @@ removeLast([_|[]],[]).
 removeLast([H|T],[H|Q]) :- removeLast(T,Q).
 
 parseerrors(nil, _).
-parseerrors(forcedPartialError, X):-
+parseerrors(invalidPartialAssignment, X):-
   write_file(X,"partial assignment error"),
   fail.
 parseerrors(invalidMachineTask, X):-
   write_file(X,"invalid machine/task"),
   fail.
-parseerrors(machinePenaltyError, X):-
+parseerrors(invalidMachinePenalty, X):-
   write_file(X,"machine penalty error"),
   fail.
-parseerrors(invalidTaskError, X):-
+parseerrors(invalidTask, X):-
   write_file(X,"invalid task"),
   fail.
-parseerrors(invalidPenaltyError, X):-
+parseerrors(invalidPenalty, X):-
   write_file(X,"invalid penalty"),
   fail.
 parseerrors(parseErr, X):-
   write_file(X,"Error while parsing input file"),
+  fail.
+parseerrors(noValidSolution, X):-
+  write_file(X,"No valid solution possible!"),
   fail.
 
 parse:-
@@ -92,10 +98,10 @@ solutionformat(FinalOutput):-
   append(Output9,"; Quality: ",Output10),
   getelement(9,X,Y9),
   number_codes(Y9,Z9),
-  append(Output10,Z9,FinalOutput).
+  append(Output10,Z9,FinalOutput), !.
 
-getelement(1,[H|T],H).
-getelement(X,[H|T],Z):-
+getelement(1,[H|_],H).
+getelement(X,[_|T],Z):-
   Y is X - 1,
   getelement(Y,T,Z).
   
@@ -114,5 +120,5 @@ outputstuff([Head|Tail]):-
   outputstuff(Tail).*/
 
 outputstuff(Y):-
-  atom_codes(X,Y),
+  atom_codes(X,Y),  
   write(X).
