@@ -441,6 +441,14 @@ taskNumberConstraint([69|T], 5, T) :- error(nil).
 taskNumberConstraint([70|T], 6, T) :- error(nil).
 taskNumberConstraint([71|T], 7, T) :- error(nil).
 taskNumberConstraint([72|T], 8, T) :- error(nil).
+taskNumberConstraint([97|T], 1, T) :- error(nil).
+taskNumberConstraint([98|T], 2, T) :- error(nil).
+taskNumberConstraint([99|T], 3, T) :- error(nil).
+taskNumberConstraint([100|T], 4, T) :- error(nil).
+taskNumberConstraint([101|T], 5, T) :- error(nil).
+taskNumberConstraint([102|T], 6, T) :- error(nil).
+taskNumberConstraint([103|T], 7, T) :- error(nil).
+taskNumberConstraint([104|T], 8, T) :- error(nil).
 taskNumberConstraint(_, _, []) :-
   error(nil),
   retract(error(nil)),
@@ -454,6 +462,14 @@ taskNumberPenalty([69|T], 5, T) :- error(nil).
 taskNumberPenalty([70|T], 6, T) :- error(nil).
 taskNumberPenalty([71|T], 7, T) :- error(nil).
 taskNumberPenalty([72|T], 8, T) :- error(nil).
+taskNumberPenalty([97|T], 1, T) :- error(nil).
+taskNumberPenalty([98|T], 2, T) :- error(nil).
+taskNumberPenalty([99|T], 3, T) :- error(nil).
+taskNumberPenalty([100|T], 4, T) :- error(nil).
+taskNumberPenalty([101|T], 5, T) :- error(nil).
+taskNumberPenalty([102|T], 6, T) :- error(nil).
+taskNumberPenalty([103|T], 7, T) :- error(nil).
+taskNumberPenalty([104|T], 8, T) :- error(nil).
 taskNumberPenalty(_, _, []) :-
   error(nil),
   retract(error(nil)),
