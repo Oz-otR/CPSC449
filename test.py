@@ -7,11 +7,13 @@ for filename in os.listdir("testcases"):
   if (filename[-4:] == ".txt"):
     print "---------------------------------------------------------"
     print "File " + filename + ":" #+ str(output1 == output2)
-    print "----running Java-------"
-    call(["java","-cp","assignment1", "Main", "testcases/" + filename, "output1.txt"])
-    # Run haskell program here!
+
     print "----running Haskell----"
-    call(["./assignment2/main","testcases/" + filename, "output2.txt"])
+    call(["./assignment2/main","testcases/" + filename, "output1.txt"])
+
+    print "----running Prolog-------"
+    call(["./assignment3/solver","testcases/" + filename, "output2.txt"])
+
     output1 = open("output1.txt", 'r').read()
     output2 = open("output2.txt", 'r').read()
 #    output2 = open("output2.txt", 'r').read()

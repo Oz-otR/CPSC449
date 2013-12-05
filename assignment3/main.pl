@@ -434,47 +434,38 @@ Takes input string I and returns the first found Task
 number in O, with the unprocessed input in R. Error codes
 are in the final variable.
 */
-taskNumberConstraint([65|T], 1, T) :- error(nil).
-taskNumberConstraint([66|T], 2, T) :- error(nil).
-taskNumberConstraint([67|T], 3, T) :- error(nil).
-taskNumberConstraint([68|T], 4, T) :- error(nil).
-taskNumberConstraint([69|T], 5, T) :- error(nil).
-taskNumberConstraint([70|T], 6, T) :- error(nil).
-taskNumberConstraint([71|T], 7, T) :- error(nil).
-taskNumberConstraint([72|T], 8, T) :- error(nil).
-taskNumberConstraint([97|T], 1, T) :- error(nil).
-taskNumberConstraint([98|T], 2, T) :- error(nil).
-taskNumberConstraint([99|T], 3, T) :- error(nil).
-taskNumberConstraint([100|T], 4, T) :- error(nil).
-taskNumberConstraint([101|T], 5, T) :- error(nil).
-taskNumberConstraint([102|T], 6, T) :- error(nil).
-taskNumberConstraint([103|T], 7, T) :- error(nil).
-taskNumberConstraint([104|T], 8, T) :- error(nil).
+taskNumberConstraint(I, P, T) :-
+  error(nil),
+  taskNumber(I, P, T).
 taskNumberConstraint(_, _, []) :-
   error(nil),
   retract(error(nil)),
   asserta(error(invalidMachineTask)).
 
-taskNumberPenalty([65|T], 1, T) :- error(nil).
-taskNumberPenalty([66|T], 2, T) :- error(nil).
-taskNumberPenalty([67|T], 3, T) :- error(nil).
-taskNumberPenalty([68|T], 4, T) :- error(nil).
-taskNumberPenalty([69|T], 5, T) :- error(nil).
-taskNumberPenalty([70|T], 6, T) :- error(nil).
-taskNumberPenalty([71|T], 7, T) :- error(nil).
-taskNumberPenalty([72|T], 8, T) :- error(nil).
-taskNumberPenalty([97|T], 1, T) :- error(nil).
-taskNumberPenalty([98|T], 2, T) :- error(nil).
-taskNumberPenalty([99|T], 3, T) :- error(nil).
-taskNumberPenalty([100|T], 4, T) :- error(nil).
-taskNumberPenalty([101|T], 5, T) :- error(nil).
-taskNumberPenalty([102|T], 6, T) :- error(nil).
-taskNumberPenalty([103|T], 7, T) :- error(nil).
-taskNumberPenalty([104|T], 8, T) :- error(nil).
+taskNumberPenalty(I, P, T) :-
+  error(nil),
+  taskNumber(I, P, T).
 taskNumberPenalty(_, _, []) :-
   error(nil),
   retract(error(nil)),
   asserta(error(invalidTask)).
+
+taskNumber([65|T], 1, T).
+taskNumber([66|T], 2, T).
+taskNumber([67|T], 3, T).
+taskNumber([68|T], 4, T).
+taskNumber([69|T], 5, T).
+taskNumber([70|T], 6, T).
+taskNumber([71|T], 7, T).
+taskNumber([72|T], 8, T).
+taskNumber([97|T], 1, T).
+taskNumber([98|T], 2, T).
+taskNumber([99|T], 3, T).
+taskNumber([100|T], 4, T).
+taskNumber([101|T], 5, T).
+taskNumber([102|T], 6, T).
+taskNumber([103|T], 7, T).
+taskNumber([104|T], 8, T).
 
 /*
 Takes input string I and returns the first found integer
