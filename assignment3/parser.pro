@@ -1,4 +1,19 @@
-:- dynamic(error/1, partialAssignment/2, forbiddenMachine/2, tooNear/2, machinePenalty/2, tooNearPenalty/2).
+:- module(parser,
+  [parse/1,
+   error/1,
+   partialAssignment/2,
+   forbiddenMachine/2,
+   tooNear/2,
+   machinePenalty/2,
+   tooNearPenalty/2]).
+
+:- dynamic(
+  error/1,
+  partialAssignment/2,
+  forbiddenMachine/2,
+  tooNear/2,
+  machinePenalty/2,
+  tooNearPenalty/2).
 
 /*
 Order:
