@@ -4,6 +4,7 @@
 :- dynamic(
   contents/1,
   error/1,
+  solver_solution/1,
   partialAssignment/2,
   forbiddenMachine/2,
   tooNear/2,
