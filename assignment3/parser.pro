@@ -364,10 +364,12 @@ penaltyNumber(_, _, []) :-
   asserta(error(invalidPenalty)).
 
 notSpace(I) :- \+ isSpace(I).
+isSpace([9|I]).
 isSpace([10|I]).
 isSpace([32|I]).
 
 getWord([], [], []).
+getWord([9|I], [], I).
 getWord([10|I], [], I).
 getWord([32|I], [], I).
 getWord([C|I], [C|O], R) :-
@@ -385,12 +387,16 @@ getLine([C|I], [C|Next], R) :-
   getLine(I, Next, R).
 
 rtrim([],[]).
+rtrim([9], []).
 rtrim([10], []).
 rtrim([32], []).
+rtrim([9|T], []) :-
+  rtrim(T, []).
 rtrim([10|T], []) :-
   rtrim(T, []).
 rtrim([32|T], []) :-
   rtrim(T, []).
+
 rtrim([H|T], [H|O]) :-
   rtrim(T, O).
 
