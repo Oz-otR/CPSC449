@@ -53,33 +53,57 @@ getRemainingTasks([H|T],ListOfRemaining, N) :-
 	
 getRemainingTasks([_|T], ListOfRemaining, 8, remainingTasks) :- 
 	taskLetter(H),
-	removeElement(H, ListOfRemaining, remainingTasks).
+	removeElement(H, ListOfRemaining, remainingTasks),
 	
 solver(Best_list,Value) :-
-	setup_forced_partial(     returns:CurrentList,Error),
-	check_too_near_task(Error),
+	setup_forced_partial(     returns:CurrentList,Error)
+	check_too_near_task(Error)
 	error =:= 0,
-	main_solver(CurrentList,FinalList,BestValue),
+	main_solver(CurrentList,FinalList,BestValue)
 	Best_list is FinalList,
 	Value is BestValue;
 	
 	Best_list is error_list(X),
 	Value is best_value_err(Y).
 
+
+% Danny's random doodling
+%
+main_solver(CurrentList,Final,Value) :-
+	check_forbidden(CurrentList),
+	check_tooNearPenalty(CurrentList),
+	check_penality(CurrentList),
+	main_solver(CurrentList, Final, Value).
+
+check_forbiddenMachine([H|T]) :-
+	isNotForbidden(H),
+	check_forbiddenMachine(T).
+	
+isNotForbidden(Machine) :- 
+check_tooNear(CurrentList) :- something.
+check_penality(CurrentList, Penality) :- something.
+	
+	
+	
+% Danny end doodle	
+
 removeElement(X, [X|XS], XS).
 removeElement(X, [Y|XS], [Y|YS]) :-
 	removeElement(X, XS, YS).
 
-setup_forced_partial(Blank,_,ReturnedList,Error) :-
+	
+
+setup_forced_partial(Blank,    ,ReturnedList,Error) :-
+	
 	get_assignment(X,Task,Position),
 	replace_at_position(Blank,Task,Position,NewList,Error),
-	setup_forced_partial(NewList,_,ReturnedList,Error).
+	setup_forced_partial(NewList,      ReturnedList,Error),
 	
-/*
-check_error() :- stub.
+	
 
-get_penalty_value() :- stub.
-*/
+check_error() :- stub
+
+get_penalty_value() :- stub
 
 replace_at_position([_|T],Task,0,[Task|T],Error).
 replace_at_position([H|T],Task,Position,[H|Rest],Error) :-
