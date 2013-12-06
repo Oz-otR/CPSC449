@@ -2,14 +2,14 @@ Name:
 Task partial assignment error
 
 forced partial assignment:
-(1,C)
-(2,C)
+(1,c)
+(2,c)
 
 forbidden machine:
-(2,D)
+(2,d)
 
 too-near tasks
-(C,D)
+(c,d)
 
 machine penalties:
 1 1 1 1 1 1 1 1
@@ -22,4 +22,4 @@ machine penalties:
 1 1 1 1 1 1 1 1
 
 too-near penalities
-(E,F,30)
+(e,f,30)

@@ -1,6 +1,6 @@
 :- module(parser,
-  [parse/0,
-   removeLast/2,
+  [parse/1,
+   error/1,
    partialAssignment/2,
    forbiddenMachine/2,
    tooNear/2,
