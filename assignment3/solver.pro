@@ -1,42 +1,72 @@
 :- dynamic(
 	bestVal/1,
-	%test_list/1,
-	error/1,
 	bestlist/1).
 
-error(nil).
 bestVal(99999999999999999).
-bestlist([99,99,99,99,99,99,99,99]).
-test_list([0,0,0,0,0,0,0,0]).
-
-	
-machinePenalty(A,Y,1).
-
-
-forbiddenMachine(1,a).
-forbiddenMachine(3,a).
-
-partialAssignment(5,a).
-partialAssignment(3,b).
-partialAssignment(0,h).
-partialAssignment(7,g).
-
-
-adjacent_pair_val(a,b,5).
-adjacent_pair_val(c,d,15).
-tooNear(z,z).
-
-task_position_pen(a,0,0).
-task_position_pen(b,1,1).
-task_position_pen(c,5,2).
-task_position_pen(d,7,3).
-task_position_pen(e,5,4).
-task_position_pen(e,4,4).
-task_position_pen(f,6,5).
-task_position_pen(g,2,6).
-task_position_pen(h,3,7).
+bestlist([]).
 
 %------------------------------------------------------------------------------
+% Solver
+%------------------------------------------------------------------------------
+
+bestlist(nil).
+
+calculatronicMagnificence :-
+  setup_forced_partial([0,0,0,0,0,0,0,0], 0, State),!,
+  getRemainingTasks_helper(State, ['A','B','C','D','E','F','G','H'], 1, Remaining),!,
+  solve(State, Remaining).
+
+solve(State, []) :-
+  eval_leaf(State).
+solve(State, []).
+solve(State, Remaining) :-
+  eval_inner(State),
+  solve_(State, Remaining, Remaining).
+solve(State, Remaining).
+
+solve_(State, Remaining, []).
+solve_(State, Remaining, [Task|Tasks]) :-
+  removeElement(Task, Remaining, Remaining_),
+  assign(State, Task, State_),
+  solve(State_, Remaining_),
+  solve_(State, Remaining, Tasks).
+
+assign(State, Task, State_) :-
+  assign_(State, Task, State_).
+
+assign_([], Task, []).
+assign_([0|List], Task, [Task|List]).
+assign_([X|List], Task, [X|State_]) :-
+  assign_(List, Task, State_),!.
+
+eval_inner(State) :-
+  eval(State, Penalty),
+  bestVal(BestPenalty),
+  Penalty < BestPenalty.
+
+eval_leaf(State) :-
+  eval_inner(State),
+  gatherList(State, Penalty),
+  retract(bestlist(_)),
+  asserta(bestlist(State)),
+  retract(bestVal(_)),
+  asserta(bestVal(Penalty)).
+
+eval(State, Penalty) :-
+  valid(State),!,
+  gatherList(State, Penalty),!.
+  
+valid(State) :-
+  valid_(State, State, 1).
+
+valid_([Task2|State], [Task1], Machine) :-
+  check_for_forbidden(Machine, Task1),
+  \+tooNear(Task1, Task2).
+valid_(State, [Task1, Task2|Tasks], Machine) :-
+  check_for_forbidden(Machine, Task1),
+  \+tooNear(Task1, Task2),
+  NextMachine is Machine + 1,
+  valid_(State, [Task2|Tasks], NextMachine).
 
 % Task letters
 

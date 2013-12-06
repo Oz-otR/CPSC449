@@ -8,12 +8,26 @@
   partialAssignment/2,
   forbiddenMachine/2,
   tooNear/2,
-  machinePenalty/2,
-  tooNearPenalty/2).
+  machinePenalty/3,
+	bestVal/1,
+	bestlist/1,
+  tooNearPenalty/3).
 
 :- initialization(commandline).
 commandline :- argument_value(1, X), argument_value(2, Y), write(X), write(Y), write('\n'), inputoutput(X,Y).
    
+bestVal(99999999999999999).
+bestlist([]).
+
+taskLetter('A').
+taskLetter('B').
+taskLetter('C').
+taskLetter('D').
+taskLetter('E').
+taskLetter('F').
+taskLetter('G').
+taskLetter('H').
+
 /*    X is the file name, Y is the output*/
 inputoutput(X,Y):-
   retractall(contents(_)),
@@ -21,25 +35,25 @@ inputoutput(X,Y):-
   retractall(partialAssignment(_,_)),
   retractall(forbiddenMachine(_,_)),
   retractall(tooNear(_,_)),
-  retractall(machinePenalty(_,_)),
-  retractall(tooNearPenalty(_,_)),
+  retractall(machinePenalty(_,_,_)),
+  retractall(tooNearPenalty(_,_,_)),
   see(X),
   read_file(3,X1),       /*Y1 is the holder of character int code list*/
   seen,
   removeLast(X1, Y1),
   append(Y1,"\n\n\n", Y2),
   asserta(contents(Y2)),
-  /*%Y = Y2,
-  write_file('writetry.txt',Y).*/
   asserta(error(nil)),
   parse,
   error(Z),
   !,
   parseerrors(Z,Y), %check for errors, include output filename.
-  solve,
-  error(Z),
-  !,
-  parseerrors(Z,Y),
+  retractall(error(_)),
+  asserta(error(nil)),
+  calculatronicMagnificence,
+  checkSolution,
+  error(Other),!,
+  parseerrors(Other, Y),
   retract(error(_)),
   solutionformat(Out),
   write_file(Y,Out),!.
@@ -73,23 +87,41 @@ parseerrors(parseErr, X):-
 parseerrors(noValidSolution, X):-
   write_file(X,"No valid solution possible!"),
   fail.
-  
-solve:-
-  asserta(error(nil)),
-  asserta(solver_solution([a,b,d,c,f,g,e,h,99])).
+checkSolution:-
+  bestlist([]),
+  retract(error(_)),
+  asserta(error(noValidSolution)).
+checkSolution.
     
 solutionformat(FinalOutput):-
   Output1 = "Solution ",
-  solver_solution(X),
-  putLetter(1, X, Output1, Output2),
-  putLetter(2, X, Output2, Output3),
-  putLetter(3, X, Output3, Output4),
-  putLetter(4, X, Output4, Output5),
-  putLetter(5, X, Output5, Output6),
-  putLetter(6, X, Output6, Output7),
-  putLetter(7, X, Output7, Output8),
-  putLetter(8, X, Output8, Output9),
-  getelement(9,X,Y9),
+  bestlist(X),
+  getelement(1,X,Y1),
+  atom_codes(Y1,Z1),
+  append(Output1,Z1,Output2),
+  getelement(2,X,Y2),
+  atom_codes(Y2,Z2),
+  append(Output2,Z2,Output3),
+  getelement(3,X,Y3),
+  atom_codes(Y3,Z3),
+  append(Output3,Z3,Output4),
+  getelement(4,X,Y4),
+  atom_codes(Y4,Z4),
+  append(Output4,Z4,Output5),
+  getelement(5,X,Y5),
+  atom_codes(Y5,Z5),
+  append(Output5,Z5,Output6),
+  getelement(6,X,Y6),
+  atom_codes(Y6,Z6),
+  append(Output6,Z6,Output7),
+  getelement(7,X,Y7),
+  atom_codes(Y7,Z7),
+  append(Output7,Z7,Output8),
+  getelement(8,X,Y8),
+  atom_codes(Y8,Z8),
+  append(Output8,Z8,Output9),
+  append(Output9,"; Quality: ",Output10),
+  bestVal(Y9),
   number_codes(Y9,Z9),
   append(Output10,Z9,FinalOutput), !.
 
@@ -98,13 +130,7 @@ getelement(X,[_|T],Z):-
   Y is X - 1,
   getelement(Y,T,Z).
   
-putLetter(ElemNumber, ListName, InputList, OutputList2):-
-  getelement(ElemNumber, ListName, X),
-  atom_codes(X,Y),
-  append(InputList, Y, OutputList1),
-  append(OutputList1, " ", OutputList2).
-
-  
+ 
 /*knowledge base contains a predicate of output
  *for now: X = file name, Y = string to write*/
 write_file(X,Y):-
@@ -204,6 +230,8 @@ tnpHeader(X, R) :-
 
 hasNoCrap([]).
 hasNoCrap([10|I]) :-
+  hasNoCrap(I).
+hasNoCrap([9|I]) :-
   hasNoCrap(I).
 hasNoCrap([32|I]) :-
   hasNoCrap(I).
@@ -375,7 +403,8 @@ parseMachinePenalty_(I, Num, Row):-
 parseWord(Line, M, T, R) :-
   getWord(Line, Word, R),!,
   penaltyNumber(Word, P, []),!,
-  assertz(machinePenalty(M, T, P)),!.
+  taskToLetter(T, Letter),!,
+  assertz(machinePenalty(M, Letter, P)),!.
 
 %------------------------------------------------------------------------------
 % Too near penalties.
@@ -439,22 +468,30 @@ taskNumberPenalty(_, _, []) :-
   retract(error(nil)),
   asserta(error(invalidTask)).
 
-taskNumber([65|T], 1, T).
-taskNumber([66|T], 2, T).
-taskNumber([67|T], 3, T).
-taskNumber([68|T], 4, T).
-taskNumber([69|T], 5, T).
-taskNumber([70|T], 6, T).
-taskNumber([71|T], 7, T).
-taskNumber([72|T], 8, T).
-taskNumber([97|T], 1, T).
-taskNumber([98|T], 2, T).
-taskNumber([99|T], 3, T).
-taskNumber([100|T], 4, T).
-taskNumber([101|T], 5, T).
-taskNumber([102|T], 6, T).
-taskNumber([103|T], 7, T).
-taskNumber([104|T], 8, T).
+taskNumber([65|T], 'A', T).
+taskNumber([66|T], 'B', T).
+taskNumber([67|T], 'C', T).
+taskNumber([68|T], 'D', T).
+taskNumber([69|T], 'E', T).
+taskNumber([70|T], 'F', T).
+taskNumber([71|T], 'G', T).
+taskNumber([72|T], 'H', T).
+taskNumber([97|T], 'A', T).
+taskNumber([98|T], 'B', T).
+taskNumber([99|T], 'C', T).
+taskNumber([100|T], 'D', T).
+taskNumber([101|T], 'E', T).
+taskNumber([102|T], 'F', T).
+taskNumber([103|T], 'G', T).
+taskNumber([104|T], 'H', T).
+taskToLetter(1, 'A').
+taskToLetter(2, 'B').
+taskToLetter(3, 'C').
+taskToLetter(4, 'D').
+taskToLetter(5, 'E').
+taskToLetter(6, 'F').
+taskToLetter(7, 'G').
+taskToLetter(8, 'H').
 
 /*
 Takes input string I and returns the first found integer
@@ -555,3 +592,204 @@ toString([H|T], [C|R]) :- atom_codes(H, [C]), toString(T, R).
 removePrefix([], Y, Y).
 removePrefix([H|[]], [H|Y], Y).
 removePrefix([H|X], [H|Y], R) :- removePrefix(X, Y, R).
+
+%------------------------------------------------------------------------------
+% Solver
+%------------------------------------------------------------------------------
+
+calculatronicMagnificence :-
+  setup_forced_partial([0,0,0,0,0,0,0,0], 1, State),
+  getRemainingTasks_helper(State, ['A','B','C','D','E','F','G','H'], 1, Remaining),
+  solve(State, Remaining),!.
+calculatronicMagnificence.
+
+solve(State, []) :-
+  eval_leaf(State).
+solve(State, []).
+solve(State, Remaining) :-
+  eval_inner(State),
+  solve_(State, Remaining, Remaining).
+solve(State, Remaining).
+
+solve_(State, Remaining, []).
+solve_(State, Remaining, [Task|Tasks]) :-
+  removeElement(Task, Remaining, Remaining_),
+  assign(State, Task, State_),
+  solve(State_, Remaining_),
+  solve_(State, Remaining, Tasks).
+
+assign(State, Task, State_) :-
+  assign_(State, Task, State_).
+
+assign_([], Task, []).
+assign_([0|List], Task, [Task|List]).
+assign_([X|List], Task, [X|State_]) :-
+  assign_(List, Task, State_),!.
+
+eval_inner(State) :-
+  eval(State, Penalty),
+  bestVal(BestPenalty),
+  Penalty < BestPenalty.
+
+eval_leaf(State) :-
+  eval_inner(State),
+  gatherList(State, Penalty),
+  retract(bestlist(_)),
+  asserta(bestlist(State)),
+  retract(bestVal(_)),
+  asserta(bestVal(Penalty)).
+
+eval(State, Penalty) :-
+  valid(State),!,
+  gatherList(State, Penalty),!.
+  
+valid(State) :-
+  valid_(State, State, 1).
+
+valid_([Task2|State], [Task1], Machine) :-
+  check_for_forbidden(Machine, Task1),
+  \+tooNear(Task1, Task2).
+valid_(State, [Task1, Task2|Tasks], Machine) :-
+  check_for_forbidden(Machine, Task1),
+  \+tooNear(Task1, Task2),
+  NextMachine is Machine + 1,
+  valid_(State, [Task2|Tasks], NextMachine).
+
+% Task letters
+
+setup_forced_partial(List,9,List).
+setup_forced_partial(List,Mach,Returned) :-
+	error(nil),
+	NewMach is Mach +1,
+	setup_helper(List,Mach,ModList),!,
+	error(nil),
+	setup_forced_partial(ModList,NewMach,Returned),!.
+	
+setup_helper(List,Mach,Return) :-
+	partialAssignment(Mach,Task),
+	check_for_forbidden(Mach,Task),
+	replace_at_position(List,Task,Mach,Return).
+	
+setup_helper(List,Mach,List) :-
+	\+partialAssignment(Mach,Task).
+	
+setup_helper(List,Mach,List) :-	
+	partialAssignment(Mach,Task),
+	\+check_for_forbidden(Mach,Task),
+	retract(error(nil)),
+	asserta(error(NoValid)).
+
+replace_at_position([_|T],Task,1,[Task|T]).
+replace_at_position([H|T],Task,Position,[H|Rest]) :-
+
+	NextPosition is Position - 1,
+	replace_at_position(T,Task,NextPosition,Rest).
+	
+
+check_for_forbidden(Mach,Task) :-
+	\+forbiddenMachine(Mach,Task).
+	
+getNextElement([],Elem,0).
+getNextElement([H|[H1|T]],H,H1).	
+getNextElement([H|T],Elem,ReturnElem) :-
+	getNextElement(T,Elem,ReturnElem).
+	
+	
+assignNext(List,Element,Position,NewList) :-
+	getPosition(List,0,0,Posi),!,
+	replace_at_position(List,Element,Posi,NewL),!,
+	Position is Posi,
+	NewList = NewL.
+	
+	
+
+getPosition([H|T],H,N,N).
+getPosition([H|T],Elem,Counter,Position) :-
+	Next is Counter + 1,
+	getPosition(T,Elem,Next,NPos),
+	Position is NPos.
+
+
+getRemainingTasks_helper(List,Remain,N,Return) :-
+	getRemainingTasks(List,Remain,N,Return),!.
+	
+
+%Last Remove	
+getRemainingTasks([H|T],ListOfRemaining,8,RemainingTasks) :- 
+	taskLetter(H),
+	removeElement_helper(H,ListOfRemaining,RemainingTasks).
+	
+%Normal	
+getRemainingTasks([H|T],ListOfRemaining,N,RemainingTask) :- 
+	taskLetter(H),
+	removeElement_helper(H,ListOfRemaining,List),
+	Next is N+1,
+	getRemainingTasks_helper(T,List,Next,RemainingTask).
+
+%Fail last remove
+getRemainingTasks([H|T],ListOfRemaining,8,ListOfRemaining) :- 
+	\+taskLetter(H).
+
+%Normal fail remove	
+getRemainingTasks([H|T],ListOfRemaining,N,RemainingTask) :-
+	\+taskLetter(H),
+	Next is N+1,
+	getRemainingTasks_helper(T,ListOfRemaining,Next,RemainingTask).
+	
+removeElement_helper(Element,List,Return) :-
+	removeElement(Element,List,Return),!.
+	
+removeElement(_, [], []).
+removeElement(X, [X], []).
+removeElement(X, [Y], [Y]).
+removeElement(X, [X|XS], XS).
+removeElement(X, [Y|XS], [Y|YS]) :-
+	removeElement(X, XS, YS).
+	
+gatherList([],0).
+gatherList(L,V) :-
+	mcalc_near_pen(L,0,Result),
+	takelist(L,1,X),
+	list_sum(X,Z),
+	V is Result + Z.
+
+list_sum([],0).
+list_sum([H|T],Sumr) :-
+	list_sum(T,Rest),
+	Sumr is H + Rest.
+	
+takelist([0|T],N,[0|Y]) :-	
+	Next is N+1,
+	takelist(T,Next,Y),!.
+
+takelist([H|T],N,[X|Y]) :- 
+	machinePenalty(N,H,X),
+	Next is N+1,
+	takelist(T,Next,Y),!.
+
+takelist([],_,[]).
+	
+get_last_element([E],E).
+get_last_element([_|T],X) :-
+	get_last_element(T,X).
+
+mcalc_near_pen(L,Current,R) :-
+	calc_near_pen(L,Current,Result),!,
+	get_last_element(L,Y),!,
+	[Head|_]=L,
+	too_near_pen(Y,Head,V),
+	R is Result + V.
+
+calc_near_pen([],Current,Current).
+calc_near_pen([E],Current,Current).	
+calc_near_pen([E,E1|Rest],Current,Result) :-
+	too_near_pen(E,E1,Val),
+	Sum is Current + Val,
+	calc_near_pen([E1|Rest],Sum,Result).
+	
+too_near_pen(X,Y,V) :-
+	tooNearPenalty(X,Y,Z),
+	!,
+	0<Z,
+	V is Z;
+	V is 0.
