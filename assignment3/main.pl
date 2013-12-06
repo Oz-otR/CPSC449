@@ -77,35 +77,18 @@ parseerrors(noValidSolution, X):-
 solve:-
   asserta(error(nil)),
   asserta(solver_solution([a,b,d,c,f,g,e,h,99])).
-  
+    
 solutionformat(FinalOutput):-
   Output1 = "Solution ",
   solver_solution(X),
-  getelement(1,X,Y1),
-  atom_codes(Y1,Z1),
-  append(Output1,Z1,Output2),
-  getelement(2,X,Y2),
-  atom_codes(Y2,Z2),
-  append(Output2,Z2,Output3),
-  getelement(3,X,Y3),
-  atom_codes(Y3,Z3),
-  append(Output3,Z3,Output4),
-  getelement(4,X,Y4),
-  atom_codes(Y4,Z4),
-  append(Output4,Z4,Output5),
-  getelement(5,X,Y5),
-  atom_codes(Y5,Z5),
-  append(Output5,Z5,Output6),
-  getelement(6,X,Y6),
-  atom_codes(Y6,Z6),
-  append(Output6,Z6,Output7),
-  getelement(7,X,Y7),
-  atom_codes(Y7,Z7),
-  append(Output7,Z7,Output8),
-  getelement(8,X,Y8),
-  atom_codes(Y8,Z8),
-  append(Output8,Z8,Output9),
-  append(Output9,"; Quality: ",Output10),
+  putLetter(1, X, Output1, Output2),
+  putLetter(2, X, Output2, Output3),
+  putLetter(3, X, Output3, Output4),
+  putLetter(4, X, Output4, Output5),
+  putLetter(5, X, Output5, Output6),
+  putLetter(6, X, Output6, Output7),
+  putLetter(7, X, Output7, Output8),
+  putLetter(8, X, Output8, Output9),
   getelement(9,X,Y9),
   number_codes(Y9,Z9),
   append(Output10,Z9,FinalOutput), !.
@@ -115,6 +98,12 @@ getelement(X,[_|T],Z):-
   Y is X - 1,
   getelement(Y,T,Z).
   
+putLetter(ElemNumber, ListName, InputList, OutputList2):-
+  getelement(ElemNumber, ListName, X),
+  atom_codes(X,Y),
+  append(InputList, Y, OutputList1),
+  append(OutputList1, " ", OutputList2).
+
   
 /*knowledge base contains a predicate of output
  *for now: X = file name, Y = string to write*/
