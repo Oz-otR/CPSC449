@@ -98,25 +98,32 @@ solutionformat(FinalOutput):-
   bestlist(X),
   getelement(1,X,Y1),
   atom_codes(Y1,Z1),
-  append(Output1,Z1,Output2),
+  append(Output1,Z1,Output1_),
+  append(Output1_," ",Output2),
   getelement(2,X,Y2),
   atom_codes(Y2,Z2),
-  append(Output2,Z2,Output3),
+  append(Output2,Z2,Output2_),
+  append(Output2_," ",Output3),
   getelement(3,X,Y3),
   atom_codes(Y3,Z3),
-  append(Output3,Z3,Output4),
+  append(Output3,Z3,Output3_),
+  append(Output3_," ",Output4),
   getelement(4,X,Y4),
   atom_codes(Y4,Z4),
-  append(Output4,Z4,Output5),
+  append(Output4,Z4,Output4_),
+  append(Output4_," ",Output5),
   getelement(5,X,Y5),
   atom_codes(Y5,Z5),
-  append(Output5,Z5,Output6),
+  append(Output5,Z5,Output5_),
+  append(Output5_," ",Output6),
   getelement(6,X,Y6),
   atom_codes(Y6,Z6),
-  append(Output6,Z6,Output7),
+  append(Output6,Z6,Output6_),
+  append(Output6_," ",Output7),
   getelement(7,X,Y7),
   atom_codes(Y7,Z7),
-  append(Output7,Z7,Output8),
+  append(Output7,Z7,Output7_),
+  append(Output7_," ",Output8),
   getelement(8,X,Y8),
   atom_codes(Y8,Z8),
   append(Output8,Z8,Output9),
@@ -233,6 +240,8 @@ hasNoCrap([10|I]) :-
   hasNoCrap(I).
 hasNoCrap([9|I]) :-
   hasNoCrap(I).
+hasNoCrap([13|I]) :-
+  hasNoCrap(I).
 hasNoCrap([32|I]) :-
   hasNoCrap(I).
   
@@ -276,6 +285,9 @@ paTuple_(Word, M, T) :-
   notSpace(R3),!,
   taskNumberConstraint(R3, T, R4),!,
   removePrefix(")", R4, []),!.
+
+  
+
 
 %------------------------------------------------------------------------------
 % Forbidden machines.
@@ -513,15 +525,19 @@ penaltyNumber(_, _, []) :-
 notSpace(I) :- \+ isSpace(I).
 isSpace([9|I]).
 isSpace([10|I]).
+isSpace([13|I]).
 isSpace([32|I]).
 
 getWord([], [], []).
 getWord([9|I], [], I).
 getWord([10|I], [], I).
+getWord([10|I], [], I).
 getWord([32|I], [], I).
 getWord([C|I], [C|O], R) :-
   C \== 10,
   C \== 32,
+  C \== 9,
+  C \== 13,
   getWord(I, O, R).
 
 getTrimmedLine(I, O, R):-
@@ -536,10 +552,13 @@ getLine([C|I], [C|Next], R) :-
 rtrim([],[]).
 rtrim([9], []).
 rtrim([10], []).
+rtrim([13], []).
 rtrim([32], []).
 rtrim([9|T], []) :-
   rtrim(T, []).
 rtrim([10|T], []) :-
+  rtrim(T, []).
+rtrim([13|T], []) :-
   rtrim(T, []).
 rtrim([32|T], []) :-
   rtrim(T, []).
@@ -577,8 +596,20 @@ number_(I, SOFAR, SOFAR, I) :-
 
 isDigit(N) :- N > 47,!, N < 58.
 
+
+
+
 line_end(X, R) :- removePrefix(" ", X, R1), line_end(R1, R).
+
+
+line_end(X, R) :- removePrefix("\r",X,R1), line_end(R1,R).
+
+
 line_end(X, R) :- removePrefix("\n", X, R).
+
+
+
+
 
 removeLast([_|[]], []).
 removeLast([H|T], [H|Q]) :- removeLast(T, Q).
